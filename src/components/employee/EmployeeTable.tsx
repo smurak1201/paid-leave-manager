@@ -62,21 +62,53 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
           <Th>従業員コード</Th>
           <Th>姓</Th>
           <Th>名</Th>
+          <Th>入社年月</Th>
+          <Th>勤続年数</Th>
           <Th isNumeric>付与日数</Th>
           <Th isNumeric>消化日数</Th>
           <Th isNumeric>残日数</Th>
-          <Th minW="100px">操作</Th>
+          <Th minW="120px">操作</Th>
         </Tr>
       </Thead>
       <Tbody>
         {employees.map((emp) => {
           const used = emp.leaveDates.length;
           const remain = emp.total - used;
+          const servicePeriod = Icons.getServicePeriod
+            ? Icons.getServicePeriod(emp.joinedAt)
+            : "-";
           return (
             <Tr key={emp.id} sx={remain === 0 ? { bg: "#FFF5F5" } : undefined}>
               <Td>{emp.id}</Td>
               <Td>{emp.lastName}</Td>
               <Td>{emp.firstName}</Td>
+              <Td>
+                <Badge
+                  colorScheme="teal"
+                  variant="subtle"
+                  fontSize="md"
+                  px={2}
+                  py={1}
+                  borderRadius="md"
+                >
+                  {emp.joinedAt
+                    .replace(/-/g, "年")
+                    .replace(/$/, "日")
+                    .replace(/年(\d{2})日/, "年$1月")}
+                </Badge>
+              </Td>
+              <Td>
+                <Badge
+                  colorScheme="gray"
+                  variant="outline"
+                  fontSize="md"
+                  px={2}
+                  py={1}
+                  borderRadius="md"
+                >
+                  {servicePeriod}
+                </Badge>
+              </Td>
               <Td isNumeric>{emp.total}</Td>
               <Td isNumeric>{used}</Td>
               <Td isNumeric>
