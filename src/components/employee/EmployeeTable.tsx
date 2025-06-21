@@ -1,7 +1,7 @@
 import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
 import type { Employee } from "./types";
 import { Box, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
-import { Icons } from "./icons";
+import { Icons, getServicePeriod } from "./icons";
 import { Tooltip } from "../ui/tooltip";
 
 interface EmployeeTableProps {
@@ -74,9 +74,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         {employees.map((emp) => {
           const used = emp.leaveDates.length;
           const remain = emp.total - used;
-          const servicePeriod = Icons.getServicePeriod
-            ? Icons.getServicePeriod(emp.joinedAt)
-            : "-";
+          const servicePeriod = getServicePeriod(emp.joinedAt);
           return (
             <Tr key={emp.id} sx={remain === 0 ? { bg: "#FFF5F5" } : undefined}>
               <Td>{emp.id}</Td>
