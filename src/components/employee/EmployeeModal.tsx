@@ -28,6 +28,21 @@ interface EmployeeModalProps {
 
 // 型定義のインポート
 import type { Employee } from "./types";
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  HStack,
+  Stack,
+  Button,
+  Icon,
+  Text,
+  Input,
+} from "@chakra-ui/react";
+import { FormControl } from "@chakra-ui/form-control";
+import { FormLabel } from "@chakra-ui/form-control";
+import { User, X, BadgeInfo } from "lucide-react";
+import { inputDateStyle } from "./icons";
+import { CustomModal } from "../ui/CustomModal";
 
 // モーダル本体
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
