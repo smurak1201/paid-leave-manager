@@ -205,32 +205,36 @@ function App() {
               </Text>
             ) : (
               <Box as="ul" pl={0} m={0}>
-                {viewDates.map((date, i) => (
-                  <Box
-                    as="li"
-                    key={date}
-                    fontSize="md"
-                    color="teal.700"
-                    py={2}
-                    px={4}
-                    borderBottom={
-                      i !== viewDates.length - 1 ? "1px solid" : undefined
-                    }
-                    borderColor="teal.50"
-                    borderRadius="md"
-                    mb={1}
-                    listStyleType="none"
-                    bg={i % 2 === 0 ? "teal.50" : "white"}
-                    display="flex"
-                    alignItems="center"
-                    gap={2}
-                  >
-                    <Text fontWeight="bold" minW="2em">
-                      {i + 1}.
-                    </Text>
-                    <Text>{date}</Text>
-                  </Box>
-                ))}
+                {viewDates.map((date, i) => {
+                  const [y, m, d] = date.split("-");
+                  const jpDate = `${y}年${m}月${d}日`;
+                  return (
+                    <Box
+                      as="li"
+                      key={date}
+                      fontSize="md"
+                      color="teal.700"
+                      py={2}
+                      px={4}
+                      borderBottom={
+                        i !== viewDates.length - 1 ? "1px solid" : undefined
+                      }
+                      borderColor="teal.50"
+                      borderRadius="md"
+                      mb={1}
+                      listStyleType="none"
+                      bg={i % 2 === 0 ? "teal.50" : "white"}
+                      display="flex"
+                      alignItems="center"
+                      gap={2}
+                    >
+                      <Text fontWeight="bold" minW="2em">
+                        {i + 1}.
+                      </Text>
+                      <Text>{jpDate}</Text>
+                    </Box>
+                  );
+                })}
               </Box>
             )}
           </Box>

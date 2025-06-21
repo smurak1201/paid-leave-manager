@@ -9,7 +9,7 @@ import {
   Text,
   CloseButton,
 } from "@chakra-ui/react";
-import { User, BadgeInfo, CalendarPlus, CalendarCheck } from "lucide-react";
+import { User, BadgeInfo, CalendarPlus, CalendarCheck, X } from "lucide-react";
 import type { Employee } from "./types";
 import { CustomModal } from "../ui/CustomModal";
 
@@ -42,15 +42,20 @@ export const EmployeeModal = ({
           従業員追加
         </Text>
       </HStack>
-      <CloseButton
+      <Button
         position="absolute"
         top={2}
         right={2}
-        color="teal.400"
+        size="sm"
+        variant="ghost"
+        colorScheme="teal"
         onClick={onClose}
-        _focus={{ boxShadow: "0 0 0 2px teal.200" }}
+        p={2}
+        minW={"auto"}
         aria-label="閉じる"
-      />
+      >
+        <Icon as={X} boxSize={4} />
+      </Button>
       <Stack gap={3} mb={6}>
         <FormControl isRequired>
           <FormLabel>

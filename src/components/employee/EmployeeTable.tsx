@@ -1,6 +1,6 @@
 import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
 import type { Employee } from "./types";
-import { Box, Text, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
+import { Box, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
 import { Edit, Trash2, Eye } from "./icons";
 import { Tooltip } from "../ui/tooltip";
 
