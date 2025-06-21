@@ -61,6 +61,215 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
             このアプリは、従業員ごとの有給休暇の付与日数・取得状況・残日数を一元管理できます。
           </Text>
           <Text mb={2}>
+            <b>付与日数と繰越日数について：</b>
+            <br />
+            ・毎年の付与日数は勤続年数に応じて決まります。
+            <br />
+            ・未消化分は翌年に繰り越されますが、繰越できるのは最大2年分までです。
+            <br />
+            ・2年以上前の有給は自動的に消滅します。
+            <br />
+            <br />
+            <b>【例】</b>
+            <br />
+            <span style={{ fontSize: "0.95em" }}>
+              2022年度: 12日付与 → 2日消化 → 10日繰越
+              <br />
+              2023年度: 14日付与 → 1日消化 → 13日繰越
+              <br />
+              2024年度: 16日付与 → 未消化
+              <br />
+              <b>
+                → 2024年度の有効日数:
+                10日（2022繰越）+13日（2023繰越）+16日（2024付与）=39日
+              </b>
+              <br />
+              ただし2022年度分は2025年度には時効消滅します。
+            </span>
+          </Text>
+          <Box mb={2}>
+            <Heading as="h4" size="sm" color="teal.600" mb={1}>
+              付与日数・繰越日数のサンプル表
+            </Heading>
+            <Box as="table" w="100%" borderCollapse="collapse" fontSize="sm">
+              <Box as="thead" bg="teal.50">
+                <Box as="tr">
+                  <Box
+                    as="th"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    年度
+                  </Box>
+                  <Box
+                    as="th"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    付与日数
+                  </Box>
+                  <Box
+                    as="th"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    消化日数
+                  </Box>
+                  <Box
+                    as="th"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    繰越日数
+                  </Box>
+                  <Box
+                    as="th"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    有効期限
+                  </Box>
+                </Box>
+              </Box>
+              <Box as="tbody">
+                <Box as="tr">
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    2022年度
+                  </Box>
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    12
+                  </Box>
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    2
+                  </Box>
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    10
+                  </Box>
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    2024年度末まで
+                  </Box>
+                </Box>
+                <Box as="tr">
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    2023年度
+                  </Box>
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    14
+                  </Box>
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    1
+                  </Box>
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    13
+                  </Box>
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    2025年度末まで
+                  </Box>
+                </Box>
+                <Box as="tr">
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    2024年度
+                  </Box>
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    16
+                  </Box>
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    0
+                  </Box>
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    16
+                  </Box>
+                  <Box
+                    as="td"
+                    border="1px solid #B2F5EA"
+                    p={1}
+                    textAlign="center"
+                  >
+                    2026年度末まで
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+            <Text color="gray.500" fontSize="xs">
+              ※繰越は最大2年分まで。2年以上前の分は自動消滅します。
+            </Text>
+          </Box>
+          <Text mb={2}>
             <b>主な機能：</b>
             <ul style={{ marginLeft: 20 }}>
               <li style={{ display: "flex", alignItems: "center", gap: 6 }}>

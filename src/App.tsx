@@ -102,7 +102,10 @@ const initialEmployees: Employee[] = [
 ];
 
 // 勤続年数（月単位）から付与日数を返す
-function calcLeaveDays(joinedAt: string, now: Date = new Date()): number {
+export function calcLeaveDays(
+  joinedAt: string,
+  now: Date = new Date()
+): number {
   if (!joinedAt.match(/^\d{4}-\d{2}-\d{2}$/)) return 10;
   const join = new Date(joinedAt);
   const diff =

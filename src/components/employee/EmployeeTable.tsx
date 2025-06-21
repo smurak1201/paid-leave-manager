@@ -3,6 +3,7 @@ import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
 import type { Employee } from "./types";
 import { Box, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
 import { Icons, getServicePeriod } from "./icons";
+import { calcLeaveDays } from "../../App";
 import { Tooltip } from "../ui/tooltip";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 
@@ -87,7 +88,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
             <Th>名</Th>
             <Th>入社年月</Th>
             <Th>勤続年数</Th>
-            <Th isNumeric>付与日数</Th>
+            <Th isNumeric>今年度付与</Th>
             <Th isNumeric>繰越</Th>
             <Th isNumeric>消化日数</Th>
             <Th isNumeric>残日数</Th>
@@ -97,8 +98,34 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         <Tbody>
           {employees.map((emp) => {
             const used = emp.leaveDates.length;
-            const carryOver = emp.carryOver ?? 0;
-            const remain = emp.total + carryOver - used;
+            const now = new Date();
+            let grantThisYear = 0;
+            let carryOver = 0;
+            let foundGrant = false;
+            if (emp.grants && emp.grants.length > 0) {
+              emp.grants.forEach((g) => {
+                const grantDate = new Date(g.grantDate);
+                const grantYear = grantDate.getFullYear();
+                const nowYear = now.getFullYear();
+                const diffMonth =
+                  (now.getFullYear() - grantDate.getFullYear()) * 12 +
+                  (now.getMonth() - grantDate.getMonth());
+                if (grantYear === nowYear && diffMonth < 24) {
+                  // 今年付与された分（消化数は考慮しない）
+                  grantThisYear += g.days;
+                  foundGrant = true;
+                } else if (diffMonth < 24) {
+                  // 今年度以外の有効な繰越分（消化数は考慮しない）
+                  carryOver += g.days;
+                }
+              });
+            }
+            // grantがなければ勤続年数から日本の制度通りの付与日数を算出
+            if (!foundGrant) {
+              // 勤続年数（月単位）から付与日数を返す
+              grantThisYear = calcLeaveDays(emp.joinedAt, now);
+            }
+            const remain = grantThisYear + carryOver - used;
             const servicePeriod = getServicePeriod(emp.joinedAt);
             return (
               <Tr
@@ -115,7 +142,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     .replace(/年(\d{2})日/, "年$1月")}
                 </Td>
                 <Td>{servicePeriod}</Td>
-                <Td isNumeric>{emp.total}</Td>
+                <Td isNumeric>{grantThisYear}</Td>
                 <Td isNumeric>{carryOver}</Td>
                 <Td isNumeric>{used}</Td>
                 <Td isNumeric>
