@@ -7,7 +7,7 @@ import {
   useDisclosure,
   Text,
 } from "@chakra-ui/react";
-import type { Employee } from "./components/employee/types";
+import type { Employee, LeaveGrant } from "./components/employee/types";
 import { EmployeeTable } from "./components/employee/EmployeeTable";
 import { EmployeeModal } from "./components/employee/EmployeeModal";
 import { Icons } from "./components/employee/icons";
@@ -19,25 +19,85 @@ const initialEmployees: Employee[] = [
     id: "001",
     lastName: "山田",
     firstName: "太郎",
-    joinedAt: "2023-04-01",
-    total: 20,
-    used: 5,
-    leaveDates: [
-      "2025-04-01",
-      "2025-04-15",
-      "2025-05-10",
-      "2025-06-01",
-      "2025-06-15",
+    joinedAt: "2021-04-01",
+    grants: [
+      { grantDate: "2022-04-01", days: 12, usedDates: ["2022-05-10"] }, // 2年以上前→時効消滅
+      {
+        grantDate: "2023-04-01",
+        days: 14,
+        usedDates: ["2023-06-15", "2024-05-20"],
+      }, // 有効
+      { grantDate: "2024-04-01", days: 16, usedDates: ["2024-06-10"] }, // 有効
     ],
+    total: 30, // grants合計
+    used: 4, // leaveDates.length
+    leaveDates: [
+      "2022-05-10", // 2022年付与分から消化（時効消滅）
+      "2023-06-15", // 2023年付与分から消化
+      "2024-05-20", // 2023年付与分から消化
+      "2024-06-10", // 2024年付与分から消化
+    ],
+    carryOver: 0,
   },
   {
     id: "002",
     lastName: "佐藤",
     firstName: "花子",
-    joinedAt: "2024-04-01",
-    total: 15,
+    joinedAt: "2022-04-01",
+    grants: [
+      {
+        grantDate: "2023-04-01",
+        days: 14,
+        usedDates: ["2023-07-01", "2024-04-10"],
+      }, // 有効
+      { grantDate: "2024-04-01", days: 16, usedDates: ["2025-04-02"] }, // 有効
+    ],
+    total: 30,
     used: 3,
-    leaveDates: ["2025-03-20", "2025-04-10", "2025-06-05"],
+    leaveDates: [
+      "2023-07-01", // 2023年付与分から消化
+      "2024-04-10", // 2023年付与分から消化
+      "2025-04-02", // 2024年付与分から消化
+    ],
+    carryOver: 0,
+  },
+  {
+    id: "003",
+    lastName: "田中",
+    firstName: "一郎",
+    joinedAt: "2023-04-01",
+    grants: [
+      { grantDate: "2024-04-01", days: 16, usedDates: ["2024-05-01"] }, // 有効
+    ],
+    total: 16,
+    used: 1,
+    leaveDates: [
+      "2024-05-01", // 2024年付与分から消化
+    ],
+    carryOver: 0,
+  },
+  {
+    id: "004",
+    lastName: "鈴木",
+    firstName: "美咲",
+    joinedAt: "2021-04-01",
+    grants: [
+      {
+        grantDate: "2022-04-01",
+        days: 12,
+        usedDates: ["2022-06-01", "2022-07-01"],
+      }, // 2年以上前→時効消滅
+      { grantDate: "2023-04-01", days: 14, usedDates: ["2023-08-10"] }, // 有効
+      { grantDate: "2024-04-01", days: 16, usedDates: [] }, // 有効
+    ],
+    total: 42, // grants合計
+    used: 3, // leaveDates.length
+    leaveDates: [
+      "2022-06-01", // 2022年付与分から消化（時効消滅）
+      "2022-07-01", // 2022年付与分から消化（時効消滅）
+      "2023-08-10", // 2023年付与分から消化
+    ],
+    carryOver: 12, // 2023年4月時点で2022年分12-2=10日繰越、2024年4月時点で2023年分14-1=13日繰越
   },
 ];
 
@@ -56,6 +116,42 @@ function calcLeaveDays(joinedAt: string, now: Date = new Date()): number {
   if (diff < 66) return 16;
   if (diff < 78) return 18;
   return 20;
+}
+
+// 付与履歴・消化履歴から有効な残日数を厳密に計算（2年時効・古い付与分から消化）
+function calcStrictRemain(
+  grants: LeaveGrant[] = [],
+  leaveDates: string[] = [],
+  now: Date = new Date()
+): number {
+  // 1. 2年以内の付与分のみ有効
+  const validGrants = grants
+    .filter((g) => {
+      const grantDate = new Date(g.grantDate);
+      const diff =
+        (now.getFullYear() - grantDate.getFullYear()) * 12 +
+        (now.getMonth() - grantDate.getMonth());
+      return diff < 24; // 24か月未満
+    })
+    .sort(
+      (a, b) =>
+        new Date(a.grantDate).getTime() - new Date(b.grantDate).getTime()
+    );
+
+  // 2. 古い付与分から順に消化
+  const usedDates = [...leaveDates].sort(); // 昇順（日付が古い順）
+  let remainList = validGrants.map((g) => ({ days: g.days, used: 0 }));
+  let usedIdx = 0;
+  for (let i = 0; i < remainList.length && usedIdx < usedDates.length; ) {
+    if (remainList[i].days - remainList[i].used > 0) {
+      remainList[i].used++;
+      usedIdx++;
+    } else {
+      i++;
+    }
+  }
+  // 3. 残日数合計
+  return remainList.reduce((sum, g) => sum + (g.days - g.used), 0);
 }
 
 function App() {
