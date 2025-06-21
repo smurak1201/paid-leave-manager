@@ -279,21 +279,21 @@ function App() {
               {editDateIdx === null ? (
                 <Button
                   colorScheme="teal"
-                  leftIcon={<Plus size={16} />}
                   onClick={handleAddDate}
                   px={4}
                   minW={"auto"}
                 >
+                  <Plus size={16} style={{ marginRight: 6 }} />
                   追加
                 </Button>
               ) : (
                 <Button
                   colorScheme="teal"
-                  leftIcon={<Edit size={16} />}
                   onClick={handleSaveDate}
                   px={4}
                   minW={"auto"}
                 >
+                  <Edit size={16} style={{ marginRight: 6 }} />
                   保存
                 </Button>
               )}
