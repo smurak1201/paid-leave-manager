@@ -182,106 +182,105 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
             取得履歴なし
           </Text>
         ) : (
-          <Box
-            as="ul"
-            pl={0}
-            m={0}
-            ref={listRef}
-          >
-            {pagedDates.map((date, i) => {
-              const idx = (currentPage - 1) * ITEMS_PER_PAGE + i;
-              const [y, m, d] = date.split("-");
-              const jpDate = `${y}年${m}月${d}日`;
-              return (
-                <Box
-                  as="li"
-                  key={date + idx}
-                  fontSize="md"
-                  color="teal.700"
-                  py={2}
-                  px={4}
-                  borderBottom={
-                    idx !== dates.length - 1 ? "1px solid" : undefined
-                  }
-                  borderColor="teal.50"
-                  borderRadius="md"
-                  mb={1}
-                  listStyleType="none"
-                  bg={idx % 2 === 0 ? "teal.50" : "white"}
-                  display="flex"
-                  alignItems="center"
-                  gap={2}
+          <>
+            {/* ページネーション（リストの上） */}
+            {dates.length > ITEMS_PER_PAGE && (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                gap={2}
+                mb={2}
+              >
+                <Button
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  variant="outline"
                 >
-                  <Text fontWeight="bold" minW="2em">
-                    {idx + 1}.
-                  </Text>
-                  {editDateIdx === idx ? (
-                    <input
-                      type="date"
-                      value={dateInput}
-                      onChange={(e) => onChangeDateInput(e.target.value)}
-                      style={inputDateSmallStyle}
-                      maxLength={10}
-                    />
-                  ) : (
-                    <Text>{jpDate}</Text>
-                  )}
-                  <Button
-                    size="xs"
-                    variant="ghost"
-                    colorScheme="teal"
-                    minW={"auto"}
-                    px={2}
-                    onClick={() => onEditDate(idx)}
-                    aria-label="編集"
+                  前へ
+                </Button>
+                <Text fontSize="sm" mx={2}>
+                  {currentPage} / {totalPages}
+                </Text>
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  variant="outline"
+                >
+                  次へ
+                </Button>
+              </Box>
+            )}
+            <Box as="ul" pl={0} m={0} ref={listRef}>
+              {pagedDates.map((date, i) => {
+                const idx = (currentPage - 1) * ITEMS_PER_PAGE + i;
+                const [y, m, d] = date.split("-");
+                const jpDate = `${y}年${m}月${d}日`;
+                return (
+                  <Box
+                    as="li"
+                    key={date + idx}
+                    fontSize="md"
+                    color="teal.700"
+                    py={2}
+                    px={4}
+                    borderBottom={
+                      idx !== dates.length - 1 ? "1px solid" : undefined
+                    }
+                    borderColor="teal.50"
+                    borderRadius="md"
+                    mb={1}
+                    listStyleType="none"
+                    bg={idx % 2 === 0 ? "teal.50" : "white"}
+                    display="flex"
+                    alignItems="center"
+                    gap={2}
                   >
-                    <Icons.Edit size={15} />
-                  </Button>
-                  <Button
-                    size="xs"
-                    variant="ghost"
-                    colorScheme="red"
-                    minW={"auto"}
-                    px={2}
-                    onClick={() => onDeleteDate(idx)}
-                    aria-label="削除"
-                  >
-                    <Icons.Trash2 size={15} />
-                  </Button>
-                </Box>
-              );
-            })}
-          </Box>
-        )}
-        {/* ページネーション */}
-        {dates.length > ITEMS_PER_PAGE && (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            gap={2}
-            mt={2}
-          >
-            <Button
-              size="sm"
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              variant="outline"
-            >
-              前へ
-            </Button>
-            <Text fontSize="sm" mx={2}>
-              {currentPage} / {totalPages}
-            </Text>
-            <Button
-              size="sm"
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-              variant="outline"
-            >
-              次へ
-            </Button>
-          </Box>
+                    <Text fontWeight="bold" minW="2em">
+                      {idx + 1}.
+                    </Text>
+                    {editDateIdx === idx ? (
+                      <input
+                        type="date"
+                        value={dateInput}
+                        onChange={(e) => onChangeDateInput(e.target.value)}
+                        style={inputDateSmallStyle}
+                        maxLength={10}
+                      />
+                    ) : (
+                      <Text>{jpDate}</Text>
+                    )}
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      colorScheme="teal"
+                      minW={"auto"}
+                      px={2}
+                      onClick={() => onEditDate(idx)}
+                      aria-label="編集"
+                    >
+                      <Icons.Edit size={15} />
+                    </Button>
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      colorScheme="red"
+                      minW={"auto"}
+                      px={2}
+                      onClick={() => onDeleteDate(idx)}
+                      aria-label="削除"
+                    >
+                      <Icons.Trash2 size={15} />
+                    </Button>
+                  </Box>
+                );
+              })}
+            </Box>
+          </>
         )}
         <Box display="flex" justifyContent="flex-end" gap={2} mt={4}>
           <Button onClick={onClose} variant="ghost" colorScheme="teal">
