@@ -269,8 +269,8 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 background:
                   remain === 0
                     ? "#FFF5F5"
-                    : idx % 2 === 0
-                    ? "rgba(0, 128, 128, 0.06)" // 偶数行に淡いteal系背景
+                    : idx % 2 === 1
+                    ? "rgba(0, 128, 128, 0.06)" // 奇数行に淡いteal系背景
                     : undefined,
               };
               return (

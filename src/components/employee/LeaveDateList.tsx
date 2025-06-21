@@ -84,7 +84,7 @@ export const LeaveDateList: React.FC<LeaveDateListProps> = ({
           borderRadius="md"
           mb={1}
           listStyleType="none"
-          bg={idx % 2 === 0 ? "teal.50" : "white"}
+          bg={idx % 2 === 1 ? "teal.50" : "white"} // 奇数行に背景色
           display="flex"
           alignItems="center"
           gap={2}
@@ -101,7 +101,9 @@ export const LeaveDateList: React.FC<LeaveDateListProps> = ({
               maxLength={10}
             />
           ) : (
-            <Text>{jpDate}</Text>
+            <Text fontSize="sm" fontFamily="inherit">
+              {jpDate}
+            </Text>
           )}
           <Button
             size="xs"
