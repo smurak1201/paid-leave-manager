@@ -190,6 +190,7 @@ function App() {
           </Button>
           <Button
             colorScheme="teal"
+            variant="outline"
             onClick={() => {
               setForm({
                 id: "",
@@ -203,9 +204,10 @@ function App() {
               onOpen();
             }}
             size="md"
-            px={8}
+            px={6}
             boxShadow="md"
           >
+            <Plus size={18} style={{ marginRight: 6 }} />
             従業員追加
           </Button>
         </Flex>
