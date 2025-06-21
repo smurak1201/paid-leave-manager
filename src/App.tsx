@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, Heading, Button, Flex, useDisclosure } from "@chakra-ui/react";
 import type { Employee } from "./components/employee/types";
 import { EmployeeTable } from "./components/employee/EmployeeTable";
@@ -94,10 +94,14 @@ const initialEmployees: Employee[] = [
   },
 ];
 
-// App関数以下はそのまま
 function App() {
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
-  const { open: isOpen, onOpen, onClose } = useDisclosure();
+  const [activeModal, setActiveModal] = useState<
+    null | "add" | "edit" | "leaveDates"
+  >(null);
+  const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null);
+  const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
+  const [dateInput, setDateInput] = useState<string>("");
   const [form, setForm] = useState<Employee>({
     id: "",
     lastName: "",
@@ -107,11 +111,6 @@ function App() {
     used: 0,
     leaveDates: [],
   });
-  const [editId, setEditId] = useState<string | null>(null);
-  const [viewDates, setViewDates] = useState<string[] | null>(null); // viewDatesの初期値はnull
-  const [viewName, setViewName] = useState<string>("");
-  const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
-  const [dateInput, setDateInput] = useState<string>("");
   const [idError, setIdError] = useState<string>("");
   const guideDisclosure = useDisclosure();
 
@@ -120,6 +119,43 @@ function App() {
     const today = new Date();
     const d = new Date(date);
     return d > today;
+  };
+
+  // 最新の従業員データ
+  const currentEmployee = activeEmployeeId
+    ? employees.find((e) => e.id === activeEmployeeId) || null
+    : null;
+
+  // テーブル操作
+  const handleView = (emp: Employee) => {
+    const latest = employees.find((e) => e.id === emp.id);
+    if (!latest) return;
+    setActiveEmployeeId(latest.id);
+    setActiveModal("leaveDates");
+    setEditDateIdx(null);
+    setDateInput("");
+  };
+  const handleEdit = (emp: Employee) => {
+    const latest = employees.find((e) => e.id === emp.id);
+    if (!latest) return;
+    setForm(latest);
+    setActiveEmployeeId(latest.id);
+    setActiveModal("edit");
+    setIdError("");
+  };
+  const handleAdd = () => {
+    setForm({
+      id: "",
+      lastName: "",
+      firstName: "",
+      joinedAt: "",
+      total: 20,
+      used: 0,
+      leaveDates: [],
+    });
+    setActiveEmployeeId(null);
+    setActiveModal("add");
+    setIdError("");
   };
 
   // 入社年月日変更時にtotalを自動計算
@@ -132,7 +168,9 @@ function App() {
       } else if (
         value &&
         employees.some(
-          (emp) => emp.id === value && (editId === null || emp.id !== editId)
+          (emp) =>
+            emp.id === value &&
+            (activeEmployeeId === null || emp.id !== activeEmployeeId)
         )
       ) {
         setIdError("従業員コードが重複しています");
@@ -150,192 +188,88 @@ function App() {
       };
       if (name === "joinedAt") {
         next.total = calcLeaveDays(value);
-        // setViewDates([]) → setViewDates(null) に修正
-        setViewDates(null);
       }
       return next;
     });
   };
 
-  const handleAdd = () => {
-    if (
-      !form.id ||
-      !form.lastName ||
-      !form.firstName ||
-      !form.joinedAt ||
-      idError ||
-      isFutureDate(form.joinedAt)
-    ) {
-      setIdError("全ての項目を正しく入力してください（入社日は未来日不可）");
-      return;
-    }
-    const autoTotal = calcLeaveDays(form.joinedAt);
-    const newEmp = { ...form, total: autoTotal };
-    setEmployees([...employees, { ...newEmp }]);
-    setForm({
-      id: "",
-      lastName: "",
-      firstName: "",
-      joinedAt: "",
-      total: 20,
-      used: 0,
-      leaveDates: [],
-    });
-    setEditId(null);
-    onClose();
-  };
-
-  const handleSave = () => {
-    if (
-      !form.id ||
-      !form.lastName ||
-      !form.firstName ||
-      !form.joinedAt ||
-      idError ||
-      isFutureDate(form.joinedAt)
-    ) {
-      setIdError("全ての項目を正しく入力してください（入社日は未来日不可）");
-      return;
-    }
-    const autoTotal = calcLeaveDays(form.joinedAt);
-    const newEmp = { ...form, total: autoTotal };
-    setEmployees((prev) =>
-      prev.map((emp) => (emp.id === editId ? { ...newEmp } : emp))
-    );
-    setForm({
-      id: "",
-      lastName: "",
-      firstName: "",
-      joinedAt: "",
-      total: 20,
-      used: 0,
-      leaveDates: [],
-    });
-    setEditId(null);
-    onClose();
-  };
-
-  const handleEdit = (emp: Employee) => {
-    setViewDates(null); // 他モーダルを閉じる
-    setEditId(emp.id);
-    setForm(emp);
-    onOpen();
-  };
-
-  const handleDelete = (emp: Employee) => {
-    setEmployees((prev) => prev.filter((e) => e.id !== emp.id));
-  };
-
-  const handleView = (emp: Employee) => {
-    onClose(); // 編集・追加モーダルを閉じる
-    setEditId(null);
-    setForm({
-      id: "",
-      lastName: "",
-      firstName: "",
-      joinedAt: "",
-      total: 20,
-      used: 0,
-      leaveDates: [],
-    });
-    setViewDates(emp.leaveDates);
-    setViewName(`${emp.lastName} ${emp.firstName}`);
-  };
-
+  // 有給日追加
   const handleAddDate = () => {
+    if (!currentEmployee) return;
+    const newDate = dateInput;
     if (
-      !viewDates ||
-      !dateInput.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
-      remain === 0 ||
-      viewDates.includes(dateInput) ||
-      (targetEmp && dateInput < targetEmp.joinedAt) ||
-      isFutureDate(dateInput)
+      !newDate.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
+      currentEmployee.leaveDates.includes(newDate) ||
+      newDate < currentEmployee.joinedAt
     )
       return;
-    setViewDates([...viewDates, dateInput]);
-    setDateInput("");
-  };
-
-  const handleEditDate = (idx: number) => {
-    setEditDateIdx(idx);
-    setDateInput(viewDates ? viewDates[idx] : "");
-  };
-
-  const handleSaveDate = () => {
-    if (
-      !viewDates ||
-      editDateIdx === null ||
-      !dateInput.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
-      remain === 0 ||
-      viewDates.includes(dateInput) ||
-      (targetEmp && dateInput < targetEmp.joinedAt) ||
-      isFutureDate(dateInput)
-    )
-      return;
-    const newDates = viewDates.map((d, i) =>
-      i === editDateIdx ? dateInput : d
-    );
-    setViewDates(newDates);
-    setEditDateIdx(null);
-    setDateInput("");
-  };
-
-  const handleDeleteDate = (idx: number) => {
-    if (!viewDates) return;
-    const newDates = viewDates.filter((_, i) => i !== idx);
-    setViewDates(newDates);
-    setEditDateIdx(null);
-    setDateInput("");
-  };
-
-  // 残日数計算（viewDatesがnullなら0、入社日より前は除外して計算）
-  const targetEmp = employees.find(
-    (emp) => `${emp.lastName} ${emp.firstName}` === viewName
-  );
-  const validDates =
-    viewDates && targetEmp
-      ? viewDates.filter((d) => d >= targetEmp.joinedAt)
-      : [];
-  const remain = targetEmp ? calcStrictRemain(targetEmp.grants, validDates) : 0;
-
-  // 有給取得日モーダルの「保存」ボタンでのみemployeesを更新
-  const handleSaveLeaveDates = () => {
-    if (!viewDates || remain === 0) return;
-    const targetEmp = employees.find(
-      (emp) => `${emp.lastName} ${emp.firstName}` === viewName
-    );
-    if (!targetEmp) return;
-    const validDates = viewDates.filter((d) => d >= targetEmp.joinedAt);
-    const newRemain = calcStrictRemain(targetEmp.grants, validDates);
-    const hasInvalidDate = viewDates.some((d) => d < targetEmp.joinedAt);
-    const hasDuplicate = new Set(viewDates).size !== viewDates.length;
-    const hasFuture = viewDates.some(isFutureDate);
-    if (hasInvalidDate) {
-      alert("入社日より前の日付は登録できません。");
-      return;
-    }
-    if (hasDuplicate) {
-      alert("有給取得日が重複しています。");
-      return;
-    }
-    if (hasFuture) {
-      alert("未来日を有給取得日として登録できません。");
-      return;
-    }
-    if (newRemain < 0) {
-      alert("残日数を超える有給取得日は登録できません。");
-      return;
-    }
     setEmployees((prev) =>
       prev.map((emp) =>
-        `${emp.lastName} ${emp.firstName}` === viewName
-          ? { ...emp, leaveDates: viewDates }
+        emp.id === currentEmployee.id
+          ? { ...emp, leaveDates: [...emp.leaveDates, newDate] }
           : emp
       )
     );
-    setViewDates(null);
+    setDateInput("");
+  };
+
+  // 有給日編集
+  const handleEditDate = (idx: number) => {
+    if (!currentEmployee) return;
+    setEditDateIdx(idx);
+    setDateInput(currentEmployee.leaveDates[idx]);
+  };
+
+  // 有給日保存
+  const handleSaveDate = () => {
+    if (!currentEmployee || editDateIdx === null) return;
+    const newDate = dateInput;
+    if (
+      !newDate.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
+      currentEmployee.leaveDates.includes(newDate) ||
+      newDate < currentEmployee.joinedAt
+    )
+      return;
+    setEmployees((prev) =>
+      prev.map((emp) =>
+        emp.id === currentEmployee.id
+          ? {
+              ...emp,
+              leaveDates: emp.leaveDates.map((d, i) =>
+                i === editDateIdx ? newDate : d
+              ),
+            }
+          : emp
+      )
+    );
     setEditDateIdx(null);
     setDateInput("");
+  };
+
+  // 有給日削除
+  const handleDeleteDate = (idx: number) => {
+    if (!currentEmployee) return;
+    setEmployees((prev) =>
+      prev.map((emp) =>
+        emp.id === currentEmployee.id
+          ? {
+              ...emp,
+              leaveDates: emp.leaveDates.filter((_, i) => i !== idx),
+            }
+          : emp
+      )
+    );
+    setEditDateIdx(null);
+    setDateInput("");
+  };
+
+  // モーダル閉じる
+  const handleCloseModal = () => {
+    setActiveModal(null);
+    setActiveEmployeeId(null);
+    setEditDateIdx(null);
+    setDateInput("");
+    setIdError("");
   };
 
   return (
@@ -372,20 +306,7 @@ function App() {
           <Button
             colorScheme="teal"
             variant="outline"
-            onClick={() => {
-              setViewDates(null); // 他モーダルを閉じる
-              setEditId(null);
-              setForm({
-                id: "",
-                lastName: "",
-                firstName: "",
-                joinedAt: "",
-                total: 20,
-                used: 0,
-                leaveDates: [],
-              });
-              onOpen();
-            }}
+            onClick={handleAdd}
             size="md"
             px={6}
             boxShadow="md"
@@ -401,53 +322,96 @@ function App() {
         <EmployeeTable
           employees={employees}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={(emp) =>
+            setEmployees((prev) => prev.filter((e) => e.id !== emp.id))
+          }
           onView={handleView}
         />
+        <EmployeeModal
+          isOpen={activeModal === "add" || activeModal === "edit"}
+          onClose={handleCloseModal}
+          form={form}
+          onChange={handleChange}
+          onAdd={() => {
+            if (
+              !form.id ||
+              !form.lastName ||
+              !form.firstName ||
+              !form.joinedAt ||
+              idError ||
+              isFutureDate(form.joinedAt)
+            ) {
+              setIdError(
+                "全ての項目を正しく入力してください（入社日は未来日不可）"
+              );
+              return;
+            }
+            const autoTotal = calcLeaveDays(form.joinedAt);
+            const newEmp = { ...form, total: autoTotal };
+            setEmployees([...employees, { ...newEmp }]);
+            setForm({
+              id: "",
+              lastName: "",
+              firstName: "",
+              joinedAt: "",
+              total: 20,
+              used: 0,
+              leaveDates: [],
+            });
+            setActiveEmployeeId(null);
+            setActiveModal(null);
+          }}
+          onSave={() => {
+            if (
+              !form.id ||
+              !form.lastName ||
+              !form.firstName ||
+              !form.joinedAt ||
+              idError ||
+              isFutureDate(form.joinedAt)
+            ) {
+              setIdError(
+                "全ての項目を正しく入力してください（入社日は未来日不可）"
+              );
+              return;
+            }
+            const autoTotal = calcLeaveDays(form.joinedAt);
+            const newEmp = { ...form, total: autoTotal };
+            setEmployees((prev) =>
+              prev.map((emp) =>
+                emp.id === activeEmployeeId ? { ...newEmp } : emp
+              )
+            );
+            setForm({
+              id: "",
+              lastName: "",
+              firstName: "",
+              joinedAt: "",
+              total: 20,
+              used: 0,
+              leaveDates: [],
+            });
+            setActiveEmployeeId(null);
+            setActiveModal(null);
+          }}
+          idError={idError}
+          editId={activeModal === "edit" ? activeEmployeeId : null}
+        />
+        <LeaveDatesModal
+          isOpen={activeModal === "leaveDates"}
+          onClose={handleCloseModal}
+          employeeId={activeEmployeeId}
+          employees={employees}
+          editDateIdx={editDateIdx}
+          setEditDateIdx={setEditDateIdx}
+          dateInput={dateInput}
+          setDateInput={setDateInput}
+          onAddDate={handleAddDate}
+          onEditDate={handleEditDate}
+          onSaveDate={handleSaveDate}
+          onDeleteDate={handleDeleteDate}
+        />
       </Box>
-      <EmployeeModal
-        isOpen={isOpen}
-        onClose={() => {
-          setEditId(null);
-          setForm({
-            id: "",
-            lastName: "",
-            firstName: "",
-            joinedAt: "",
-            total: 20,
-            used: 0,
-            leaveDates: [],
-          });
-          setIdError("");
-          onClose();
-        }}
-        form={form}
-        onChange={handleChange}
-        onAdd={handleAdd}
-        onSave={handleSave}
-        idError={idError}
-        editId={editId}
-      />
-      <LeaveDatesModal
-        isOpen={viewDates !== null}
-        onClose={() => {
-          setViewDates(null);
-          setEditDateIdx(null);
-          setDateInput("");
-        }}
-        viewName={viewName}
-        viewDates={viewDates || []}
-        editDateIdx={editDateIdx}
-        dateInput={dateInput}
-        onDateInputChange={setDateInput}
-        onEditDate={handleEditDate}
-        onSaveDate={handleSaveDate}
-        onDeleteDate={handleDeleteDate}
-        onAddDate={handleAddDate}
-        setEditDateIdx={setEditDateIdx}
-        onSaveLeaveDates={handleSaveLeaveDates}
-        remain={remain}
-      />
     </Box>
   );
 }

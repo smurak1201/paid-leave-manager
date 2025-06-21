@@ -2,53 +2,46 @@ import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import { X, Plus } from "lucide-react";
 import React from "react";
 import { Icons, inputDateStyle, inputDateSmallStyle } from "./icons";
+import { calcStrictRemain } from "./utils";
+import type { Employee } from "./types";
 
 interface LeaveDatesModalProps {
   isOpen: boolean;
   onClose: () => void;
-  viewName: string;
-  viewDates: string[];
+  employeeId: string | null;
+  employees: Employee[];
   editDateIdx: number | null;
+  setEditDateIdx: (idx: number | null) => void;
   dateInput: string;
-  onDateInputChange: (v: string) => void;
+  setDateInput: (v: string) => void;
+  onAddDate: () => void;
   onEditDate: (idx: number) => void;
   onSaveDate: () => void;
   onDeleteDate: (idx: number) => void;
-  onAddDate: () => void;
-  setEditDateIdx: (idx: number | null) => void;
-  onSaveLeaveDates: () => void;
-  remain: number; // 追加
 }
 
 export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   isOpen,
   onClose,
-  viewName,
-  viewDates,
+  employeeId,
+  employees,
   editDateIdx,
+  setEditDateIdx,
   dateInput,
-  onDateInputChange,
+  setDateInput,
+  onAddDate,
   onEditDate,
   onSaveDate,
   onDeleteDate,
-  onAddDate,
-  setEditDateIdx,
-  onSaveLeaveDates,
-  remain,
 }) => {
-  const overlayRef = React.useRef<HTMLDivElement>(null);
-  // オーバーレイ外クリックで閉じる
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === overlayRef.current) {
-      onClose();
-      setEditDateIdx(null);
-      onDateInputChange("");
-    }
-  };
-  if (!isOpen) return null;
+  const employee = employeeId
+    ? employees.find((e) => e.id === employeeId) || null
+    : null;
+  if (!isOpen || !employee) return null;
+  const dates = employee.leaveDates;
+  const remain = calcStrictRemain(employee.grants || [], dates);
   return (
     <Box
-      ref={overlayRef}
       position="fixed"
       top={0}
       left={0}
@@ -59,7 +52,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
       display="flex"
       alignItems="center"
       justifyContent="center"
-      onClick={handleOverlayClick}
+      onClick={onClose}
     >
       <Box
         bg="white"
@@ -78,27 +71,26 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
           size="sm"
           variant="ghost"
           colorScheme="teal"
-          onClick={() => {
-            onClose();
-            setEditDateIdx(null);
-            onDateInputChange("");
-          }}
+          onClick={onClose}
           p={2}
           minW={"auto"}
         >
           <X size={18} />
         </Button>
         <Heading as="h3" size="md" mb={4} color="teal.700" textAlign="center">
-          {viewName} さんの有給取得日
+          {employee.lastName} {employee.firstName} さんの有給取得日
         </Heading>
+        <Text color="teal.700" fontWeight="bold" mb={1} textAlign="center">
+          消化日数：{dates.length}日
+        </Text>
         <Text color="teal.700" fontWeight="bold" mb={2} textAlign="center">
-          消化日数：{viewDates.length}日
+          残日数：{remain}日
         </Text>
         <Box display="flex" gap={2} mb={4}>
           <input
             type="date"
             value={dateInput}
-            onChange={(e) => onDateInputChange(e.target.value)}
+            onChange={(e) => setDateInput(e.target.value)}
             style={inputDateStyle}
             maxLength={10}
           />
@@ -142,13 +134,13 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
             </Button>
           )}
         </Box>
-        {viewDates.length === 0 ? (
+        {dates.length === 0 ? (
           <Text color="gray.500" textAlign="center">
             取得履歴なし
           </Text>
         ) : (
           <Box as="ul" pl={0} m={0}>
-            {viewDates.map((date, i) => {
+            {dates.map((date, i) => {
               const [y, m, d] = date.split("-");
               const jpDate = `${y}年${m}月${d}日`;
               return (
@@ -160,7 +152,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                   py={2}
                   px={4}
                   borderBottom={
-                    i !== viewDates.length - 1 ? "1px solid" : undefined
+                    i !== dates.length - 1 ? "1px solid" : undefined
                   }
                   borderColor="teal.50"
                   borderRadius="md"
@@ -178,7 +170,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                     <input
                       type="date"
                       value={dateInput}
-                      onChange={(e) => onDateInputChange(e.target.value)}
+                      onChange={(e) => setDateInput(e.target.value)}
                       style={inputDateSmallStyle}
                       maxLength={10}
                     />
@@ -217,14 +209,6 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
         <Box display="flex" justifyContent="flex-end" gap={2} mt={4}>
           <Button onClick={onClose} variant="ghost" colorScheme="teal">
             キャンセル
-          </Button>
-          <Button
-            colorScheme="teal"
-            onClick={onSaveLeaveDates}
-            disabled={remain <= 0}
-            cursor={remain <= 0 ? "not-allowed" : "pointer"}
-          >
-            保存
           </Button>
         </Box>
         {remain <= 0 && (
