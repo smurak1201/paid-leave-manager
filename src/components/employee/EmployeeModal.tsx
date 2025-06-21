@@ -20,6 +20,7 @@ interface EmployeeModalProps {
   form: Employee;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAdd: () => void;
+  idError?: string;
 }
 
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
@@ -28,6 +29,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   form,
   onChange,
   onAdd,
+  idError,
 }) => {
   if (!isOpen) return null;
   return (
@@ -72,7 +74,16 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
               borderColor="teal.300"
               bg="whiteAlpha.900"
               _placeholder={{ color: "teal.200" }}
+              type="text"
+              inputMode="numeric"
+              pattern="^[0-9]*$"
+              autoComplete="off"
             />
+            {idError && (
+              <Text color="red.500" fontSize="sm" mt={1}>
+                {idError}
+              </Text>
+            )}
           </FormControl>
           <FormControl isRequired>
             <FormLabel>

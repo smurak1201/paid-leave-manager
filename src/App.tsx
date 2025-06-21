@@ -174,11 +174,21 @@ function App() {
   const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
   const [dateInput, setDateInput] = useState<string>("");
   const [guideOpen, setGuideOpen] = useState(false);
+  const [idError, setIdError] = useState<string>("");
   const guideDisclosure = useDisclosure();
 
   // 入社年月日変更時にtotalを自動計算
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    if (name === "id") {
+      setForm((prev) => ({ ...prev, id: value }));
+      if (value && !/^[0-9]*$/.test(value)) {
+        setIdError("従業員コードは半角数字のみ入力できます");
+      } else {
+        setIdError("");
+      }
+      return;
+    }
     setForm((prev) => {
       let next = {
         ...prev,
@@ -192,7 +202,14 @@ function App() {
   };
 
   const handleAdd = () => {
-    if (!form.id || !form.lastName || !form.firstName || !form.joinedAt) return;
+    if (
+      !form.id ||
+      !form.lastName ||
+      !form.firstName ||
+      !form.joinedAt ||
+      idError // エラーがあれば追加不可
+    )
+      return;
     const autoTotal = calcLeaveDays(form.joinedAt);
     const newEmp = { ...form, total: autoTotal };
     if (editId) {
@@ -361,6 +378,7 @@ function App() {
         form={form}
         onChange={handleChange}
         onAdd={handleAdd}
+        idError={idError}
       />
       <LeaveDatesModal
         isOpen={!!viewDates}
