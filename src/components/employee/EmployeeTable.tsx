@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
 import type { Employee } from "./types";
 import { Box, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
@@ -24,6 +24,22 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
 }) => {
   const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
+  const [recentlyAddedId, setRecentlyAddedId] = useState<string | null>(null);
+  const prevEmployeesRef = useRef<Employee[]>(employees);
+
+  // 追加時にrecentlyAddedIdをセットし、1秒後に解除
+  useEffect(() => {
+    const prev = prevEmployeesRef.current;
+    if (employees.length > prev.length) {
+      // 新規追加された従業員を特定
+      const added = employees.find((e) => !prev.some((p) => p.id === e.id));
+      if (added) {
+        setRecentlyAddedId(added.id);
+        setTimeout(() => setRecentlyAddedId(null), 1000);
+      }
+    }
+    prevEmployeesRef.current = employees;
+  }, [employees]);
 
   const handleDeleteClick = (emp: Employee) => {
     setDeleteTarget(emp);
@@ -131,77 +147,150 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               }
               const remain = grantThisYear + carryOver - used;
               const servicePeriod = getServicePeriod(emp.joinedAt);
-              return (
-                <FadeTableRow
-                  key={emp.id}
-                  style={remain === 0 ? { background: "#FFF5F5" } : undefined}
-                >
-                  <Td>{emp.id}</Td>
-                  <Td>{emp.lastName}</Td>
-                  <Td>{emp.firstName}</Td>
-                  <Td>
-                    {(() => {
-                      const [y, m, d] = emp.joinedAt.split("-");
-                      return `${y}年${Number(m)}月${d ? Number(d) + "日" : ""}`;
-                    })()}
-                  </Td>
-                  <Td>{servicePeriod}</Td>
-                  <Td isNumeric>{grantThisYear}</Td>
-                  <Td isNumeric>{carryOver}</Td>
-                  <Td isNumeric>{used}</Td>
-                  <Td isNumeric>
-                    <Badge
-                      colorScheme={
-                        remain <= 3 ? "red" : remain <= 7 ? "yellow" : "teal"
-                      }
-                      fontSize="md"
-                      px={3}
-                      py={1}
-                      borderRadius="md"
-                      fontWeight="bold"
-                    >
-                      {remain}
-                    </Badge>
-                  </Td>
-                  <Td>
-                    <HStack justify="center" gap={1}>
-                      <Tooltip content="確認" showArrow>
-                        <IconButton
-                          aria-label="確認"
-                          size="sm"
-                          variant="ghost"
-                          colorScheme="blue"
-                          onClick={() => onView && onView(emp)}
-                        >
-                          <Icon as={Icons.Eye} boxSize={5} />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip content="編集" showArrow>
-                        <IconButton
-                          aria-label="編集"
-                          size="sm"
-                          variant="ghost"
-                          colorScheme="teal"
-                          onClick={() => onEdit && onEdit(emp)}
-                        >
-                          <Icon as={Icons.Edit} boxSize={5} />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip content="削除" showArrow>
-                        <IconButton
-                          aria-label="削除"
-                          size="sm"
-                          variant="ghost"
-                          colorScheme="red"
-                          onClick={() => handleDeleteClick(emp)}
-                        >
-                          <Icon as={Icons.Trash2} boxSize={5} />
-                        </IconButton>
-                      </Tooltip>
-                    </HStack>
-                  </Td>
-                </FadeTableRow>
-              );
+              // 背景色分岐: 追加直後 > 残日数0 > 通常
+              if (remain === 0) {
+                return (
+                  <FadeTableRow key={emp.id} style={{ background: "#FFF5F5" }}>
+                    <Td>{emp.id}</Td>
+                    <Td>{emp.lastName}</Td>
+                    <Td>{emp.firstName}</Td>
+                    <Td>
+                      {(() => {
+                        const [y, m, d] = emp.joinedAt.split("-");
+                        return `${y}年${Number(m)}月${
+                          d ? Number(d) + "日" : ""
+                        }`;
+                      })()}
+                    </Td>
+                    <Td>{servicePeriod}</Td>
+                    <Td isNumeric>{grantThisYear}</Td>
+                    <Td isNumeric>{carryOver}</Td>
+                    <Td isNumeric>{used}</Td>
+                    <Td isNumeric>
+                      <Badge
+                        colorScheme={
+                          remain <= 3 ? "red" : remain <= 7 ? "yellow" : "teal"
+                        }
+                        fontSize="md"
+                        px={3}
+                        py={1}
+                        borderRadius="md"
+                        fontWeight="bold"
+                      >
+                        {remain}
+                      </Badge>
+                    </Td>
+                    <Td>
+                      <HStack justify="center" gap={1}>
+                        <Tooltip content="確認" showArrow>
+                          <IconButton
+                            aria-label="確認"
+                            size="sm"
+                            variant="ghost"
+                            colorScheme="blue"
+                            onClick={() => onView && onView(emp)}
+                          >
+                            <Icon as={Icons.Eye} boxSize={5} />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip content="編集" showArrow>
+                          <IconButton
+                            aria-label="編集"
+                            size="sm"
+                            variant="ghost"
+                            colorScheme="teal"
+                            onClick={() => onEdit && onEdit(emp)}
+                          >
+                            <Icon as={Icons.Edit} boxSize={5} />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip content="削除" showArrow>
+                          <IconButton
+                            aria-label="削除"
+                            size="sm"
+                            variant="ghost"
+                            colorScheme="red"
+                            onClick={() => handleDeleteClick(emp)}
+                          >
+                            <Icon as={Icons.Trash2} boxSize={5} />
+                          </IconButton>
+                        </Tooltip>
+                      </HStack>
+                    </Td>
+                  </FadeTableRow>
+                );
+              } else {
+                return (
+                  <FadeTableRow key={emp.id}>
+                    <Td>{emp.id}</Td>
+                    <Td>{emp.lastName}</Td>
+                    <Td>{emp.firstName}</Td>
+                    <Td>
+                      {(() => {
+                        const [y, m, d] = emp.joinedAt.split("-");
+                        return `${y}年${Number(m)}月${
+                          d ? Number(d) + "日" : ""
+                        }`;
+                      })()}
+                    </Td>
+                    <Td>{servicePeriod}</Td>
+                    <Td isNumeric>{grantThisYear}</Td>
+                    <Td isNumeric>{carryOver}</Td>
+                    <Td isNumeric>{used}</Td>
+                    <Td isNumeric>
+                      <Badge
+                        colorScheme={
+                          remain <= 3 ? "red" : remain <= 7 ? "yellow" : "teal"
+                        }
+                        fontSize="md"
+                        px={3}
+                        py={1}
+                        borderRadius="md"
+                        fontWeight="bold"
+                      >
+                        {remain}
+                      </Badge>
+                    </Td>
+                    <Td>
+                      <HStack justify="center" gap={1}>
+                        <Tooltip content="確認" showArrow>
+                          <IconButton
+                            aria-label="確認"
+                            size="sm"
+                            variant="ghost"
+                            colorScheme="blue"
+                            onClick={() => onView && onView(emp)}
+                          >
+                            <Icon as={Icons.Eye} boxSize={5} />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip content="編集" showArrow>
+                          <IconButton
+                            aria-label="編集"
+                            size="sm"
+                            variant="ghost"
+                            colorScheme="teal"
+                            onClick={() => onEdit && onEdit(emp)}
+                          >
+                            <Icon as={Icons.Edit} boxSize={5} />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip content="削除" showArrow>
+                          <IconButton
+                            aria-label="削除"
+                            size="sm"
+                            variant="ghost"
+                            colorScheme="red"
+                            onClick={() => handleDeleteClick(emp)}
+                          >
+                            <Icon as={Icons.Trash2} boxSize={5} />
+                          </IconButton>
+                        </Tooltip>
+                      </HStack>
+                    </Td>
+                  </FadeTableRow>
+                );
+              }
             })}
           </AnimatePresence>
         </Tbody>
