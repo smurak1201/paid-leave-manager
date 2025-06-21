@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Icons, inputDateStyle, inputDateSmallStyle } from "./icons";
 import { calcLeaveDays } from "./utils";
 import type { Employee } from "./types";
+import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 
 interface LeaveDatesModalProps {
   isOpen: boolean;
@@ -79,6 +80,22 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
     grantThisYear = calcLeaveDays(employee.joinedAt, now);
   }
   const remainSimple = grantThisYear + carryOver - dates.length;
+  // 削除確認モーダル用
+  const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
+  const [isDeleteOpen, setDeleteOpen] = useState(false);
+  const handleDeleteClick = (idx: number) => {
+    setDeleteIdx(idx);
+    setDeleteOpen(true);
+  };
+  const handleDeleteConfirm = () => {
+    if (deleteIdx !== null) onDeleteDate(deleteIdx);
+    setDeleteOpen(false);
+    setDeleteIdx(null);
+  };
+  const handleDeleteClose = () => {
+    setDeleteOpen(false);
+    setDeleteIdx(null);
+  };
   return (
     <Box
       position="fixed"
@@ -271,7 +288,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                       colorScheme="red"
                       minW={"auto"}
                       px={2}
-                      onClick={() => onDeleteDate(idx)}
+                      onClick={() => handleDeleteClick(idx)}
                       aria-label="削除"
                     >
                       <Icons.Trash2 size={15} />
@@ -293,6 +310,18 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
           </Text>
         )}
       </Box>
+      <ConfirmDeleteModal
+        isOpen={isDeleteOpen}
+        onClose={handleDeleteClose}
+        onConfirm={handleDeleteConfirm}
+        targetName={
+          deleteIdx !== null && dates[deleteIdx]
+            ? `${dates[deleteIdx]
+                .replace(/-/g, "年")
+                .replace(/年(\d{2})$/, "月$1日")}`
+            : undefined
+        }
+      />
     </Box>
   );
 };
