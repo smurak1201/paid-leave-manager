@@ -10,7 +10,7 @@ import {
 import type { Employee } from "./components/employee/types";
 import { EmployeeTable } from "./components/employee/EmployeeTable";
 import { EmployeeModal } from "./components/employee/EmployeeModal";
-import { X } from "lucide-react";
+import { X, Edit, Trash2, Plus } from "lucide-react";
 
 const initialEmployees: Employee[] = [
   {
@@ -51,6 +51,8 @@ function App() {
   const [editId, setEditId] = useState<string | null>(null);
   const [viewDates, setViewDates] = useState<string[] | null>(null);
   const [viewName, setViewName] = useState<string>("");
+  const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
+  const [dateInput, setDateInput] = useState<string>("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -94,6 +96,62 @@ function App() {
   const handleView = (emp: Employee) => {
     setViewDates(emp.leaveDates);
     setViewName(`${emp.lastName} ${emp.firstName}`);
+  };
+
+  const handleAddDate = () => {
+    if (!viewDates || !dateInput.match(/^\d{4}-\d{2}-\d{2}$/)) return;
+    setViewDates([...viewDates, dateInput]);
+    setDateInput("");
+    // employees側も更新
+    setEmployees((prev) =>
+      prev.map((emp) =>
+        `${emp.lastName} ${emp.firstName}` === viewName
+          ? { ...emp, leaveDates: [...emp.leaveDates, dateInput] }
+          : emp
+      )
+    );
+  };
+
+  const handleEditDate = (idx: number) => {
+    setEditDateIdx(idx);
+    setDateInput(viewDates ? viewDates[idx] : "");
+  };
+
+  const handleSaveDate = () => {
+    if (
+      !viewDates ||
+      editDateIdx === null ||
+      !dateInput.match(/^\d{4}-\d{2}-\d{2}$/)
+    )
+      return;
+    const newDates = viewDates.map((d, i) =>
+      i === editDateIdx ? dateInput : d
+    );
+    setViewDates(newDates);
+    setEditDateIdx(null);
+    setDateInput("");
+    setEmployees((prev) =>
+      prev.map((emp) =>
+        `${emp.lastName} ${emp.firstName}` === viewName
+          ? { ...emp, leaveDates: newDates }
+          : emp
+      )
+    );
+  };
+
+  const handleDeleteDate = (idx: number) => {
+    if (!viewDates) return;
+    const newDates = viewDates.filter((_, i) => i !== idx);
+    setViewDates(newDates);
+    setEditDateIdx(null);
+    setDateInput("");
+    setEmployees((prev) =>
+      prev.map((emp) =>
+        `${emp.lastName} ${emp.firstName}` === viewName
+          ? { ...emp, leaveDates: newDates }
+          : emp
+      )
+    );
   };
 
   return (
@@ -173,7 +231,7 @@ function App() {
             borderRadius="lg"
             boxShadow="lg"
             p={6}
-            minW="320px"
+            minW="340px"
             maxW="90vw"
             position="relative"
           >
@@ -184,7 +242,11 @@ function App() {
               size="sm"
               variant="ghost"
               colorScheme="teal"
-              onClick={() => setViewDates(null)}
+              onClick={() => {
+                setViewDates(null);
+                setEditDateIdx(null);
+                setDateInput("");
+              }}
               p={2}
               minW={"auto"}
             >
@@ -199,6 +261,43 @@ function App() {
             >
               {viewName} さんの有給取得日
             </Heading>
+            <Box display="flex" gap={2} mb={4}>
+              <input
+                type="date"
+                value={dateInput}
+                onChange={(e) => setDateInput(e.target.value)}
+                style={{
+                  border: "1px solid #B2F5EA",
+                  borderRadius: 6,
+                  padding: "6px 12px",
+                  fontSize: 16,
+                  outline: "none",
+                  flex: 1,
+                }}
+                maxLength={10}
+              />
+              {editDateIdx === null ? (
+                <Button
+                  colorScheme="teal"
+                  leftIcon={<Plus size={16} />}
+                  onClick={handleAddDate}
+                  px={4}
+                  minW={"auto"}
+                >
+                  追加
+                </Button>
+              ) : (
+                <Button
+                  colorScheme="teal"
+                  leftIcon={<Edit size={16} />}
+                  onClick={handleSaveDate}
+                  px={4}
+                  minW={"auto"}
+                >
+                  保存
+                </Button>
+              )}
+            </Box>
             {viewDates.length === 0 ? (
               <Text color="gray.500" textAlign="center">
                 取得履歴なし
@@ -211,7 +310,7 @@ function App() {
                   return (
                     <Box
                       as="li"
-                      key={date}
+                      key={date + i}
                       fontSize="md"
                       color="teal.700"
                       py={2}
@@ -231,7 +330,49 @@ function App() {
                       <Text fontWeight="bold" minW="2em">
                         {i + 1}.
                       </Text>
-                      <Text>{jpDate}</Text>
+                      {editDateIdx === i ? (
+                        <input
+                          type="date"
+                          value={dateInput}
+                          onChange={(e) => setDateInput(e.target.value)}
+                          style={{
+                            border: "1px solid #B2F5EA",
+                            borderRadius: 6,
+                            padding: "4px 8px",
+                            fontSize: 16,
+                            outline: "none",
+                          }}
+                          maxLength={10}
+                        />
+                      ) : (
+                        <Text>{jpDate}</Text>
+                      )}
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        colorScheme="teal"
+                        minW={"auto"}
+                        px={2}
+                        onClick={() =>
+                          editDateIdx === i
+                            ? setEditDateIdx(null)
+                            : handleEditDate(i)
+                        }
+                        aria-label="編集"
+                      >
+                        <Edit size={15} />
+                      </Button>
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        colorScheme="red"
+                        minW={"auto"}
+                        px={2}
+                        onClick={() => handleDeleteDate(i)}
+                        aria-label="削除"
+                      >
+                        <Trash2 size={15} />
+                      </Button>
                     </Box>
                   );
                 })}
