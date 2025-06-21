@@ -3,7 +3,7 @@ import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
 import type { Employee } from "./types";
 import { Box, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
 import { Icons, getServicePeriod } from "./icons";
-import { calcLeaveDays, calcStrictRemain } from "./utils";
+import { calcLeaveDays } from "./utils";
 import { Tooltip } from "../ui/tooltip";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { FadeTableRow } from "./FadeTableRow";
