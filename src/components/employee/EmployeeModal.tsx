@@ -20,7 +20,9 @@ interface EmployeeModalProps {
   form: Employee;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAdd: () => void;
+  onSave?: () => void; // 追加
   idError?: string;
+  editId?: string | null; // 追加
 }
 
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
@@ -29,7 +31,9 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   form,
   onChange,
   onAdd,
+  onSave,
   idError,
+  editId,
 }) => {
   if (!isOpen) return null;
   return (
@@ -44,7 +48,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             fontSize="xl"
             letterSpacing={1}
           >
-            従業員追加
+            {editId ? "従業員編集" : "従業員追加"}
           </Text>
         </HStack>
         <Button
@@ -78,6 +82,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
               inputMode="numeric"
               pattern="^[0-9]*$"
               autoComplete="off"
+              disabled={!!editId} // 編集時はid変更不可
             />
             {idError && (
               <Text color="red.500" fontSize="sm" mt={1}>
@@ -128,12 +133,12 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
         <HStack justify="flex-end" gap={3}>
           <Button
             colorScheme="teal"
-            onClick={onAdd}
+            onClick={editId ? onSave : onAdd}
             borderRadius="full"
             px={6}
             fontWeight="bold"
             boxShadow="md"
-            isDisabled={
+            disabled={
               !!idError ||
               !form.id ||
               !form.lastName ||
@@ -152,7 +157,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
           >
             <Icon as={User} mr={2} />
-            追加
+            {editId ? "保存" : "追加"}
           </Button>
           <Button
             onClick={onClose}

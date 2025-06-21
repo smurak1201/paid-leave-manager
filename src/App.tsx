@@ -219,13 +219,34 @@ function App() {
       return;
     const autoTotal = calcLeaveDays(form.joinedAt);
     const newEmp = { ...form, total: autoTotal };
-    if (editId) {
-      setEmployees((prev) =>
-        prev.map((emp) => (emp.id === editId ? { ...newEmp } : emp))
-      );
-    } else {
-      setEmployees([...employees, { ...newEmp }]);
-    }
+    setEmployees([...employees, { ...newEmp }]);
+    setForm({
+      id: "",
+      lastName: "",
+      firstName: "",
+      joinedAt: "",
+      total: 20,
+      used: 0,
+      leaveDates: [],
+    });
+    setEditId(null);
+    onClose();
+  };
+
+  const handleSave = () => {
+    if (
+      !form.id ||
+      !form.lastName ||
+      !form.firstName ||
+      !form.joinedAt ||
+      idError
+    )
+      return;
+    const autoTotal = calcLeaveDays(form.joinedAt);
+    const newEmp = { ...form, total: autoTotal };
+    setEmployees((prev) =>
+      prev.map((emp) => (emp.id === editId ? { ...newEmp } : emp))
+    );
     setForm({
       id: "",
       lastName: "",
@@ -385,7 +406,9 @@ function App() {
         form={form}
         onChange={handleChange}
         onAdd={handleAdd}
+        onSave={handleSave}
         idError={idError}
+        editId={editId}
       />
       <LeaveDatesModal
         isOpen={!!viewDates}
