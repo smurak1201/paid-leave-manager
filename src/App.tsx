@@ -184,6 +184,13 @@ function App() {
       setForm((prev) => ({ ...prev, id: value }));
       if (value && !/^[0-9]*$/.test(value)) {
         setIdError("従業員コードは半角数字のみ入力できます");
+      } else if (
+        value &&
+        employees.some(
+          (emp) => emp.id === value && (editId === null || emp.id !== editId)
+        )
+      ) {
+        setIdError("従業員コードが重複しています");
       } else {
         setIdError("");
       }
