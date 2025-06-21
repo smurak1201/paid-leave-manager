@@ -56,101 +56,45 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
           <Text mb={2}>
             <b>主な機能：</b>
             <ul style={{ marginLeft: 20 }}>
-              <li>
-                <Plus
-                  size={16}
-                  style={{ verticalAlign: "middle", marginRight: 4 }}
-                />
-                <b>従業員の追加：</b>{" "}
-                <span style={{ color: "#319795" }}>「従業員追加」ボタン</span>
-                で新規登録
+              <li style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Plus size={16} />
+                <span>従業員の追加・管理</span>
               </li>
-              <li>
-                <Edit
-                  size={16}
-                  style={{ verticalAlign: "middle", marginRight: 4 }}
-                />
-                <b>従業員情報の編集：</b>{" "}
-                <span style={{ color: "#319795" }}>
-                  テーブルの
-                  <Edit
-                    size={14}
-                    style={{ verticalAlign: "middle", margin: "0 2px" }}
-                  />
-                  編集ボタン
-                </span>
-                で編集
+              <li style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Edit size={16} />
+                <span>従業員情報の編集</span>
               </li>
-              <li>
-                <Trash2
-                  size={16}
-                  style={{ verticalAlign: "middle", marginRight: 4 }}
-                />
-                <b>従業員の削除：</b>{" "}
-                <span style={{ color: "#E53E3E" }}>
-                  テーブルの
-                  <Trash2
-                    size={14}
-                    style={{ verticalAlign: "middle", margin: "0 2px" }}
-                  />
-                  削除ボタン
-                </span>
-                で削除
+              <li style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Trash2 size={16} />
+                <span>従業員の削除</span>
               </li>
-              <li>
-                <Edit
-                  size={16}
-                  style={{ verticalAlign: "middle", marginRight: 4 }}
-                />
-                <b>有給取得日の登録・編集：</b>{" "}
-                <span style={{ color: "#319795" }}>
-                  「確認」ボタンから日付を
-                  <Plus
-                    size={14}
-                    style={{ verticalAlign: "middle", margin: "0 2px" }}
-                  />
-                  追加、
-                  <Edit
-                    size={14}
-                    style={{ verticalAlign: "middle", margin: "0 2px" }}
-                  />
-                  編集、
-                  <Trash2
-                    size={14}
-                    style={{ verticalAlign: "middle", margin: "0 2px" }}
-                  />
-                  削除
-                </span>
+              <li style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Edit size={16} />
+                <span>有給取得日の登録・編集・削除</span>
+              </li>
+              <li style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span>残日数の自動計算</span>
               </li>
             </ul>
           </Text>
           <Text mb={2}>
             <b>使い方：</b>
             <ul style={{ marginLeft: 20 }}>
-              <li>
-                <Plus
-                  size={14}
-                  style={{ verticalAlign: "middle", margin: "0 2px" }}
-                />
-                「従業員追加」ボタンで新規従業員を登録
+              <li style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Plus size={14} />
+                <span>「従業員追加」ボタンで新規従業員を登録</span>
               </li>
-              <li>
-                <Edit
-                  size={14}
-                  style={{ verticalAlign: "middle", margin: "0 2px" }}
-                />
-                テーブルの編集ボタンで従業員情報を編集
+              <li style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Edit size={14} />
+                <span>テーブルの編集ボタンで従業員情報を編集</span>
               </li>
-              <li>
-                <Trash2
-                  size={14}
-                  style={{ verticalAlign: "middle", margin: "0 2px" }}
-                />
-                テーブルの削除ボタンで従業員を削除
+              <li style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Trash2 size={14} />
+                <span>テーブルの削除ボタンで従業員を削除</span>
               </li>
-              <li>
+              <li style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <span style={{ color: "#319795" }}>「確認」ボタン</span>
-                で有給取得日を一覧・編集
+                <span>で有給取得日を一覧・編集</span>
               </li>
             </ul>
           </Text>
