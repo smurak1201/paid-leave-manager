@@ -11,9 +11,7 @@ interface LeaveDatesModalProps {
   employeeId: string | null;
   employees: Employee[];
   editDateIdx: number | null;
-  setEditDateIdx: (idx: number | null) => void;
   dateInput: string;
-  setDateInput: (v: string) => void;
   onAddDate: () => void;
   onEditDate: (idx: number) => void;
   onSaveDate: () => void;
@@ -26,9 +24,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   employeeId,
   employees,
   editDateIdx,
-  setEditDateIdx,
   dateInput,
-  setDateInput,
   onAddDate,
   onEditDate,
   onSaveDate,

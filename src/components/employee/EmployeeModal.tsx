@@ -19,9 +19,9 @@ interface EmployeeModalProps {
   form: Employee;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAdd: () => void;
-  onSave?: () => void; // 追加
-  idError?: string;
-  editId?: string | null; // 追加
+  onSave: () => void;
+  idError: string;
+  editId: string | null;
 }
 
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({

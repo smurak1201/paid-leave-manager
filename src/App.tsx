@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Box, Heading, Button, Flex, useDisclosure } from "@chakra-ui/react";
 import type { Employee } from "./components/employee/types";
 import { EmployeeTable } from "./components/employee/EmployeeTable";
@@ -6,7 +6,9 @@ import { EmployeeModal } from "./components/employee/EmployeeModal";
 import { Icons } from "./components/employee/icons";
 import { GuideModal } from "./components/ui/GuideModal";
 import { LeaveDatesModal } from "./components/employee/LeaveDatesModal";
-import { calcLeaveDays, calcStrictRemain } from "./components/employee/utils";
+import { calcLeaveDays } from "./components/employee/utils";
+import { useEmployeeForm } from "./hooks/useEmployeeForm";
+import { useLeaveDates } from "./hooks/useLeaveDates";
 
 const initialEmployees: Employee[] = [
   {
@@ -100,20 +102,43 @@ function App() {
     null | "add" | "edit" | "leaveDates"
   >(null);
   const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null);
-  const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
-  const [dateInput, setDateInput] = useState<string>("");
-  const [form, setForm] = useState<Employee>({
-    id: "",
-    lastName: "",
-    firstName: "",
-    joinedAt: "",
-    total: 20,
-    used: 0,
-    leaveDates: [],
-  });
-  const [idError, setIdError] = useState<string>("");
   const guideDisclosure = useDisclosure();
 
+  // 最新の従業員データ
+  const currentEmployee = activeEmployeeId
+    ? employees.find((e) => e.id === activeEmployeeId) || null
+    : null;
+
+  // useEmployeeFormでフォーム状態・バリデーションを管理
+  const { form, setForm, idError, setIdError, handleChange } = useEmployeeForm(
+    activeModal === "edit" && currentEmployee
+      ? currentEmployee
+      : {
+          id: "",
+          lastName: "",
+          firstName: "",
+          joinedAt: "",
+          total: 20,
+          used: 0,
+          leaveDates: [],
+        },
+    employees,
+    activeEmployeeId
+  );
+
+  // useLeaveDatesで有給日付編集ロジックを管理
+  const {
+    editDateIdx,
+    setEditDateIdx,
+    dateInput,
+    setDateInput,
+    handleAddDate,
+    handleEditDate,
+    handleSaveDate,
+    handleDeleteDate,
+  } = useLeaveDates(currentEmployee);
+
+  // 未来日チェック
   const isFutureDate = (date: string) => {
     if (!date) return false;
     const today = new Date();
@@ -121,25 +146,16 @@ function App() {
     return d > today;
   };
 
-  // 最新の従業員データ
-  const currentEmployee = activeEmployeeId
-    ? employees.find((e) => e.id === activeEmployeeId) || null
-    : null;
-
   // テーブル操作
   const handleView = (emp: Employee) => {
-    const latest = employees.find((e) => e.id === emp.id);
-    if (!latest) return;
-    setActiveEmployeeId(latest.id);
+    setActiveEmployeeId(emp.id);
     setActiveModal("leaveDates");
     setEditDateIdx(null);
     setDateInput("");
   };
   const handleEdit = (emp: Employee) => {
-    const latest = employees.find((e) => e.id === emp.id);
-    if (!latest) return;
-    setForm(latest);
-    setActiveEmployeeId(latest.id);
+    setForm(emp);
+    setActiveEmployeeId(emp.id);
     setActiveModal("edit");
     setIdError("");
   };
@@ -157,113 +173,6 @@ function App() {
     setActiveModal("add");
     setIdError("");
   };
-
-  // 入社年月日変更時にtotalを自動計算
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (name === "id") {
-      setForm((prev) => ({ ...prev, id: value }));
-      if (value && !/^[0-9]*$/.test(value)) {
-        setIdError("従業員コードは半角数字のみ入力できます");
-      } else if (
-        value &&
-        employees.some(
-          (emp) =>
-            emp.id === value &&
-            (activeEmployeeId === null || emp.id !== activeEmployeeId)
-        )
-      ) {
-        setIdError("従業員コードが重複しています");
-      } else if (!value) {
-        setIdError("従業員コードは必須です");
-      } else {
-        setIdError("");
-      }
-      return;
-    }
-    setForm((prev) => {
-      let next = {
-        ...prev,
-        [name]: name === "total" || name === "used" ? Number(value) : value,
-      };
-      if (name === "joinedAt") {
-        next.total = calcLeaveDays(value);
-      }
-      return next;
-    });
-  };
-
-  // 有給日追加
-  const handleAddDate = () => {
-    if (!currentEmployee) return;
-    const newDate = dateInput;
-    if (
-      !newDate.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
-      currentEmployee.leaveDates.includes(newDate) ||
-      newDate < currentEmployee.joinedAt
-    )
-      return;
-    setEmployees((prev) =>
-      prev.map((emp) =>
-        emp.id === currentEmployee.id
-          ? { ...emp, leaveDates: [...emp.leaveDates, newDate] }
-          : emp
-      )
-    );
-    setDateInput("");
-  };
-
-  // 有給日編集
-  const handleEditDate = (idx: number) => {
-    if (!currentEmployee) return;
-    setEditDateIdx(idx);
-    setDateInput(currentEmployee.leaveDates[idx]);
-  };
-
-  // 有給日保存
-  const handleSaveDate = () => {
-    if (!currentEmployee || editDateIdx === null) return;
-    const newDate = dateInput;
-    if (
-      !newDate.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
-      currentEmployee.leaveDates.includes(newDate) ||
-      newDate < currentEmployee.joinedAt
-    )
-      return;
-    setEmployees((prev) =>
-      prev.map((emp) =>
-        emp.id === currentEmployee.id
-          ? {
-              ...emp,
-              leaveDates: emp.leaveDates.map((d, i) =>
-                i === editDateIdx ? newDate : d
-              ),
-            }
-          : emp
-      )
-    );
-    setEditDateIdx(null);
-    setDateInput("");
-  };
-
-  // 有給日削除
-  const handleDeleteDate = (idx: number) => {
-    if (!currentEmployee) return;
-    setEmployees((prev) =>
-      prev.map((emp) =>
-        emp.id === currentEmployee.id
-          ? {
-              ...emp,
-              leaveDates: emp.leaveDates.filter((_, i) => i !== idx),
-            }
-          : emp
-      )
-    );
-    setEditDateIdx(null);
-    setDateInput("");
-  };
-
-  // モーダル閉じる
   const handleCloseModal = () => {
     setActiveModal(null);
     setActiveEmployeeId(null);
@@ -406,10 +315,43 @@ function App() {
           setEditDateIdx={setEditDateIdx}
           dateInput={dateInput}
           setDateInput={setDateInput}
-          onAddDate={handleAddDate}
+          onAddDate={() => {
+            if (!currentEmployee) return;
+            handleAddDate((dates) =>
+              setEmployees((prev) =>
+                prev.map((emp) =>
+                  emp.id === currentEmployee.id
+                    ? { ...emp, leaveDates: dates }
+                    : emp
+                )
+              )
+            );
+          }}
           onEditDate={handleEditDate}
-          onSaveDate={handleSaveDate}
-          onDeleteDate={handleDeleteDate}
+          onSaveDate={() => {
+            if (!currentEmployee) return;
+            handleSaveDate((dates) =>
+              setEmployees((prev) =>
+                prev.map((emp) =>
+                  emp.id === currentEmployee.id
+                    ? { ...emp, leaveDates: dates }
+                    : emp
+                )
+              )
+            );
+          }}
+          onDeleteDate={(idx) => {
+            if (!currentEmployee) return;
+            handleDeleteDate(idx, (dates) =>
+              setEmployees((prev) =>
+                prev.map((emp) =>
+                  emp.id === currentEmployee.id
+                    ? { ...emp, leaveDates: dates }
+                    : emp
+                )
+              )
+            );
+          }}
         />
       </Box>
     </Box>
