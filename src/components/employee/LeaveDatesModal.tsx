@@ -186,8 +186,6 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
             as="ul"
             pl={0}
             m={0}
-            maxHeight="260px"
-            overflowY="auto"
             ref={listRef}
           >
             {pagedDates.map((date, i) => {
