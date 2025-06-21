@@ -45,6 +45,24 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   onDelete,
   onView,
 }) => {
+  // ページネーション用
+  const ITEMS_PER_PAGE = 15;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(employees.length / ITEMS_PER_PAGE));
+  const pagedEmployees = employees.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+  // ページ切替時にリスト先頭へスクロール
+  const listRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (listRef.current) listRef.current.scrollTop = 0;
+  }, [currentPage]);
+  // 削除等でページ数が減った場合にcurrentPageを自動調整
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [employees.length, totalPages]);
+
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const prevEmployeesRef = useRef<Employee[]>(employees);
@@ -174,7 +192,50 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
       mb={0}
       display="block"
       style={{ minWidth: 0 }}
+      ref={listRef}
     >
+      {/* ページネーション（テーブル上部） */}
+      {employees.length > ITEMS_PER_PAGE && (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          gap={2}
+          mb={2}
+        >
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            style={{
+              padding: "4px 12px",
+              borderRadius: 6,
+              border: "1px solid #B2F5EA",
+              background: currentPage === 1 ? "#eee" : "#fff",
+              color: "black",
+              cursor: currentPage === 1 ? "not-allowed" : "pointer",
+            }}
+          >
+            前へ
+          </button>
+          <span style={{ fontSize: "0.95em", color: "black" }}>
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            style={{
+              padding: "4px 12px",
+              borderRadius: 6,
+              border: "1px solid #B2F5EA",
+              background: currentPage === totalPages ? "#eee" : "#fff",
+              color: "black",
+              cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+            }}
+          >
+            次へ
+          </button>
+        </Box>
+      )}
       <Table
         variant="striped"
         colorScheme="teal"
@@ -223,7 +284,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         </Thead>
         <Tbody>
           <AnimatePresence>
-            {employees.map((emp, idx) => {
+            {pagedEmployees.map((emp, idx) => {
               const used = emp.leaveDates.length;
               const now = new Date();
               let grantThisYear = 0;
