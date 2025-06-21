@@ -133,6 +133,23 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             px={6}
             fontWeight="bold"
             boxShadow="md"
+            isDisabled={
+              !!idError ||
+              !form.id ||
+              !form.lastName ||
+              !form.firstName ||
+              !form.joinedAt
+            }
+            cursor={
+              !!idError ||
+              !form.id ||
+              !form.lastName ||
+              !form.firstName ||
+              !form.joinedAt
+                ? "not-allowed"
+                : "pointer"
+            }
+            _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
           >
             <Icon as={User} mr={2} />
             追加

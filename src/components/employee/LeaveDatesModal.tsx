@@ -99,7 +99,19 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
             maxLength={10}
           />
           {editDateIdx === null ? (
-            <Button colorScheme="teal" onClick={onAddDate} px={4} minW={"auto"}>
+            <Button
+              colorScheme="teal"
+              onClick={onAddDate}
+              px={4}
+              minW={"auto"}
+              isDisabled={!dateInput.match(/^\d{4}-\d{2}-\d{2}$/)}
+              cursor={
+                !dateInput.match(/^\d{4}-\d{2}-\d{2}$/)
+                  ? "not-allowed"
+                  : "pointer"
+              }
+              _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
+            >
               <Plus size={16} style={{ marginRight: 6 }} />
               追加
             </Button>
@@ -109,6 +121,13 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
               onClick={onSaveDate}
               px={4}
               minW={"auto"}
+              isDisabled={!dateInput.match(/^\d{4}-\d{2}-\d{2}$/)}
+              cursor={
+                !dateInput.match(/^\d{4}-\d{2}-\d{2}$/)
+                  ? "not-allowed"
+                  : "pointer"
+              }
+              _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
             >
               <Icons.Edit size={16} style={{ marginRight: 6 }} />
               保存
