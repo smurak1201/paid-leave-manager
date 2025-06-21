@@ -22,24 +22,25 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     borderRadius="lg"
     boxShadow="lg"
     bg="white"
-    p={6}
-    maxW="900px"
+    p={2}
+    maxW="100vw"
     mx="auto"
     mb={0}
-    display="flex"
-    justifyContent="center"
+    display="block"
+    style={{ minWidth: 0 }}
   >
     <Table
       variant="striped"
       colorScheme="teal"
       size="sm"
       sx={{
-        minWidth: "0",
+        minWidth: 600,
         width: "100%",
         "th, td": {
           fontSize: "sm",
-          py: 2,
-          px: 1,
+          py: [1, 2],
+          px: [1, 2],
+          whiteSpace: "nowrap",
         },
         th: {
           bg: "teal.50",
