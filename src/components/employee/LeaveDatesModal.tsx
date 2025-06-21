@@ -96,6 +96,60 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
     setDeleteOpen(false);
     setDeleteIdx(null);
   };
+  const DateInputRow: React.FC<{
+    dateInput: string;
+    onChangeDateInput: (v: string) => void;
+    onAddDate: (date: string) => void;
+    onSaveDate: () => void;
+    editDateIdx: number | null;
+    remainSimple: number;
+  }> = ({
+    dateInput,
+    onChangeDateInput,
+    onAddDate,
+    onSaveDate,
+    editDateIdx,
+    remainSimple,
+  }) => (
+    <Box display="flex" gap={2} mb={4}>
+      <input
+        type="date"
+        value={dateInput}
+        onChange={(e) => {
+          onChangeDateInput(e.target.value);
+          if (
+            editDateIdx === null &&
+            e.target.value.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/) &&
+            remainSimple > 0
+          ) {
+            onAddDate(e.target.value);
+          }
+        }}
+        style={inputDateStyle}
+        maxLength={10}
+      />
+      {editDateIdx !== null && (
+        <Button
+          colorScheme="teal"
+          onClick={onSaveDate}
+          px={4}
+          minW={"auto"}
+          disabled={
+            remainSimple === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
+          }
+          cursor={
+            remainSimple === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
+              ? "not-allowed"
+              : "pointer"
+          }
+          _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
+        >
+          <Icons.Edit size={16} style={{ marginRight: 6 }} />
+          保存
+        </Button>
+      )}
+    </Box>
+  );
   return (
     <Box
       position="fixed"
@@ -142,46 +196,14 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
         <Text color="teal.700" fontWeight="bold" mb={2} textAlign="center">
           残日数：{remainSimple}日
         </Text>
-        <Box display="flex" gap={2} mb={4}>
-          <input
-            type="date"
-            value={dateInput}
-            onChange={(e) => {
-              onChangeDateInput(e.target.value);
-              if (
-                editDateIdx === null &&
-                e.target.value.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/) &&
-                remainSimple > 0
-              ) {
-                onAddDate(e.target.value);
-              }
-            }}
-            style={inputDateStyle}
-            maxLength={10}
-          />
-          {editDateIdx !== null && (
-            <Button
-              colorScheme="teal"
-              onClick={onSaveDate}
-              px={4}
-              minW={"auto"}
-              disabled={
-                remainSimple === 0 ||
-                !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
-              }
-              cursor={
-                remainSimple === 0 ||
-                !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
-                  ? "not-allowed"
-                  : "pointer"
-              }
-              _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
-            >
-              <Icons.Edit size={16} style={{ marginRight: 6 }} />
-              保存
-            </Button>
-          )}
-        </Box>
+        <DateInputRow
+          dateInput={dateInput}
+          onChangeDateInput={onChangeDateInput}
+          onAddDate={onAddDate}
+          onSaveDate={onSaveDate}
+          editDateIdx={editDateIdx}
+          remainSimple={remainSimple}
+        />
         {dates.length === 0 ? (
           <Text color="gray.500" textAlign="center">
             取得履歴なし
