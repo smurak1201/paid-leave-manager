@@ -1,7 +1,32 @@
+// =============================
+// LeaveDatesModal.tsx
+// 有給取得日編集モーダルコンポーネント
+// =============================
+//
+// このファイルは従業員ごとの有給取得日を編集・確認するモーダルUI部品です。
+// - propsとしてモーダル開閉状態・従業員ID・従業員取得関数・日付編集用状態・ハンドラ等を受け取る
+// - 日付編集の状態・バリデーションはカスタムフックで共通化
+// - propsは「idのみ受け取り、データ参照はAppのstateから行う」形に統一
+// - UI部品の小コンポーネント化・責務分離・型安全性を徹底
+//
+// 設計意図:
+// - モーダルの責務は「日付リストUIと編集操作」のみに限定
+// - 業務ロジックや状態管理は親(App)で一元化
+// - 初学者でも理解しやすいように全体の流れ・propsの意味を日本語コメントで明記
+//
+// このファイルを通じて、従業員の有給取得日を簡単に確認・編集できるモーダルの実装方法を学べます。
+// - 具体的には、Reactのfunctional component、propsの受け渡し、カスタムフックによる状態管理、
+//   Chakra UIを用いたスタイリング、TypeScriptによる型安全なコーディング手法などが含まれます。
+//
+// 初学者の方は、まずはこのコンポーネントがどのように組み立てられているか、
+// どのように親コンポーネントと連携しているかを中心に注目してみてください。
+// その後、実際に手を動かして同様のコンポーネントを作成することで、
+// ReactやTypeScript、Chakra UIの理解を深めることができるでしょう。
+
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import { X } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
-import { Icons } from "./icons";
+import { Icons } from "./icons"; // 一部のアイコンは未使用のため削除可
 import { calcLeaveDays } from "./utils";
 import type { Employee } from "./types";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
@@ -9,6 +34,7 @@ import { DateInputRow } from "./DateInputRow";
 import { inputDateSmallStyle } from "./icons";
 import { LeaveDateList } from "./LeaveDateList";
 
+// propsの型定義。親(App)から必要な情報・関数を受け取る
 interface LeaveDatesModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -23,6 +49,7 @@ interface LeaveDatesModalProps {
   onDeleteDate: (idx: number) => void;
 }
 
+// モーダル本体
 export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   isOpen,
   onClose,

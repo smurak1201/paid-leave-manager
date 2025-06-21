@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { FormControl, FormLabel } from "@chakra-ui/form-control";
-import {
-  Button,
-  Input,
-  Stack,
-  HStack,
-  Icon,
-  Box,
-  Text,
-} from "@chakra-ui/react";
-import { User, BadgeInfo, X } from "lucide-react";
-import type { Employee } from "./types";
-import { CustomModal } from "../ui/CustomModal";
-import { inputDateStyle } from "./icons";
-
+// =============================
+// EmployeeModal.tsx
+// 従業員追加・編集モーダルコンポーネント
+// =============================
+//
+// このファイルは従業員の追加・編集用モーダルUI部品です。
+// - propsとしてモーダル開閉状態・従業員ID・従業員取得関数・追加/保存ハンドラ・バリデーションエラー等を受け取る
+// - 入力フォームの状態・バリデーションはカスタムフックで共通化
+// - propsは「idのみ受け取り、データ参照はAppのstateから行う」形に統一
+// - UI部品の小コンポーネント化・責務分離・型安全性を徹底
+//
+// 設計意図:
+// - モーダルの責務は「フォームUIとバリデーション表示」のみに限定
+// - 業務ロジックや状態管理は親(App)で一元化
+// - 初学者でも理解しやすいように全体の流れ・propsの意味を日本語コメントで明記
+//
+// propsの型定義。親(App)から必要な情報・関数を受け取る
 interface EmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -25,6 +26,7 @@ interface EmployeeModalProps {
   editId: string | null;
 }
 
+// モーダル本体
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   isOpen,
   onClose,

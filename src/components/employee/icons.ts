@@ -1,3 +1,29 @@
+// =============================
+// icons.ts
+// アイコン管理ファイル
+// =============================
+//
+// このファイルはアプリ全体で使うアイコン（lucide-react等）を一元管理します。
+// - UI部品で使うアイコンをまとめてimport/export
+// - props/stateの流れをシンプルに保つ
+//
+// 設計意図:
+// - アイコン管理を一元化し、UI部品の可読性・保守性を向上
+// - 初学者でも理解しやすいようにアイコンの意味・用途を日本語コメントで明記
+//
+// アイコン一覧:
+// - X: 閉じる
+// - Edit: 編集
+// - Trash2: 削除
+// - Plus: 追加
+// - Info: 情報
+// - Eye: 表示
+//
+// 使用例:
+// import { Icons } from 'path/to/icons';
+// <Icons.Edit /> // 編集アイコン
+//
+
 import { X, Edit, Trash2, Plus, Info, Eye } from "lucide-react";
 
 export const Icons = {
@@ -9,6 +35,7 @@ export const Icons = {
   Eye,
 };
 
+// 日付入力用のスタイル
 export const inputDateStyle: React.CSSProperties = {
   border: "1px solid #B2F5EA",
   borderRadius: 6,
@@ -18,6 +45,7 @@ export const inputDateStyle: React.CSSProperties = {
   width: "100%",
 };
 
+// 小さい日付入力用のスタイル
 export const inputDateSmallStyle: React.CSSProperties = {
   border: "1px solid #B2F5EA",
   borderRadius: 6,
@@ -26,14 +54,15 @@ export const inputDateSmallStyle: React.CSSProperties = {
   outline: "none",
 };
 
-// 勤続年数を「X年Yか月」形式で返す（YYYY-MM-DD対応・正確な計算）
+// 勤続年数を「X年Yか月」形式で返す関数
+// 入社日と現在日から年・月を計算し、UI表示用に整形します。
 export function getServicePeriod(joinedAt: string, now: Date = new Date()): string {
   // YYYY-MM-DDまたはYYYY-MM形式に対応
-  const match = joinedAt.match(/^(\d{4})-(\d{2})(?:-(\d{2}))?$/);
+  const match = joinedAt.match(/^\d{4}-(\d{2})(?:-(\d{2}))?$/);
   if (!match) return "-";
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  const day = match[3] ? Number(match[3]) : 1;
+  const year = Number(joinedAt.slice(0, 4));
+  const month = Number(joinedAt.slice(5, 7));
+  const day = joinedAt.length >= 10 ? Number(joinedAt.slice(8, 10)) : 1;
   const joinDate = new Date(year, month - 1, day);
   if (joinDate > now) return "-";
   let years = now.getFullYear() - year;

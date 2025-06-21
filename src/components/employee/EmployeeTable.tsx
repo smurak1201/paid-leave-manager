@@ -1,3 +1,24 @@
+// =============================
+// EmployeeTable.tsx
+// 従業員一覧テーブルコンポーネント
+// =============================
+//
+// このファイルは従業員の有給休暇情報を一覧表示するテーブルUI部品です。
+// - propsとして従業員リスト・編集/削除/確認ボタンのハンドラを受け取る
+// - 各従業員ごとに編集・削除・有給取得日確認ボタンを表示
+// - propsは「idのみ受け取り、データ参照はAppのstateから行う」形に統一
+// - UI部品の小コンポーネント化・責務分離・型安全性を徹底
+//
+// 設計意図:
+// - テーブルの責務は「表示と操作ボタンの配置」のみに限定
+// - 業務ロジックや状態管理は親(App)で一元化
+// - 初学者でも理解しやすいように全体の流れ・propsの意味を日本語コメントで明記
+//
+// 各従業員の勤続年数に応じた有給休暇の付与日数を計算し、残日数がわかるように色分け表示
+// 削除確認モーダルや行のフェードアニメーションも実装
+//
+// 従業員一覧テーブルのUI部品です。
+// 一覧表示・操作ボタン・残日数計算などをまとめて管理し、propsでデータと操作関数を受け取ります。
 import React, { useState, useEffect, useRef } from "react";
 import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
 import type { Employee } from "./types";
@@ -9,6 +30,7 @@ import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { FadeTableRow } from "./FadeTableRow";
 import { AnimatePresence } from "framer-motion";
 
+// propsの型定義。データと操作関数を親(App)から受け取る
 interface EmployeeTableProps {
   employees: Employee[];
   onEdit: (id: string) => void;
@@ -16,6 +38,7 @@ interface EmployeeTableProps {
   onView: (id: string) => void;
 }
 
+// 従業員一覧テーブル本体
 export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   employees,
   onEdit,
