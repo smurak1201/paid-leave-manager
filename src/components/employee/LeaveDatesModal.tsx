@@ -1,5 +1,5 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
-import { X, Plus } from "lucide-react";
+import { X } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import { Icons, inputDateStyle, inputDateSmallStyle } from "./icons";
 import { calcLeaveDays } from "./utils";
@@ -14,7 +14,7 @@ interface LeaveDatesModalProps {
   editDateIdx: number | null;
   dateInput: string;
   onChangeDateInput: (v: string) => void;
-  onAddDate: () => void;
+  onAddDate: (date: string) => void;
   onEditDate: (idx: number) => void;
   onSaveDate: () => void;
   onDeleteDate: (idx: number) => void;
@@ -146,32 +146,20 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
           <input
             type="date"
             value={dateInput}
-            onChange={(e) => onChangeDateInput(e.target.value)}
+            onChange={(e) => {
+              onChangeDateInput(e.target.value);
+              if (
+                editDateIdx === null &&
+                e.target.value.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/) &&
+                remainSimple > 0
+              ) {
+                onAddDate(e.target.value);
+              }
+            }}
             style={inputDateStyle}
             maxLength={10}
           />
-          {editDateIdx === null ? (
-            <Button
-              colorScheme="teal"
-              onClick={onAddDate}
-              px={4}
-              minW={"auto"}
-              disabled={
-                remainSimple === 0 ||
-                !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
-              }
-              cursor={
-                remainSimple === 0 ||
-                !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
-                  ? "not-allowed"
-                  : "pointer"
-              }
-              _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
-            >
-              <Plus size={16} style={{ marginRight: 6 }} />
-              追加
-            </Button>
-          ) : (
+          {editDateIdx !== null && (
             <Button
               colorScheme="teal"
               onClick={onSaveDate}

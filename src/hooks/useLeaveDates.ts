@@ -5,9 +5,9 @@ export function useLeaveDates(employee: Employee | null) {
   const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
   const [dateInput, setDateInput] = useState<string>("");
 
-  const handleAddDate = (onUpdate: (dates: string[]) => void) => {
+  const handleAddDate = (date: string, onUpdate: (dates: string[]) => void) => {
     if (!employee) return;
-    const newDate = dateInput;
+    const newDate = date;
     if (
       !newDate.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
       employee.leaveDates.includes(newDate) ||

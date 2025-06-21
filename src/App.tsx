@@ -300,9 +300,9 @@ function App() {
           editDateIdx={editDateIdx}
           dateInput={dateInput}
           onChangeDateInput={setDateInput}
-          onAddDate={() => {
+          onAddDate={(date) => {
             if (!currentEmployee) return;
-            handleAddDate((dates) =>
+            handleAddDate(date, (dates) =>
               setEmployees((prev) =>
                 prev.map((emp) =>
                   emp.id === currentEmployee.id
