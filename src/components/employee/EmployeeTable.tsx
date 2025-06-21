@@ -32,12 +32,14 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     <Table
       variant="striped"
       colorScheme="teal"
-      size="md"
+      size="sm"
       sx={{
-        minWidth: "700px",
+        minWidth: "0",
+        width: "100%",
         "th, td": {
-          fontSize: "md",
-          py: 3,
+          fontSize: "sm",
+          py: 2,
+          px: 1,
         },
         th: {
           bg: "teal.50",
