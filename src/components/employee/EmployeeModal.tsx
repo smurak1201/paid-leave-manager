@@ -26,6 +26,9 @@ interface EmployeeModalProps {
   editId: string | null;
 }
 
+// 型定義のインポート
+import type { Employee } from "./types";
+
 // モーダル本体
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   isOpen,

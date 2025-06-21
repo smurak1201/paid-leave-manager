@@ -26,7 +26,6 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import { X } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
-import { Icons } from "./icons"; // 一部のアイコンは未使用のため削除可
 import { calcLeaveDays } from "./utils";
 import type { Employee } from "./types";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
