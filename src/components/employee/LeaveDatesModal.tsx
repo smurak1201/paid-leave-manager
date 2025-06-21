@@ -104,7 +104,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
               onClick={onAddDate}
               px={4}
               minW={"auto"}
-              isDisabled={!dateInput.match(/^\d{4}-\d{2}-\d{2}$/)}
+              disabled={!dateInput.match(/^\d{4}-\d{2}-\d{2}$/)}
               cursor={
                 !dateInput.match(/^\d{4}-\d{2}-\d{2}$/)
                   ? "not-allowed"
@@ -121,7 +121,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
               onClick={onSaveDate}
               px={4}
               minW={"auto"}
-              isDisabled={!dateInput.match(/^\d{4}-\d{2}-\d{2}$/)}
+              disabled={!dateInput.match(/^\d{4}-\d{2}-\d{2}$/)}
               cursor={
                 !dateInput.match(/^\d{4}-\d{2}-\d{2}$/)
                   ? "not-allowed"
