@@ -9,150 +9,141 @@ import {
   Text,
   CloseButton,
 } from "@chakra-ui/react";
-import { User, BadgeInfo, CalendarPlus, CalendarCheck, X } from "lucide-react";
+import { User, BadgeInfo, CalendarPlus, X } from "lucide-react";
 import type { Employee } from "./types";
 import { CustomModal } from "../ui/CustomModal";
 
-interface Props {
+interface EmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  form: Omit<Employee, "id"> & { id: string };
+  form: Employee;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAdd: () => void;
 }
 
-export const EmployeeModal = ({
+export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   isOpen,
   onClose,
   form,
   onChange,
   onAdd,
-}: Props) => (
-  <CustomModal isOpen={isOpen} onClose={onClose}>
-    <Box position="relative">
-      <HStack justify="center" gap={2} mb={6}>
-        <Icon as={User} color="teal.400" boxSize={6} />
-        <Text
-          as="span"
-          fontWeight="bold"
-          color="teal.700"
-          fontSize="xl"
-          letterSpacing={1}
-        >
-          従業員追加
-        </Text>
-      </HStack>
-      <Button
-        position="absolute"
-        top={2}
-        right={2}
-        size="sm"
-        variant="ghost"
-        colorScheme="teal"
-        onClick={onClose}
-        p={2}
-        minW={"auto"}
-        aria-label="閉じる"
-      >
-        <Icon as={X} boxSize={4} />
-      </Button>
-      <Stack gap={3} mb={6}>
-        <FormControl isRequired>
-          <FormLabel>
-            <Icon as={BadgeInfo} mr={2} />
-            従業員コード
-          </FormLabel>
-          <Input
-            name="id"
-            value={form.id}
-            onChange={onChange}
-            borderColor="teal.300"
-            bg="whiteAlpha.900"
-            _placeholder={{ color: "teal.200" }}
-          />
-        </FormControl>
-        <FormControl isRequired>
-          <FormLabel>
-            <Icon as={User} mr={2} />姓
-          </FormLabel>
-          <Input
-            name="lastName"
-            value={form.lastName}
-            onChange={onChange}
-            borderColor="teal.300"
-            bg="whiteAlpha.900"
-            _placeholder={{ color: "teal.200" }}
-          />
-        </FormControl>
-        <FormControl isRequired>
-          <FormLabel>
-            <Icon as={User} mr={2} />名
-          </FormLabel>
-          <Input
-            name="firstName"
-            value={form.firstName}
-            onChange={onChange}
-            borderColor="teal.300"
-            bg="whiteAlpha.900"
-            _placeholder={{ color: "teal.200" }}
-          />
-        </FormControl>
-        <FormControl>
-          <FormLabel>
-            <Icon as={CalendarPlus} mr={2} />
-            付与日数
-          </FormLabel>
-          <Input
-            name="total"
-            type="number"
-            min={0}
-            value={form.total}
-            onChange={onChange}
-            borderColor="teal.300"
-            bg="whiteAlpha.900"
-            _placeholder={{ color: "teal.200" }}
-          />
-        </FormControl>
-        <FormControl>
-          <FormLabel>
-            <Icon as={CalendarCheck} mr={2} />
-            消化日数
-          </FormLabel>
-          <Input
-            name="used"
-            type="number"
-            min={0}
-            value={form.used}
-            onChange={onChange}
-            borderColor="teal.300"
-            bg="whiteAlpha.900"
-            _placeholder={{ color: "teal.200" }}
-          />
-        </FormControl>
-      </Stack>
-      <HStack justify="flex-end" gap={3}>
+}) => {
+  if (!isOpen) return null;
+  return (
+    <CustomModal isOpen={isOpen} onClose={onClose}>
+      <Box position="relative">
+        <HStack justify="center" gap={2} mb={6}>
+          <Icon as={User} color="teal.400" boxSize={6} />
+          <Text
+            as="span"
+            fontWeight="bold"
+            color="teal.700"
+            fontSize="xl"
+            letterSpacing={1}
+          >
+            従業員追加
+          </Text>
+        </HStack>
         <Button
-          colorScheme="teal"
-          onClick={onAdd}
-          borderRadius="full"
-          px={6}
-          fontWeight="bold"
-          boxShadow="md"
-        >
-          <Icon as={User} mr={2} />
-          追加
-        </Button>
-        <Button
-          onClick={onClose}
+          position="absolute"
+          top={2}
+          right={2}
+          size="sm"
           variant="ghost"
           colorScheme="teal"
-          borderRadius="full"
-          px={6}
-          fontWeight="bold"
+          onClick={onClose}
+          p={2}
+          minW={"auto"}
+          aria-label="閉じる"
         >
-          キャンセル
+          <Icon as={X} boxSize={4} />
         </Button>
-      </HStack>
-    </Box>
-  </CustomModal>
-);
+        <Stack gap={3} mb={6}>
+          <FormControl isRequired>
+            <FormLabel>
+              <Icon as={BadgeInfo} mr={2} />
+              従業員コード
+            </FormLabel>
+            <Input
+              name="id"
+              value={form.id}
+              onChange={onChange}
+              borderColor="teal.300"
+              bg="whiteAlpha.900"
+              _placeholder={{ color: "teal.200" }}
+            />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>
+              <Icon as={User} mr={2} />姓
+            </FormLabel>
+            <Input
+              name="lastName"
+              value={form.lastName}
+              onChange={onChange}
+              borderColor="teal.300"
+              bg="whiteAlpha.900"
+              _placeholder={{ color: "teal.200" }}
+            />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>
+              <Icon as={User} mr={2} />名
+            </FormLabel>
+            <Input
+              name="firstName"
+              value={form.firstName}
+              onChange={onChange}
+              borderColor="teal.300"
+              bg="whiteAlpha.900"
+              _placeholder={{ color: "teal.200" }}
+            />
+          </FormControl>
+        </Stack>
+        <Box mb={4}>
+          <Text fontWeight="bold" mb={1}>
+            入社年月日
+          </Text>
+          <input
+            type="date"
+            name="joinedAt"
+            value={form.joinedAt || ""}
+            onChange={onChange}
+            style={{
+              border: "1px solid #B2F5EA",
+              borderRadius: 6,
+              padding: "6px 12px",
+              fontSize: 16,
+              outline: "none",
+              width: "100%",
+            }}
+            max={new Date().toISOString().slice(0, 10)}
+          />
+        </Box>
+        <HStack justify="flex-end" gap={3}>
+          <Button
+            colorScheme="teal"
+            onClick={onAdd}
+            borderRadius="full"
+            px={6}
+            fontWeight="bold"
+            boxShadow="md"
+          >
+            <Icon as={User} mr={2} />
+            追加
+          </Button>
+          <Button
+            onClick={onClose}
+            variant="ghost"
+            colorScheme="teal"
+            borderRadius="full"
+            px={6}
+            fontWeight="bold"
+          >
+            キャンセル
+          </Button>
+        </HStack>
+      </Box>
+    </CustomModal>
+  );
+};

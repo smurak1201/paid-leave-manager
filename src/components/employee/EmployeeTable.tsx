@@ -4,19 +4,19 @@ import { Box, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
 import { Edit, Trash2, Eye } from "./icons";
 import { Tooltip } from "../ui/tooltip";
 
-interface Props {
+interface EmployeeTableProps {
   employees: Employee[];
-  onEdit?: (emp: Employee) => void;
-  onDelete?: (emp: Employee) => void;
-  onView?: (emp: Employee) => void;
+  onEdit: (emp: Employee) => void;
+  onDelete: (emp: Employee) => void;
+  onView: (emp: Employee) => void;
 }
 
-export const EmployeeTable = ({
+export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   employees,
   onEdit,
   onDelete,
   onView,
-}: Props) => (
+}) => (
   <Box
     overflowX="auto"
     borderRadius="lg"
@@ -70,14 +70,15 @@ export const EmployeeTable = ({
       </Thead>
       <Tbody>
         {employees.map((emp) => {
-          const remain = emp.total - emp.used;
+          const used = emp.leaveDates.length;
+          const remain = emp.total - used;
           return (
-            <Tr key={emp.id}>
+            <Tr key={emp.id} sx={remain === 0 ? { bg: "#FFF5F5" } : undefined}>
               <Td>{emp.id}</Td>
               <Td>{emp.lastName}</Td>
               <Td>{emp.firstName}</Td>
               <Td isNumeric>{emp.total}</Td>
-              <Td isNumeric>{emp.used}</Td>
+              <Td isNumeric>{used}</Td>
               <Td isNumeric>
                 <Badge
                   colorScheme={

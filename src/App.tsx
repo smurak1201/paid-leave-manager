@@ -18,6 +18,7 @@ const initialEmployees: Employee[] = [
     id: "001",
     lastName: "山田",
     firstName: "太郎",
+    joinedAt: "2023-04-01",
     total: 20,
     used: 5,
     leaveDates: [
@@ -32,11 +33,29 @@ const initialEmployees: Employee[] = [
     id: "002",
     lastName: "佐藤",
     firstName: "花子",
+    joinedAt: "2024-04-01",
     total: 15,
     used: 3,
     leaveDates: ["2025-03-20", "2025-04-10", "2025-06-05"],
   },
 ];
+
+// 勤続年数（月単位）から付与日数を返す
+function calcLeaveDays(joinedAt: string, now: Date = new Date()): number {
+  if (!joinedAt.match(/^\d{4}-\d{2}-\d{2}$/)) return 10;
+  const join = new Date(joinedAt);
+  const diff =
+    (now.getFullYear() - join.getFullYear()) * 12 +
+    (now.getMonth() - join.getMonth());
+  if (diff < 6) return 0;
+  if (diff < 18) return 10;
+  if (diff < 30) return 11;
+  if (diff < 42) return 12;
+  if (diff < 54) return 14;
+  if (diff < 66) return 16;
+  if (diff < 78) return 18;
+  return 20;
+}
 
 function App() {
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
@@ -45,6 +64,7 @@ function App() {
     id: "",
     lastName: "",
     firstName: "",
+    joinedAt: "",
     total: 20,
     used: 0,
     leaveDates: [],
@@ -57,27 +77,37 @@ function App() {
   const [guideOpen, setGuideOpen] = useState(false);
   const guideDisclosure = useDisclosure();
 
+  // 入社年月日変更時にtotalを自動計算
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: name === "total" || name === "used" ? Number(value) : value,
-    }));
+    setForm((prev) => {
+      let next = {
+        ...prev,
+        [name]: name === "total" || name === "used" ? Number(value) : value,
+      };
+      if (name === "joinedAt") {
+        next.total = calcLeaveDays(value);
+      }
+      return next;
+    });
   };
 
   const handleAdd = () => {
-    if (!form.id || !form.lastName || !form.firstName) return;
+    if (!form.id || !form.lastName || !form.firstName || !form.joinedAt) return;
+    const autoTotal = calcLeaveDays(form.joinedAt);
+    const newEmp = { ...form, total: autoTotal };
     if (editId) {
       setEmployees((prev) =>
-        prev.map((emp) => (emp.id === editId ? { ...form } : emp))
+        prev.map((emp) => (emp.id === editId ? { ...newEmp } : emp))
       );
     } else {
-      setEmployees([...employees, { ...form }]);
+      setEmployees([...employees, { ...newEmp }]);
     }
     setForm({
       id: "",
       lastName: "",
       firstName: "",
+      joinedAt: "",
       total: 20,
       used: 0,
       leaveDates: [],
@@ -196,6 +226,7 @@ function App() {
                 id: "",
                 lastName: "",
                 firstName: "",
+                joinedAt: "",
                 total: 20,
                 used: 0,
                 leaveDates: [],
@@ -281,6 +312,9 @@ function App() {
             >
               {viewName} さんの有給取得日
             </Heading>
+            <Text color="teal.700" fontWeight="bold" mb={2} textAlign="center">
+              消化日数：{viewDates.length}日
+            </Text>
             <Box display="flex" gap={2} mb={4}>
               <input
                 type="date"
