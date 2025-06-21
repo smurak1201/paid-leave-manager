@@ -28,7 +28,15 @@ export const EmployeeModal = ({
 }: Props) => (
   <Modal isOpen={isOpen} onClose={onClose}>
     <ModalOverlay />
-    <ModalContent>
+    <ModalContent
+      bg="white"
+      boxShadow="xl"
+      maxW="400px"
+      w="90%"
+      margin="auto"
+      border="2px solid"
+      borderColor="teal.300"
+    >
       <ModalHeader>従業員追加</ModalHeader>
       <ModalCloseButton />
       <ModalBody>
