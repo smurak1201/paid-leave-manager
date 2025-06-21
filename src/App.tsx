@@ -138,14 +138,6 @@ function App() {
     handleDeleteDate,
   } = useLeaveDates(currentEmployee);
 
-  // 未来日チェック
-  const isFutureDate = (date: string) => {
-    if (!date) return false;
-    const today = new Date();
-    const d = new Date(date);
-    return d > today;
-  };
-
   // テーブル操作
   const handleView = (emp: Employee) => {
     setActiveEmployeeId(emp.id);
@@ -247,12 +239,9 @@ function App() {
               !form.lastName ||
               !form.firstName ||
               !form.joinedAt ||
-              idError ||
-              isFutureDate(form.joinedAt)
+              idError
             ) {
-              setIdError(
-                "全ての項目を正しく入力してください（入社日は未来日不可）"
-              );
+              setIdError("全ての項目を正しく入力してください");
               return;
             }
             const autoTotal = calcLeaveDays(form.joinedAt);
@@ -276,12 +265,9 @@ function App() {
               !form.lastName ||
               !form.firstName ||
               !form.joinedAt ||
-              idError ||
-              isFutureDate(form.joinedAt)
+              idError
             ) {
-              setIdError(
-                "全ての項目を正しく入力してください（入社日は未来日不可）"
-              );
+              setIdError("全ての項目を正しく入力してください");
               return;
             }
             const autoTotal = calcLeaveDays(form.joinedAt);

@@ -126,7 +126,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             value={form.joinedAt || ""}
             onChange={onChange}
             style={inputDateStyle}
-            max={new Date().toISOString().slice(0, 10)}
           />
         </Box>
         <HStack justify="flex-end" gap={3}>
