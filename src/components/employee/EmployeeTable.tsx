@@ -1,12 +1,16 @@
 import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
 import type { Employee } from "./types";
-import { Box, Text, Badge } from "@chakra-ui/react";
+import { Box, Text, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
+import { Edit, Trash2 } from "./icons";
+import { Tooltip } from "../ui/tooltip";
 
 interface Props {
   employees: Employee[];
+  onEdit?: (emp: Employee) => void;
+  onDelete?: (emp: Employee) => void;
 }
 
-export const EmployeeTable = ({ employees }: Props) => (
+export const EmployeeTable = ({ employees, onEdit, onDelete }: Props) => (
   <Box
     overflowX="auto"
     borderRadius="lg"
@@ -55,6 +59,7 @@ export const EmployeeTable = ({ employees }: Props) => (
           <Th isNumeric>付与日数</Th>
           <Th isNumeric>消化日数</Th>
           <Th isNumeric>残日数</Th>
+          <Th minW="100px">操作</Th>
         </Tr>
       </Thead>
       <Tbody>
@@ -80,6 +85,32 @@ export const EmployeeTable = ({ employees }: Props) => (
                 >
                   {remain}
                 </Badge>
+              </Td>
+              <Td>
+                <HStack justify="center" gap={1}>
+                  <Tooltip content="編集" showArrow>
+                    <IconButton
+                      aria-label="編集"
+                      size="sm"
+                      variant="ghost"
+                      colorScheme="teal"
+                      onClick={() => onEdit && onEdit(emp)}
+                    >
+                      <Icon as={Edit} boxSize={5} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip content="削除" showArrow>
+                    <IconButton
+                      aria-label="削除"
+                      size="sm"
+                      variant="ghost"
+                      colorScheme="red"
+                      onClick={() => onDelete && onDelete(emp)}
+                    >
+                      <Icon as={Trash2} boxSize={5} />
+                    </IconButton>
+                  </Tooltip>
+                </HStack>
               </Td>
             </Tr>
           );

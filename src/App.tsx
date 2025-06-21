@@ -19,6 +19,7 @@ function App() {
     total: 20,
     used: 0,
   });
+  const [editId, setEditId] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -30,9 +31,26 @@ function App() {
 
   const handleAdd = () => {
     if (!form.id || !form.lastName || !form.firstName) return;
-    setEmployees([...employees, { ...form }]);
+    if (editId) {
+      setEmployees((prev) =>
+        prev.map((emp) => (emp.id === editId ? { ...form } : emp))
+      );
+    } else {
+      setEmployees([...employees, { ...form }]);
+    }
     setForm({ id: "", lastName: "", firstName: "", total: 20, used: 0 });
+    setEditId(null);
     onClose();
+  };
+
+  const handleEdit = (emp: Employee) => {
+    setForm(emp);
+    setEditId(emp.id);
+    onOpen();
+  };
+
+  const handleDelete = (emp: Employee) => {
+    setEmployees((prev) => prev.filter((e) => e.id !== emp.id));
   };
 
   return (
@@ -57,7 +75,17 @@ function App() {
         <Flex mb={6} justify="flex-end">
           <Button
             colorScheme="teal"
-            onClick={onOpen}
+            onClick={() => {
+              setForm({
+                id: "",
+                lastName: "",
+                firstName: "",
+                total: 20,
+                used: 0,
+              });
+              setEditId(null);
+              onOpen();
+            }}
             size="md"
             px={8}
             boxShadow="md"
@@ -65,11 +93,18 @@ function App() {
             従業員追加
           </Button>
         </Flex>
-        <EmployeeTable employees={employees} />
+        <EmployeeTable
+          employees={employees}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
       </Box>
       <EmployeeModal
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={() => {
+          setEditId(null);
+          onClose();
+        }}
         form={form}
         onChange={handleChange}
         onAdd={handleAdd}
