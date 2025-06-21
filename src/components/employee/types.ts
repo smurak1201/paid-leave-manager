@@ -6,4 +6,5 @@ export interface Employee {
   total: number;
   used: number;
   leaveDates: string[]; // 有給取得日（YYYY-MM-DD）
+  carryOver?: number; // 前年からの繰越日数（省略時は0）
 }

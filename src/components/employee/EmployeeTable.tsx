@@ -68,6 +68,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
           <Th>入社年月</Th>
           <Th>勤続年数</Th>
           <Th isNumeric>付与日数</Th>
+          <Th isNumeric>繰越</Th>
           <Th isNumeric>消化日数</Th>
           <Th isNumeric>残日数</Th>
           <Th minW="120px">操作</Th>
@@ -76,7 +77,8 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
       <Tbody>
         {employees.map((emp) => {
           const used = emp.leaveDates.length;
-          const remain = emp.total - used;
+          const carryOver = emp.carryOver ?? 0;
+          const remain = emp.total + carryOver - used;
           const servicePeriod = getServicePeriod(emp.joinedAt);
           return (
             <Tr key={emp.id} sx={remain === 0 ? { bg: "#FFF5F5" } : undefined}>
@@ -91,6 +93,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               </Td>
               <Td>{servicePeriod}</Td>
               <Td isNumeric>{emp.total}</Td>
+              <Td isNumeric>{carryOver}</Td>
               <Td isNumeric>{used}</Td>
               <Td isNumeric>
                 <Badge
