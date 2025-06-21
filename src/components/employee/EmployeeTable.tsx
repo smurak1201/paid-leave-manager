@@ -11,9 +11,9 @@ import { AnimatePresence } from "framer-motion";
 
 interface EmployeeTableProps {
   employees: Employee[];
-  onEdit: (emp: Employee) => void;
-  onDelete: (emp: Employee) => void;
-  onView: (emp: Employee) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onView: (id: string) => void;
 }
 
 export const EmployeeTable: React.FC<EmployeeTableProps> = ({
@@ -22,7 +22,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   onDelete,
   onView,
 }) => {
-  const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const prevEmployeesRef = useRef<Employee[]>(employees);
 
@@ -32,8 +32,8 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     prevEmployeesRef.current = employees;
   }, [employees]);
 
-  const handleDeleteClick = (emp: Employee) => {
-    setDeleteTarget(emp);
+  const handleDeleteClick = (id: string) => {
+    setDeleteTarget(id);
     setDeleteOpen(true);
   };
   const handleDeleteConfirm = () => {
@@ -53,9 +53,9 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     used: number;
     remain: number;
     servicePeriod: string;
-    onView: (emp: Employee) => void;
-    onEdit: (emp: Employee) => void;
-    handleDeleteClick: (emp: Employee) => void;
+    onView: (id: string) => void;
+    onEdit: (id: string) => void;
+    handleDeleteClick: (id: string) => void;
   }
 
   const RowContent: React.FC<RowContentProps> = ({
@@ -106,7 +106,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 size="sm"
                 variant="ghost"
                 colorScheme="blue"
-                onClick={() => onView && onView(emp)}
+                onClick={() => onView(emp.id)}
               >
                 <Icon as={Icons.Eye} boxSize={5} />
               </IconButton>
@@ -117,7 +117,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 size="sm"
                 variant="ghost"
                 colorScheme="teal"
-                onClick={() => onEdit && onEdit(emp)}
+                onClick={() => onEdit(emp.id)}
               >
                 <Icon as={Icons.Edit} boxSize={5} />
               </IconButton>
@@ -128,7 +128,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 size="sm"
                 variant="ghost"
                 colorScheme="red"
-                onClick={() => handleDeleteClick(emp)}
+                onClick={() => handleDeleteClick(emp.id)}
               >
                 <Icon as={Icons.Trash2} boxSize={5} />
               </IconButton>
@@ -259,7 +259,10 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         onConfirm={handleDeleteConfirm}
         targetName={
           deleteTarget
-            ? `${deleteTarget.lastName} ${deleteTarget.firstName}`
+            ? (() => {
+                const emp = employees.find((e) => e.id === deleteTarget);
+                return emp ? `${emp.lastName} ${emp.firstName}` : undefined;
+              })()
             : undefined
         }
       />

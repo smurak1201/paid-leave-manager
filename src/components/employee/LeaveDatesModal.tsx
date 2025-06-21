@@ -1,16 +1,19 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import { X } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
-import { Icons, inputDateStyle, inputDateSmallStyle } from "./icons";
+import { Icons } from "./icons";
 import { calcLeaveDays } from "./utils";
 import type { Employee } from "./types";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
+import { DateInputRow } from "./DateInputRow";
+import { inputDateSmallStyle } from "./icons";
+import { LeaveDateList } from "./LeaveDateList";
 
 interface LeaveDatesModalProps {
   isOpen: boolean;
   onClose: () => void;
   employeeId: string | null;
-  employees: Employee[];
+  getEmployee: (id: string) => Employee | undefined;
   editDateIdx: number | null;
   dateInput: string;
   onChangeDateInput: (v: string) => void;
@@ -24,7 +27,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   isOpen,
   onClose,
   employeeId,
-  employees,
+  getEmployee,
   editDateIdx,
   dateInput,
   onChangeDateInput,
@@ -33,9 +36,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   onSaveDate,
   onDeleteDate,
 }) => {
-  const employee = employeeId
-    ? employees.find((e) => e.id === employeeId) || null
-    : null;
+  const employee = employeeId ? getEmployee(employeeId) : undefined;
   if (!isOpen || !employee) return null;
   const dates = employee.leaveDates;
   // ページネーション用
@@ -96,60 +97,6 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
     setDeleteOpen(false);
     setDeleteIdx(null);
   };
-  const DateInputRow: React.FC<{
-    dateInput: string;
-    onChangeDateInput: (v: string) => void;
-    onAddDate: (date: string) => void;
-    onSaveDate: () => void;
-    editDateIdx: number | null;
-    remainSimple: number;
-  }> = ({
-    dateInput,
-    onChangeDateInput,
-    onAddDate,
-    onSaveDate,
-    editDateIdx,
-    remainSimple,
-  }) => (
-    <Box display="flex" gap={2} mb={4}>
-      <input
-        type="date"
-        value={dateInput}
-        onChange={(e) => {
-          onChangeDateInput(e.target.value);
-          if (
-            editDateIdx === null &&
-            e.target.value.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/) &&
-            remainSimple > 0
-          ) {
-            onAddDate(e.target.value);
-          }
-        }}
-        style={inputDateStyle}
-        maxLength={10}
-      />
-      {editDateIdx !== null && (
-        <Button
-          colorScheme="teal"
-          onClick={onSaveDate}
-          px={4}
-          minW={"auto"}
-          disabled={
-            remainSimple === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
-          }
-          cursor={
-            remainSimple === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
-              ? "not-allowed"
-              : "pointer"
-          }
-          _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
-        >
-          <Icons.Edit size={16} style={{ marginRight: 6 }} />
-          保存
-        </Button>
-      )}
-    </Box>
-  );
   return (
     <Box
       position="fixed"
@@ -242,71 +189,18 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                 </Button>
               </Box>
             )}
-            <Box as="ul" pl={0} m={0} ref={listRef}>
-              {pagedDates.map((date, i) => {
-                const idx = (currentPage - 1) * ITEMS_PER_PAGE + i;
-                const [y, m, d] = date.split("-");
-                const jpDate = `${y}年${m}月${d}日`;
-                return (
-                  <Box
-                    as="li"
-                    key={date + idx}
-                    fontSize="md"
-                    color="teal.700"
-                    py={2}
-                    px={4}
-                    borderBottom={
-                      idx !== dates.length - 1 ? "1px solid" : undefined
-                    }
-                    borderColor="teal.50"
-                    borderRadius="md"
-                    mb={1}
-                    listStyleType="none"
-                    bg={idx % 2 === 0 ? "teal.50" : "white"}
-                    display="flex"
-                    alignItems="center"
-                    gap={2}
-                  >
-                    <Text fontWeight="bold" minW="2em">
-                      {idx + 1}.
-                    </Text>
-                    {editDateIdx === idx ? (
-                      <input
-                        type="date"
-                        value={dateInput}
-                        onChange={(e) => onChangeDateInput(e.target.value)}
-                        style={inputDateSmallStyle}
-                        maxLength={10}
-                      />
-                    ) : (
-                      <Text>{jpDate}</Text>
-                    )}
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      colorScheme="teal"
-                      minW={"auto"}
-                      px={2}
-                      onClick={() => onEditDate(idx)}
-                      aria-label="編集"
-                    >
-                      <Icons.Edit size={15} />
-                    </Button>
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      colorScheme="red"
-                      minW={"auto"}
-                      px={2}
-                      onClick={() => handleDeleteClick(idx)}
-                      aria-label="削除"
-                    >
-                      <Icons.Trash2 size={15} />
-                    </Button>
-                  </Box>
-                );
-              })}
-            </Box>
+            <LeaveDateList
+              dates={dates}
+              editDateIdx={editDateIdx}
+              dateInput={dateInput}
+              onChangeDateInput={onChangeDateInput}
+              onEditDate={onEditDate}
+              onDeleteDate={handleDeleteClick}
+              inputDateSmallStyle={inputDateSmallStyle}
+              pagedDates={pagedDates}
+              currentPage={currentPage}
+              ITEMS_PER_PAGE={ITEMS_PER_PAGE}
+            />
           </>
         )}
         <Box display="flex" justifyContent="flex-end" gap={2} mt={4}>

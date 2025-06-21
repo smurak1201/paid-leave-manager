@@ -139,15 +139,16 @@ function App() {
   } = useLeaveDates(currentEmployee);
 
   // テーブル操作
-  const handleView = (emp: Employee) => {
-    setActiveEmployeeId(emp.id);
+  const handleView = (id: string) => {
+    setActiveEmployeeId(id);
     setActiveModal("leaveDates");
     setEditDateIdx(null);
     setDateInput("");
   };
-  const handleEdit = (emp: Employee) => {
-    setForm(emp);
-    setActiveEmployeeId(emp.id);
+  const handleEdit = (id: string) => {
+    const emp = employees.find((e) => e.id === id);
+    if (emp) setForm(emp);
+    setActiveEmployeeId(id);
     setActiveModal("edit");
     setIdError("");
   };
@@ -223,17 +224,17 @@ function App() {
         <EmployeeTable
           employees={employees}
           onEdit={handleEdit}
-          onDelete={(emp) =>
-            setEmployees((prev) => prev.filter((e) => e.id !== emp.id))
+          onDelete={(id) =>
+            setEmployees((prev) => prev.filter((e) => e.id !== id))
           }
           onView={handleView}
         />
         <EmployeeModal
           isOpen={activeModal === "add" || activeModal === "edit"}
           onClose={handleCloseModal}
-          form={form}
-          onChange={handleChange}
-          onAdd={() => {
+          employeeId={activeModal === "add" ? null : activeEmployeeId}
+          getEmployee={(id) => employees.find((e) => e.id === id)}
+          onAdd={(form) => {
             if (
               !form.id ||
               !form.lastName ||
@@ -259,7 +260,7 @@ function App() {
             setActiveEmployeeId(null);
             setActiveModal(null);
           }}
-          onSave={() => {
+          onSave={(form) => {
             if (
               !form.id ||
               !form.lastName ||
@@ -296,43 +297,40 @@ function App() {
           isOpen={activeModal === "leaveDates"}
           onClose={handleCloseModal}
           employeeId={activeEmployeeId}
-          employees={employees}
+          getEmployee={(id) => employees.find((e) => e.id === id)}
           editDateIdx={editDateIdx}
           dateInput={dateInput}
           onChangeDateInput={setDateInput}
           onAddDate={(date) => {
-            if (!currentEmployee) return;
+            const emp = employees.find((e) => e.id === activeEmployeeId);
+            if (!emp) return;
             handleAddDate(date, (dates) =>
               setEmployees((prev) =>
-                prev.map((emp) =>
-                  emp.id === currentEmployee.id
-                    ? { ...emp, leaveDates: dates }
-                    : emp
+                prev.map((e) =>
+                  e.id === emp.id ? { ...e, leaveDates: dates } : e
                 )
               )
             );
           }}
           onEditDate={handleEditDate}
           onSaveDate={() => {
-            if (!currentEmployee) return;
+            const emp = employees.find((e) => e.id === activeEmployeeId);
+            if (!emp) return;
             handleSaveDate((dates) =>
               setEmployees((prev) =>
-                prev.map((emp) =>
-                  emp.id === currentEmployee.id
-                    ? { ...emp, leaveDates: dates }
-                    : emp
+                prev.map((e) =>
+                  e.id === emp.id ? { ...e, leaveDates: dates } : e
                 )
               )
             );
           }}
           onDeleteDate={(idx) => {
-            if (!currentEmployee) return;
+            const emp = employees.find((e) => e.id === activeEmployeeId);
+            if (!emp) return;
             handleDeleteDate(idx, (dates) =>
               setEmployees((prev) =>
-                prev.map((emp) =>
-                  emp.id === currentEmployee.id
-                    ? { ...emp, leaveDates: dates }
-                    : emp
+                prev.map((e) =>
+                  e.id === emp.id ? { ...e, leaveDates: dates } : e
                 )
               )
             );

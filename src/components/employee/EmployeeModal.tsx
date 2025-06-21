@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import {
   Button,
@@ -16,10 +17,10 @@ import { inputDateStyle } from "./icons";
 interface EmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  form: Employee;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onAdd: () => void;
-  onSave: () => void;
+  employeeId: string | null;
+  getEmployee: (id: string) => Employee | undefined;
+  onAdd: (form: Employee) => void;
+  onSave: (form: Employee) => void;
   idError: string;
   editId: string | null;
 }
@@ -27,14 +28,26 @@ interface EmployeeModalProps {
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   isOpen,
   onClose,
-  form,
-  onChange,
+  employeeId,
+  getEmployee,
   onAdd,
   onSave,
   idError,
   editId,
 }) => {
-  if (!isOpen) return null;
+  const employee = employeeId ? getEmployee(employeeId) : undefined;
+  const [form, setForm] = useState<Employee | undefined>(employee);
+
+  useEffect(() => {
+    setForm(employee);
+  }, [employee]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!form) return;
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  if (!isOpen || !form) return null;
   return (
     <CustomModal isOpen={isOpen} onClose={onClose}>
       <Box position="relative">
@@ -73,7 +86,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             <Input
               name="id"
               value={form.id}
-              onChange={onChange}
+              onChange={handleChange}
               borderColor="teal.300"
               bg="whiteAlpha.900"
               _placeholder={{ color: "teal.200" }}
@@ -81,7 +94,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
               inputMode="numeric"
               pattern="^[0-9]*$"
               autoComplete="off"
-              disabled={!!editId} // 編集時はid変更不可
+              disabled={!!editId}
             />
             {idError && (
               <Text color="red.500" fontSize="sm" mt={1}>
@@ -96,7 +109,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             <Input
               name="lastName"
               value={form.lastName}
-              onChange={onChange}
+              onChange={handleChange}
               borderColor="teal.300"
               bg="whiteAlpha.900"
               _placeholder={{ color: "teal.200" }}
@@ -109,7 +122,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             <Input
               name="firstName"
               value={form.firstName}
-              onChange={onChange}
+              onChange={handleChange}
               borderColor="teal.300"
               bg="whiteAlpha.900"
               _placeholder={{ color: "teal.200" }}
@@ -124,14 +137,14 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             type="date"
             name="joinedAt"
             value={form.joinedAt || ""}
-            onChange={onChange}
+            onChange={handleChange}
             style={inputDateStyle}
           />
         </Box>
         <HStack justify="flex-end" gap={3}>
           <Button
             colorScheme="teal"
-            onClick={editId ? onSave : onAdd}
+            onClick={() => (editId ? onSave(form) : onAdd(form))}
             borderRadius="full"
             px={6}
             fontWeight="bold"
