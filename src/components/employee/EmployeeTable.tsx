@@ -81,32 +81,12 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               <Td>{emp.lastName}</Td>
               <Td>{emp.firstName}</Td>
               <Td>
-                <Badge
-                  colorScheme="teal"
-                  variant="subtle"
-                  fontSize="md"
-                  px={2}
-                  py={1}
-                  borderRadius="md"
-                >
-                  {emp.joinedAt
-                    .replace(/-/g, "年")
-                    .replace(/$/, "日")
-                    .replace(/年(\d{2})日/, "年$1月")}
-                </Badge>
+                {emp.joinedAt
+                  .replace(/-/g, "年")
+                  .replace(/$/, "日")
+                  .replace(/年(\d{2})日/, "年$1月")}
               </Td>
-              <Td>
-                <Badge
-                  colorScheme="gray"
-                  variant="outline"
-                  fontSize="md"
-                  px={2}
-                  py={1}
-                  borderRadius="md"
-                >
-                  {servicePeriod}
-                </Badge>
-              </Td>
+              <Td>{servicePeriod}</Td>
               <Td isNumeric>{emp.total}</Td>
               <Td isNumeric>{used}</Td>
               <Td isNumeric>
