@@ -10,6 +10,7 @@ import {
 import type { Employee } from "./components/employee/types";
 import { EmployeeTable } from "./components/employee/EmployeeTable";
 import { EmployeeModal } from "./components/employee/EmployeeModal";
+import { X } from "lucide-react";
 
 const initialEmployees: Employee[] = [
   {
@@ -184,8 +185,10 @@ function App() {
               variant="ghost"
               colorScheme="teal"
               onClick={() => setViewDates(null)}
+              p={2}
+              minW={"auto"}
             >
-              閉じる
+              <X size={18} />
             </Button>
             <Heading
               as="h3"
@@ -201,11 +204,32 @@ function App() {
                 取得履歴なし
               </Text>
             ) : (
-              <Box as="ul" pl={4}>
+              <Box as="ul" pl={0} m={0}>
                 {viewDates.map((date, i) => (
-                  <Text as="li" key={date} fontSize="md" color="teal.700">
-                    {i + 1}. {date}
-                  </Text>
+                  <Box
+                    as="li"
+                    key={date}
+                    fontSize="md"
+                    color="teal.700"
+                    py={2}
+                    px={4}
+                    borderBottom={
+                      i !== viewDates.length - 1 ? "1px solid" : undefined
+                    }
+                    borderColor="teal.50"
+                    borderRadius="md"
+                    mb={1}
+                    listStyleType="none"
+                    bg={i % 2 === 0 ? "teal.50" : "white"}
+                    display="flex"
+                    alignItems="center"
+                    gap={2}
+                  >
+                    <Text fontWeight="bold" minW="2em">
+                      {i + 1}.
+                    </Text>
+                    <Text>{date}</Text>
+                  </Box>
                 ))}
               </Box>
             )}
