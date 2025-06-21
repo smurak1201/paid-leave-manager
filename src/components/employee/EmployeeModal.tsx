@@ -30,22 +30,28 @@ export const EmployeeModal = ({
   <Modal isOpen={isOpen} onClose={onClose}>
     <ModalOverlay />
     <ModalContent
-      bg="white"
-      boxShadow="2xl"
-      maxW="400px"
-      w="90%"
+      bg="whiteAlpha.900"
+      boxShadow="lg"
+      maxW="420px"
+      w="95%"
       margin="auto"
-      border="2px solid"
-      borderColor="teal.400"
-      borderRadius="xl"
+      borderRadius="lg"
     >
-      <ModalHeader textAlign="center" color="teal.700" fontWeight="bold">
+      <ModalHeader
+        textAlign="center"
+        color="teal.700"
+        fontWeight="bold"
+        letterSpacing={1}
+      >
         <HStack justify="center" gap={2}>
           <Icon as={User} color="teal.400" boxSize={6} />
           <span>従業員追加</span>
         </HStack>
       </ModalHeader>
-      <ModalCloseButton color="teal.400" />
+      <ModalCloseButton
+        color="teal.400"
+        _focus={{ boxShadow: "0 0 0 2px teal.200" }}
+      />
       <ModalBody>
         <Stack gap={3}>
           <FormControl isRequired>
@@ -57,7 +63,9 @@ export const EmployeeModal = ({
               name="id"
               value={form.id}
               onChange={onChange}
-              borderColor="teal.400"
+              borderColor="teal.300"
+              bg="whiteAlpha.900"
+              _placeholder={{ color: "teal.200" }}
             />
           </FormControl>
           <FormControl isRequired>
@@ -68,7 +76,9 @@ export const EmployeeModal = ({
               name="lastName"
               value={form.lastName}
               onChange={onChange}
-              borderColor="teal.400"
+              borderColor="teal.300"
+              bg="whiteAlpha.900"
+              _placeholder={{ color: "teal.200" }}
             />
           </FormControl>
           <FormControl isRequired>
@@ -79,7 +89,9 @@ export const EmployeeModal = ({
               name="firstName"
               value={form.firstName}
               onChange={onChange}
-              borderColor="teal.400"
+              borderColor="teal.300"
+              bg="whiteAlpha.900"
+              _placeholder={{ color: "teal.200" }}
             />
           </FormControl>
           <FormControl>
@@ -93,7 +105,9 @@ export const EmployeeModal = ({
               min={0}
               value={form.total}
               onChange={onChange}
-              borderColor="teal.400"
+              borderColor="teal.300"
+              bg="whiteAlpha.900"
+              _placeholder={{ color: "teal.200" }}
             />
           </FormControl>
           <FormControl>
@@ -107,7 +121,9 @@ export const EmployeeModal = ({
               min={0}
               value={form.used}
               onChange={onChange}
-              borderColor="teal.400"
+              borderColor="teal.300"
+              bg="whiteAlpha.900"
+              _placeholder={{ color: "teal.200" }}
             />
           </FormControl>
         </Stack>
@@ -119,6 +135,8 @@ export const EmployeeModal = ({
           onClick={onAdd}
           borderRadius="full"
           px={6}
+          fontWeight="bold"
+          boxShadow="md"
         >
           <Icon as={User} mr={2} />
           追加
@@ -129,6 +147,7 @@ export const EmployeeModal = ({
           colorScheme="teal"
           borderRadius="full"
           px={6}
+          fontWeight="bold"
         >
           キャンセル
         </Button>
