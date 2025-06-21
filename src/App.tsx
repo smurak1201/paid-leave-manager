@@ -10,8 +10,9 @@ import {
 import type { Employee } from "./components/employee/types";
 import { EmployeeTable } from "./components/employee/EmployeeTable";
 import { EmployeeModal } from "./components/employee/EmployeeModal";
-import { X, Edit, Trash2, Plus, Info } from "lucide-react";
+import { Plus, Info } from "lucide-react";
 import { GuideModal } from "./components/ui/GuideModal";
+import { LeaveDatesModal } from "./components/employee/LeaveDatesModal";
 
 const initialEmployees: Employee[] = [
   {
@@ -263,178 +264,24 @@ function App() {
         onChange={handleChange}
         onAdd={handleAdd}
       />
-      {/* 有給取得日確認モーダル */}
-      {viewDates && (
-        <Box
-          position="fixed"
-          top={0}
-          left={0}
-          w="100vw"
-          h="100vh"
-          zIndex={2000}
-          bg="blackAlpha.400"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Box
-            bg="white"
-            borderRadius="lg"
-            boxShadow="lg"
-            p={6}
-            minW="340px"
-            maxW="90vw"
-            position="relative"
-          >
-            <Button
-              position="absolute"
-              top={2}
-              right={2}
-              size="sm"
-              variant="ghost"
-              colorScheme="teal"
-              onClick={() => {
-                setViewDates(null);
-                setEditDateIdx(null);
-                setDateInput("");
-              }}
-              p={2}
-              minW={"auto"}
-            >
-              <X size={18} />
-            </Button>
-            <Heading
-              as="h3"
-              size="md"
-              mb={4}
-              color="teal.700"
-              textAlign="center"
-            >
-              {viewName} さんの有給取得日
-            </Heading>
-            <Text color="teal.700" fontWeight="bold" mb={2} textAlign="center">
-              消化日数：{viewDates.length}日
-            </Text>
-            <Box display="flex" gap={2} mb={4}>
-              <input
-                type="date"
-                value={dateInput}
-                onChange={(e) => setDateInput(e.target.value)}
-                style={{
-                  border: "1px solid #B2F5EA",
-                  borderRadius: 6,
-                  padding: "6px 12px",
-                  fontSize: 16,
-                  outline: "none",
-                  flex: 1,
-                }}
-                maxLength={10}
-              />
-              {editDateIdx === null ? (
-                <Button
-                  colorScheme="teal"
-                  onClick={handleAddDate}
-                  px={4}
-                  minW={"auto"}
-                >
-                  <Plus size={16} style={{ marginRight: 6 }} />
-                  追加
-                </Button>
-              ) : (
-                <Button
-                  colorScheme="teal"
-                  onClick={handleSaveDate}
-                  px={4}
-                  minW={"auto"}
-                >
-                  <Edit size={16} style={{ marginRight: 6 }} />
-                  保存
-                </Button>
-              )}
-            </Box>
-            {viewDates.length === 0 ? (
-              <Text color="gray.500" textAlign="center">
-                取得履歴なし
-              </Text>
-            ) : (
-              <Box as="ul" pl={0} m={0}>
-                {viewDates.map((date, i) => {
-                  const [y, m, d] = date.split("-");
-                  const jpDate = `${y}年${m}月${d}日`;
-                  return (
-                    <Box
-                      as="li"
-                      key={date + i}
-                      fontSize="md"
-                      color="teal.700"
-                      py={2}
-                      px={4}
-                      borderBottom={
-                        i !== viewDates.length - 1 ? "1px solid" : undefined
-                      }
-                      borderColor="teal.50"
-                      borderRadius="md"
-                      mb={1}
-                      listStyleType="none"
-                      bg={i % 2 === 0 ? "teal.50" : "white"}
-                      display="flex"
-                      alignItems="center"
-                      gap={2}
-                    >
-                      <Text fontWeight="bold" minW="2em">
-                        {i + 1}.
-                      </Text>
-                      {editDateIdx === i ? (
-                        <input
-                          type="date"
-                          value={dateInput}
-                          onChange={(e) => setDateInput(e.target.value)}
-                          style={{
-                            border: "1px solid #B2F5EA",
-                            borderRadius: 6,
-                            padding: "4px 8px",
-                            fontSize: 16,
-                            outline: "none",
-                          }}
-                          maxLength={10}
-                        />
-                      ) : (
-                        <Text>{jpDate}</Text>
-                      )}
-                      <Button
-                        size="xs"
-                        variant="ghost"
-                        colorScheme="teal"
-                        minW={"auto"}
-                        px={2}
-                        onClick={() =>
-                          editDateIdx === i
-                            ? setEditDateIdx(null)
-                            : handleEditDate(i)
-                        }
-                        aria-label="編集"
-                      >
-                        <Edit size={15} />
-                      </Button>
-                      <Button
-                        size="xs"
-                        variant="ghost"
-                        colorScheme="red"
-                        minW={"auto"}
-                        px={2}
-                        onClick={() => handleDeleteDate(i)}
-                        aria-label="削除"
-                      >
-                        <Trash2 size={15} />
-                      </Button>
-                    </Box>
-                  );
-                })}
-              </Box>
-            )}
-          </Box>
-        </Box>
-      )}
+      <LeaveDatesModal
+        isOpen={!!viewDates}
+        onClose={() => {
+          setViewDates(null);
+          setEditDateIdx(null);
+          setDateInput("");
+        }}
+        viewName={viewName}
+        viewDates={viewDates || []}
+        editDateIdx={editDateIdx}
+        dateInput={dateInput}
+        onDateInputChange={setDateInput}
+        onEditDate={handleEditDate}
+        onSaveDate={handleSaveDate}
+        onDeleteDate={handleDeleteDate}
+        onAddDate={handleAddDate}
+        setEditDateIdx={setEditDateIdx}
+      />
     </Box>
   );
 }
