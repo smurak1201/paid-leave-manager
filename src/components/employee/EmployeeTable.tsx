@@ -6,6 +6,8 @@ import { Icons, getServicePeriod } from "./icons";
 import { calcLeaveDays } from "../../App";
 import { Tooltip } from "../ui/tooltip";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
+import { FadeTableRow } from "./FadeTableRow";
+import { AnimatePresence } from "framer-motion";
 
 interface EmployeeTableProps {
   employees: Employee[];
@@ -97,109 +99,111 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
           </Tr>
         </Thead>
         <Tbody>
-          {employees.map((emp) => {
-            const used = emp.leaveDates.length;
-            const now = new Date();
-            let grantThisYear = 0;
-            let carryOver = 0;
-            let foundGrant = false;
-            if (emp.grants && emp.grants.length > 0) {
-              emp.grants.forEach((g) => {
-                const grantDate = new Date(g.grantDate);
-                const grantYear = grantDate.getFullYear();
-                const nowYear = now.getFullYear();
-                const diffMonth =
-                  (now.getFullYear() - grantDate.getFullYear()) * 12 +
-                  (now.getMonth() - grantDate.getMonth());
-                if (grantYear === nowYear && diffMonth < 24) {
-                  // 今年付与された分（消化数は考慮しない）
-                  grantThisYear += g.days;
-                  foundGrant = true;
-                } else if (diffMonth < 24) {
-                  // 今年度以外の有効な繰越分（消化数は考慮しない）
-                  carryOver += g.days;
-                }
-              });
-            }
-            // grantがなければ勤続年数から日本の制度通りの付与日数を算出
-            if (!foundGrant) {
-              // 勤続年数（月単位）から付与日数を返す
-              grantThisYear = calcLeaveDays(emp.joinedAt, now);
-            }
-            const remain = grantThisYear + carryOver - used;
-            const servicePeriod = getServicePeriod(emp.joinedAt);
-            return (
-              <Tr
-                key={emp.id}
-                sx={remain === 0 ? { bg: "#FFF5F5" } : undefined}
-              >
-                <Td>{emp.id}</Td>
-                <Td>{emp.lastName}</Td>
-                <Td>{emp.firstName}</Td>
-                <Td>
-                  {(() => {
-                    const [y, m, d] = emp.joinedAt.split("-");
-                    return `${y}年${Number(m)}月${d ? Number(d) + "日" : ""}`;
-                  })()}
-                </Td>
-                <Td>{servicePeriod}</Td>
-                <Td isNumeric>{grantThisYear}</Td>
-                <Td isNumeric>{carryOver}</Td>
-                <Td isNumeric>{used}</Td>
-                <Td isNumeric>
-                  <Badge
-                    colorScheme={
-                      remain <= 3 ? "red" : remain <= 7 ? "yellow" : "teal"
-                    }
-                    fontSize="md"
-                    px={3}
-                    py={1}
-                    borderRadius="md"
-                    fontWeight="bold"
-                  >
-                    {remain}
-                  </Badge>
-                </Td>
-                <Td>
-                  <HStack justify="center" gap={1}>
-                    <Tooltip content="確認" showArrow>
-                      <IconButton
-                        aria-label="確認"
-                        size="sm"
-                        variant="ghost"
-                        colorScheme="blue"
-                        onClick={() => onView && onView(emp)}
-                      >
-                        <Icon as={Icons.Eye} boxSize={5} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip content="編集" showArrow>
-                      <IconButton
-                        aria-label="編集"
-                        size="sm"
-                        variant="ghost"
-                        colorScheme="teal"
-                        onClick={() => onEdit && onEdit(emp)}
-                      >
-                        <Icon as={Icons.Edit} boxSize={5} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip content="削除" showArrow>
-                      <IconButton
-                        aria-label="削除"
-                        size="sm"
-                        variant="ghost"
-                        colorScheme="red"
-                        onClick={() => handleDeleteClick(emp)}
-                      >
-                        <Icon as={Icons.Trash2} boxSize={5} />
-                      </IconButton>
-                    </Tooltip>
-                  </HStack>
-                </Td>
-              </Tr>
-            );
-          })}
+          <AnimatePresence>
+            {employees.map((emp) => {
+              const used = emp.leaveDates.length;
+              const now = new Date();
+              let grantThisYear = 0;
+              let carryOver = 0;
+              let foundGrant = false;
+              if (emp.grants && emp.grants.length > 0) {
+                emp.grants.forEach((g) => {
+                  const grantDate = new Date(g.grantDate);
+                  const grantYear = grantDate.getFullYear();
+                  const nowYear = now.getFullYear();
+                  const diffMonth =
+                    (now.getFullYear() - grantDate.getFullYear()) * 12 +
+                    (now.getMonth() - grantDate.getMonth());
+                  if (grantYear === nowYear && diffMonth < 24) {
+                    // 今年付与された分（消化数は考慮しない）
+                    grantThisYear += g.days;
+                    foundGrant = true;
+                  } else if (diffMonth < 24) {
+                    // 今年度以外の有効な繰越分（消化数は考慮しない）
+                    carryOver += g.days;
+                  }
+                });
+              }
+              // grantがなければ勤続年数から日本の制度通りの付与日数を算出
+              if (!foundGrant) {
+                // 勤続年数（月単位）から付与日数を返す
+                grantThisYear = calcLeaveDays(emp.joinedAt, now);
+              }
+              const remain = grantThisYear + carryOver - used;
+              const servicePeriod = getServicePeriod(emp.joinedAt);
+              return (
+                <FadeTableRow
+                  key={emp.id}
+                  style={remain === 0 ? { background: "#FFF5F5" } : undefined}
+                >
+                  <Td>{emp.id}</Td>
+                  <Td>{emp.lastName}</Td>
+                  <Td>{emp.firstName}</Td>
+                  <Td>
+                    {(() => {
+                      const [y, m, d] = emp.joinedAt.split("-");
+                      return `${y}年${Number(m)}月${d ? Number(d) + "日" : ""}`;
+                    })()}
+                  </Td>
+                  <Td>{servicePeriod}</Td>
+                  <Td isNumeric>{grantThisYear}</Td>
+                  <Td isNumeric>{carryOver}</Td>
+                  <Td isNumeric>{used}</Td>
+                  <Td isNumeric>
+                    <Badge
+                      colorScheme={
+                        remain <= 3 ? "red" : remain <= 7 ? "yellow" : "teal"
+                      }
+                      fontSize="md"
+                      px={3}
+                      py={1}
+                      borderRadius="md"
+                      fontWeight="bold"
+                    >
+                      {remain}
+                    </Badge>
+                  </Td>
+                  <Td>
+                    <HStack justify="center" gap={1}>
+                      <Tooltip content="確認" showArrow>
+                        <IconButton
+                          aria-label="確認"
+                          size="sm"
+                          variant="ghost"
+                          colorScheme="blue"
+                          onClick={() => onView && onView(emp)}
+                        >
+                          <Icon as={Icons.Eye} boxSize={5} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip content="編集" showArrow>
+                        <IconButton
+                          aria-label="編集"
+                          size="sm"
+                          variant="ghost"
+                          colorScheme="teal"
+                          onClick={() => onEdit && onEdit(emp)}
+                        >
+                          <Icon as={Icons.Edit} boxSize={5} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip content="削除" showArrow>
+                        <IconButton
+                          aria-label="削除"
+                          size="sm"
+                          variant="ghost"
+                          colorScheme="red"
+                          onClick={() => handleDeleteClick(emp)}
+                        >
+                          <Icon as={Icons.Trash2} boxSize={5} />
+                        </IconButton>
+                      </Tooltip>
+                    </HStack>
+                  </Td>
+                </FadeTableRow>
+              );
+            })}
+          </AnimatePresence>
         </Tbody>
       </Table>
       <ConfirmDeleteModal
