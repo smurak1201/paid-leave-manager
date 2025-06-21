@@ -1,2 +1,2 @@
-import { Edit, Trash2 } from "lucide-react";
-export { Edit, Trash2 };
+import { Edit, Trash2, Eye } from "lucide-react";
+export { Edit, Trash2, Eye };

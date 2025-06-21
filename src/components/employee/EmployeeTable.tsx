@@ -1,16 +1,22 @@
 import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
 import type { Employee } from "./types";
 import { Box, Text, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
-import { Edit, Trash2 } from "./icons";
+import { Edit, Trash2, Eye } from "./icons";
 import { Tooltip } from "../ui/tooltip";
 
 interface Props {
   employees: Employee[];
   onEdit?: (emp: Employee) => void;
   onDelete?: (emp: Employee) => void;
+  onView?: (emp: Employee) => void;
 }
 
-export const EmployeeTable = ({ employees, onEdit, onDelete }: Props) => (
+export const EmployeeTable = ({
+  employees,
+  onEdit,
+  onDelete,
+  onView,
+}: Props) => (
   <Box
     overflowX="auto"
     borderRadius="lg"
@@ -88,6 +94,17 @@ export const EmployeeTable = ({ employees, onEdit, onDelete }: Props) => (
               </Td>
               <Td>
                 <HStack justify="center" gap={1}>
+                  <Tooltip content="確認" showArrow>
+                    <IconButton
+                      aria-label="確認"
+                      size="sm"
+                      variant="ghost"
+                      colorScheme="blue"
+                      onClick={() => onView && onView(emp)}
+                    >
+                      <Icon as={Eye} boxSize={5} />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip content="編集" showArrow>
                     <IconButton
                       aria-label="編集"
