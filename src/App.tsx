@@ -1,31 +1,8 @@
 import { useState } from "react";
-import {
-  Box,
-  Heading,
-  Button,
-  Input,
-  Flex,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-} from "@chakra-ui/modal";
-import { FormControl, FormLabel } from "@chakra-ui/form-control";
-
-interface Employee {
-  id: string;
-  lastName: string;
-  firstName: string;
-  total: number;
-  used: number;
-}
+import { Box, Heading, Button, Flex, useDisclosure } from "@chakra-ui/react";
+import type { Employee } from "./components/employee/types";
+import { EmployeeTable } from "./components/employee/EmployeeTable";
+import { EmployeeModal } from "./components/employee/EmployeeModal";
 
 const initialEmployees: Employee[] = [
   { id: "001", lastName: "山田", firstName: "太郎", total: 20, used: 5 },
@@ -35,7 +12,7 @@ const initialEmployees: Employee[] = [
 function App() {
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
   const { open: isOpen, onOpen, onClose } = useDisclosure();
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<Employee>({
     id: "",
     lastName: "",
     firstName: "",
@@ -59,92 +36,44 @@ function App() {
   };
 
   return (
-    <Box maxW="700px" mx="auto" mt={10} p={5}>
-      <Heading mb={6}>有給休暇管理</Heading>
-      <Flex mb={4} gap={2}>
-        <Button colorScheme="teal" onClick={onOpen}>
-          追加
-        </Button>
-      </Flex>
-      <Table variant="simple">
-        <Thead>
-          <Tr>
-            <Th>従業員コード</Th>
-            <Th>姓</Th>
-            <Th>名</Th>
-            <Th isNumeric>付与日数</Th>
-            <Th isNumeric>消化日数</Th>
-            <Th isNumeric>残日数</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {employees.map((emp) => (
-            <Tr key={emp.id}>
-              <Td>{emp.id}</Td>
-              <Td>{emp.lastName}</Td>
-              <Td>{emp.firstName}</Td>
-              <Td isNumeric>{emp.total}</Td>
-              <Td isNumeric>{emp.used}</Td>
-              <Td isNumeric>{emp.total - emp.used}</Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>従業員追加</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl mb={2} isRequired>
-              <FormLabel>従業員コード</FormLabel>
-              <Input name="id" value={form.id} onChange={handleChange} />
-            </FormControl>
-            <FormControl mb={2} isRequired>
-              <FormLabel>姓</FormLabel>
-              <Input
-                name="lastName"
-                value={form.lastName}
-                onChange={handleChange}
-              />
-            </FormControl>
-            <FormControl mb={2} isRequired>
-              <FormLabel>名</FormLabel>
-              <Input
-                name="firstName"
-                value={form.firstName}
-                onChange={handleChange}
-              />
-            </FormControl>
-            <FormControl mb={2}>
-              <FormLabel>付与日数</FormLabel>
-              <Input
-                name="total"
-                type="number"
-                min={0}
-                value={form.total}
-                onChange={handleChange}
-              />
-            </FormControl>
-            <FormControl mb={2}>
-              <FormLabel>消化日数</FormLabel>
-              <Input
-                name="used"
-                type="number"
-                min={0}
-                value={form.used}
-                onChange={handleChange}
-              />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="teal" mr={3} onClick={handleAdd}>
-              追加
-            </Button>
-            <Button onClick={onClose}>キャンセル</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+    <Box minH="100vh" bgGradient="linear(to-br, teal.50, white)" py={10}>
+      <Box
+        maxW="900px"
+        mx="auto"
+        p={6}
+        borderRadius="lg"
+        boxShadow="lg"
+        bg="whiteAlpha.900"
+      >
+        <Heading
+          mb={8}
+          color="teal.700"
+          textAlign="center"
+          fontWeight="bold"
+          letterSpacing={2}
+        >
+          有給休暇管理
+        </Heading>
+        <Flex mb={6} justify="flex-end">
+          <Button
+            colorScheme="teal"
+            onClick={onOpen}
+            size="md"
+            px={8}
+            boxShadow="md"
+          >
+            従業員追加
+          </Button>
+        </Flex>
+        <EmployeeTable employees={employees} />
+      </Box>
+      <EmployeeModal
+        isOpen={isOpen}
+        onClose={onClose}
+        form={form}
+        onChange={handleChange}
+        onAdd={handleAdd}
+      />
     </Box>
   );
 }
