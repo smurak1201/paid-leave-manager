@@ -1,7 +1,7 @@
 import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
 import type { Employee } from "./types";
 import { Box, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
-import { Edit, Trash2, Eye } from "./icons";
+import { Icons } from "./icons";
 import { Tooltip } from "../ui/tooltip";
 
 interface EmployeeTableProps {
@@ -103,7 +103,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                       colorScheme="blue"
                       onClick={() => onView && onView(emp)}
                     >
-                      <Icon as={Eye} boxSize={5} />
+                      <Icon as={Icons.Eye} boxSize={5} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip content="編集" showArrow>
@@ -114,7 +114,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                       colorScheme="teal"
                       onClick={() => onEdit && onEdit(emp)}
                     >
-                      <Icon as={Edit} boxSize={5} />
+                      <Icon as={Icons.Edit} boxSize={5} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip content="削除" showArrow>
@@ -125,7 +125,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                       colorScheme="red"
                       onClick={() => onDelete && onDelete(emp)}
                     >
-                      <Icon as={Trash2} boxSize={5} />
+                      <Icon as={Icons.Trash2} boxSize={5} />
                     </IconButton>
                   </Tooltip>
                 </HStack>

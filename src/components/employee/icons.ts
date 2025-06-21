@@ -1,4 +1,4 @@
-import { X, Edit, Trash2, Plus, Info } from "lucide-react";
+import { X, Edit, Trash2, Plus, Info, Eye } from "lucide-react";
 
 export const Icons = {
   X,
@@ -6,6 +6,7 @@ export const Icons = {
   Trash2,
   Plus,
   Info,
+  Eye,
 };
 
 export const inputDateStyle: React.CSSProperties = {
