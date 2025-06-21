@@ -108,12 +108,19 @@ function App() {
     leaveDates: [],
   });
   const [editId, setEditId] = useState<string | null>(null);
-  const [viewDates, setViewDates] = useState<string[] | null>(null);
+  const [viewDates, setViewDates] = useState<string[] | null>(null); // viewDatesの初期値はnull
   const [viewName, setViewName] = useState<string>("");
   const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
   const [dateInput, setDateInput] = useState<string>("");
   const [idError, setIdError] = useState<string>("");
   const guideDisclosure = useDisclosure();
+
+  const isFutureDate = (date: string) => {
+    if (!date) return false;
+    const today = new Date();
+    const d = new Date(date);
+    return d > today;
+  };
 
   // 入社年月日変更時にtotalを自動計算
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,6 +136,8 @@ function App() {
         )
       ) {
         setIdError("従業員コードが重複しています");
+      } else if (!value) {
+        setIdError("従業員コードは必須です");
       } else {
         setIdError("");
       }
@@ -141,6 +150,8 @@ function App() {
       };
       if (name === "joinedAt") {
         next.total = calcLeaveDays(value);
+        // setViewDates([]) → setViewDates(null) に修正
+        setViewDates(null);
       }
       return next;
     });
@@ -152,9 +163,12 @@ function App() {
       !form.lastName ||
       !form.firstName ||
       !form.joinedAt ||
-      idError // エラーがあれば追加不可
-    )
+      idError ||
+      isFutureDate(form.joinedAt)
+    ) {
+      setIdError("全ての項目を正しく入力してください（入社日は未来日不可）");
       return;
+    }
     const autoTotal = calcLeaveDays(form.joinedAt);
     const newEmp = { ...form, total: autoTotal };
     setEmployees([...employees, { ...newEmp }]);
@@ -177,9 +191,12 @@ function App() {
       !form.lastName ||
       !form.firstName ||
       !form.joinedAt ||
-      idError
-    )
+      idError ||
+      isFutureDate(form.joinedAt)
+    ) {
+      setIdError("全ての項目を正しく入力してください（入社日は未来日不可）");
       return;
+    }
     const autoTotal = calcLeaveDays(form.joinedAt);
     const newEmp = { ...form, total: autoTotal };
     setEmployees((prev) =>
@@ -199,8 +216,9 @@ function App() {
   };
 
   const handleEdit = (emp: Employee) => {
-    setForm(emp);
+    setViewDates(null); // 他モーダルを閉じる
     setEditId(emp.id);
+    setForm(emp);
     onOpen();
   };
 
@@ -209,6 +227,17 @@ function App() {
   };
 
   const handleView = (emp: Employee) => {
+    onClose(); // 編集・追加モーダルを閉じる
+    setEditId(null);
+    setForm({
+      id: "",
+      lastName: "",
+      firstName: "",
+      joinedAt: "",
+      total: 20,
+      used: 0,
+      leaveDates: [],
+    });
     setViewDates(emp.leaveDates);
     setViewName(`${emp.lastName} ${emp.firstName}`);
   };
@@ -217,12 +246,14 @@ function App() {
     if (
       !viewDates ||
       !dateInput.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
-      remain === 0
+      remain === 0 ||
+      viewDates.includes(dateInput) ||
+      (targetEmp && dateInput < targetEmp.joinedAt) ||
+      isFutureDate(dateInput)
     )
       return;
     setViewDates([...viewDates, dateInput]);
     setDateInput("");
-    // employees側はここで更新しない
   };
 
   const handleEditDate = (idx: number) => {
@@ -235,7 +266,10 @@ function App() {
       !viewDates ||
       editDateIdx === null ||
       !dateInput.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
-      remain === 0
+      remain === 0 ||
+      viewDates.includes(dateInput) ||
+      (targetEmp && dateInput < targetEmp.joinedAt) ||
+      isFutureDate(dateInput)
     )
       return;
     const newDates = viewDates.map((d, i) =>
@@ -244,7 +278,6 @@ function App() {
     setViewDates(newDates);
     setEditDateIdx(null);
     setDateInput("");
-    // employees側はここで更新しない
   };
 
   const handleDeleteDate = (idx: number) => {
@@ -253,7 +286,6 @@ function App() {
     setViewDates(newDates);
     setEditDateIdx(null);
     setDateInput("");
-    // employees側はここで更新しない
   };
 
   // 残日数計算（viewDatesがnullなら0、入社日より前は除外して計算）
@@ -276,8 +308,18 @@ function App() {
     const validDates = viewDates.filter((d) => d >= targetEmp.joinedAt);
     const newRemain = calcStrictRemain(targetEmp.grants, validDates);
     const hasInvalidDate = viewDates.some((d) => d < targetEmp.joinedAt);
+    const hasDuplicate = new Set(viewDates).size !== viewDates.length;
+    const hasFuture = viewDates.some(isFutureDate);
     if (hasInvalidDate) {
       alert("入社日より前の日付は登録できません。");
+      return;
+    }
+    if (hasDuplicate) {
+      alert("有給取得日が重複しています。");
+      return;
+    }
+    if (hasFuture) {
+      alert("未来日を有給取得日として登録できません。");
       return;
     }
     if (newRemain < 0) {
@@ -331,6 +373,8 @@ function App() {
             colorScheme="teal"
             variant="outline"
             onClick={() => {
+              setViewDates(null); // 他モーダルを閉じる
+              setEditId(null);
               setForm({
                 id: "",
                 lastName: "",
@@ -340,7 +384,6 @@ function App() {
                 used: 0,
                 leaveDates: [],
               });
-              setEditId(null);
               onOpen();
             }}
             size="md"
@@ -352,7 +395,7 @@ function App() {
           </Button>
         </Flex>
         <GuideModal
-          isOpen={guideDisclosure.open}
+          open={guideDisclosure.open}
           onClose={guideDisclosure.onClose}
         />
         <EmployeeTable
@@ -386,7 +429,7 @@ function App() {
         editId={editId}
       />
       <LeaveDatesModal
-        isOpen={!!viewDates}
+        isOpen={viewDates !== null}
         onClose={() => {
           setViewDates(null);
           setEditDateIdx(null);

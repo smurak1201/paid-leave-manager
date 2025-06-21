@@ -3,16 +3,16 @@ import { X, Edit, Trash2, Plus, Info, Eye } from "lucide-react";
 import React from "react";
 
 interface GuideModalProps {
-  isOpen: boolean;
+  open: boolean;
   onClose: () => void;
 }
 
-export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
+export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
   const overlayRef = React.useRef<HTMLDivElement>(null);
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === overlayRef.current) onClose();
   };
-  if (!isOpen) return null;
+  if (!open) return null;
   return (
     <Box
       ref={overlayRef}
