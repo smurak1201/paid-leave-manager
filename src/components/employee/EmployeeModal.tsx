@@ -75,6 +75,14 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     employeeId ? employee ?? emptyEmployee : emptyEmployee
   );
 
+  // id入力欄の値（数字以外も含めて表示）
+  const [idInputValue, setIdInputValue] = useState(form.id);
+
+  useEffect(() => {
+    // 編集モードや初期化時にidInputValueも同期
+    setIdInputValue(form.id);
+  }, [employeeId, employee]);
+
   // employeeIdまたは従業員データが変わったらformを再初期化
   useEffect(() => {
     if (employeeId) {
@@ -88,8 +96,43 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!form) return;
-    setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === "id") {
+      setIdInputValue(e.target.value); // 入力値はそのまま表示
+      // 数字以外が含まれていればエラー
+      if (e.target.value && !/^[0-9]*$/.test(e.target.value)) {
+        // setIdErrorはAppから渡されるので、数字以外ならエラー
+        if (typeof window !== "undefined") {
+          const event = new CustomEvent("setIdError", {
+            detail: "数字を入力してください",
+          });
+          window.dispatchEvent(event);
+        }
+      } else {
+        // setIdErrorをクリア
+        if (typeof window !== "undefined") {
+          const event = new CustomEvent("setIdError", { detail: "" });
+          window.dispatchEvent(event);
+        }
+        // form.idも数字のみ反映
+        setForm({ ...form, id: e.target.value });
+      }
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   };
+
+  // setIdErrorをAppから受け取るためのwindowイベントリスナー
+  useEffect(() => {
+    const handler = (e: any) => {
+      if (typeof e.detail === "string" && typeof idError === "string") {
+        if (idError !== e.detail) {
+          // idErrorがpropsで渡されている場合はApp側で管理
+        }
+      }
+    };
+    window.addEventListener("setIdError", handler);
+    return () => window.removeEventListener("setIdError", handler);
+  }, [idError]);
 
   if (!isOpen || !form) return null;
   return (
@@ -129,7 +172,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             </FormLabel>
             <Input
               name="id"
-              value={form.id}
+              value={idInputValue}
               onChange={handleChange}
               borderColor="teal.300"
               bg="whiteAlpha.900"
@@ -140,6 +183,11 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
               autoComplete="off"
               disabled={!!editId}
             />
+            {idInputValue && !/^[0-9]*$/.test(idInputValue) && (
+              <Text color="red.500" fontSize="sm" mt={1}>
+                数字を入力してください
+              </Text>
+            )}
             {idError && (
               <Text color="red.500" fontSize="sm" mt={1}>
                 {idError}
