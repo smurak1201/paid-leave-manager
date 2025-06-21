@@ -312,9 +312,8 @@ function App() {
           employeeId={activeEmployeeId}
           employees={employees}
           editDateIdx={editDateIdx}
-          setEditDateIdx={setEditDateIdx}
           dateInput={dateInput}
-          setDateInput={setDateInput}
+          onChangeDateInput={setDateInput}
           onAddDate={() => {
             if (!currentEmployee) return;
             handleAddDate((dates) =>

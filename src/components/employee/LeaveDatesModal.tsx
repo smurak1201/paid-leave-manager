@@ -12,6 +12,7 @@ interface LeaveDatesModalProps {
   employees: Employee[];
   editDateIdx: number | null;
   dateInput: string;
+  onChangeDateInput: (v: string) => void;
   onAddDate: () => void;
   onEditDate: (idx: number) => void;
   onSaveDate: () => void;
@@ -25,6 +26,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   employees,
   editDateIdx,
   dateInput,
+  onChangeDateInput,
   onAddDate,
   onEditDate,
   onSaveDate,
@@ -110,7 +112,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
           <input
             type="date"
             value={dateInput}
-            onChange={(e) => setDateInput(e.target.value)}
+            onChange={(e) => onChangeDateInput(e.target.value)}
             style={inputDateStyle}
             maxLength={10}
           />
@@ -194,7 +196,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                     <input
                       type="date"
                       value={dateInput}
-                      onChange={(e) => setDateInput(e.target.value)}
+                      onChange={(e) => onChangeDateInput(e.target.value)}
                       style={inputDateSmallStyle}
                       maxLength={10}
                     />
@@ -207,9 +209,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                     colorScheme="teal"
                     minW={"auto"}
                     px={2}
-                    onClick={() =>
-                      editDateIdx === i ? setEditDateIdx(null) : onEditDate(i)
-                    }
+                    onClick={() => onEditDate(i)}
                     aria-label="編集"
                   >
                     <Icons.Edit size={15} />
