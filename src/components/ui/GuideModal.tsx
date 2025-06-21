@@ -30,6 +30,8 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
         minW="340px"
         maxW="90vw"
         position="relative"
+        maxHeight="80vh"
+        overflowY="auto"
       >
         <Button
           position="absolute"
