@@ -2,7 +2,7 @@ import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import { X, Plus } from "lucide-react";
 import React from "react";
 import { Icons, inputDateStyle, inputDateSmallStyle } from "./icons";
-import { calcStrictRemain } from "./utils";
+import { calcLeaveDays } from "./utils";
 import type { Employee } from "./types";
 
 interface LeaveDatesModalProps {
@@ -39,7 +39,31 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
     : null;
   if (!isOpen || !employee) return null;
   const dates = employee.leaveDates;
-  const remain = calcStrictRemain(employee.grants || [], dates);
+  // 一覧と同じ「付与＋繰越－消化」単純計算
+  const now = new Date();
+  let grantThisYear = 0;
+  let carryOver = 0;
+  let foundGrant = false;
+  if (employee.grants && employee.grants.length > 0) {
+    employee.grants.forEach((g) => {
+      const grantDate = new Date(g.grantDate);
+      const grantYear = grantDate.getFullYear();
+      const nowYear = now.getFullYear();
+      const diffMonth =
+        (now.getFullYear() - grantDate.getFullYear()) * 12 +
+        (now.getMonth() - grantDate.getMonth());
+      if (grantYear === nowYear && diffMonth < 24) {
+        grantThisYear += g.days;
+        foundGrant = true;
+      } else if (grantYear === nowYear - 1 && diffMonth < 24) {
+        carryOver += g.days;
+      }
+    });
+  }
+  if (!foundGrant) {
+    grantThisYear = calcLeaveDays(employee.joinedAt, now);
+  }
+  const remainSimple = grantThisYear + carryOver - dates.length;
   return (
     <Box
       position="fixed"
@@ -84,7 +108,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
           消化日数：{dates.length}日
         </Text>
         <Text color="teal.700" fontWeight="bold" mb={2} textAlign="center">
-          残日数：{remain}日
+          残日数：{remainSimple}日
         </Text>
         <Box display="flex" gap={2} mb={4}>
           <input
@@ -101,10 +125,12 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
               px={4}
               minW={"auto"}
               disabled={
-                remain === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
+                remainSimple === 0 ||
+                !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
               }
               cursor={
-                remain === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
+                remainSimple === 0 ||
+                !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
                   ? "not-allowed"
                   : "pointer"
               }
@@ -120,10 +146,12 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
               px={4}
               minW={"auto"}
               disabled={
-                remain === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
+                remainSimple === 0 ||
+                !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
               }
               cursor={
-                remain === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
+                remainSimple === 0 ||
+                !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
                   ? "not-allowed"
                   : "pointer"
               }
@@ -211,7 +239,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
             キャンセル
           </Button>
         </Box>
-        {remain <= 0 && (
+        {remainSimple <= 0 && (
           <Text color="red.500" fontSize="sm" mt={2} textAlign="right">
             残日数が0の場合、有給取得日は登録できません。
           </Text>
