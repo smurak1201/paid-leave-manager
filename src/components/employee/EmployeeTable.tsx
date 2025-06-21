@@ -62,16 +62,17 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
             py: [1, 2],
             px: [1, 2],
             whiteSpace: "nowrap",
+            textAlign: "center", // すべて中央揃え
           },
           th: {
             bg: "teal.50",
             color: "teal.700",
             fontWeight: "bold",
             letterSpacing: 1,
-            textAlign: "center",
+            textAlign: "center", // ヘッダーも中央揃え
           },
           td: {
-            textAlign: "center",
+            textAlign: "center", // データも中央揃え
           },
           tbody: {
             tr: {
@@ -136,10 +137,10 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 <Td>{emp.lastName}</Td>
                 <Td>{emp.firstName}</Td>
                 <Td>
-                  {emp.joinedAt
-                    .replace(/-/g, "年")
-                    .replace(/$/, "日")
-                    .replace(/年(\d{2})日/, "年$1月")}
+                  {(() => {
+                    const [y, m, d] = emp.joinedAt.split("-");
+                    return `${y}年${Number(m)}月${d ? Number(d) + "日" : ""}`;
+                  })()}
                 </Td>
                 <Td>{servicePeriod}</Td>
                 <Td isNumeric>{grantThisYear}</Td>

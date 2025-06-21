@@ -19,23 +19,28 @@ const initialEmployees: Employee[] = [
     id: "001",
     lastName: "山田",
     firstName: "太郎",
-    joinedAt: "2021-04-01",
+    joinedAt: "2021-02-15",
     grants: [
-      { grantDate: "2022-04-01", days: 12, usedDates: ["2022-05-10"] }, // 2年以上前→時効消滅
       {
-        grantDate: "2023-04-01",
-        days: 14,
-        usedDates: ["2023-06-15", "2024-05-20"],
-      }, // 有効
-      { grantDate: "2024-04-01", days: 16, usedDates: ["2024-06-10"] }, // 有効
+        grantDate: "2022-02-15",
+        days: 12,
+        usedDates: ["2022-03-01", "2022-10-10"],
+      },
+      { grantDate: "2023-02-15", days: 14, usedDates: ["2023-03-01"] },
+      {
+        grantDate: "2024-02-15",
+        days: 16,
+        usedDates: ["2024-03-01", "2024-05-10"],
+      },
     ],
-    total: 30, // grants合計
-    used: 4, // leaveDates.length
+    total: 42,
+    used: 5,
     leaveDates: [
-      "2022-05-10", // 2022年付与分から消化（時効消滅）
-      "2023-06-15", // 2023年付与分から消化
-      "2024-05-20", // 2023年付与分から消化
-      "2024-06-10", // 2024年付与分から消化
+      "2022-03-01",
+      "2022-10-10",
+      "2023-03-01",
+      "2024-03-01",
+      "2024-05-10",
     ],
     carryOver: 0,
   },
@@ -43,61 +48,55 @@ const initialEmployees: Employee[] = [
     id: "002",
     lastName: "佐藤",
     firstName: "花子",
-    joinedAt: "2022-04-01",
+    joinedAt: "2022-07-01",
     grants: [
       {
-        grantDate: "2023-04-01",
+        grantDate: "2023-07-01",
         days: 14,
-        usedDates: ["2023-07-01", "2024-04-10"],
-      }, // 有効
-      { grantDate: "2024-04-01", days: 16, usedDates: ["2025-04-02"] }, // 有効
+        usedDates: ["2023-08-01", "2023-12-01"],
+      },
+      { grantDate: "2024-07-01", days: 16, usedDates: ["2024-08-01"] },
     ],
     total: 30,
     used: 3,
-    leaveDates: [
-      "2023-07-01", // 2023年付与分から消化
-      "2024-04-10", // 2023年付与分から消化
-      "2025-04-02", // 2024年付与分から消化
-    ],
+    leaveDates: ["2023-08-01", "2023-12-01", "2024-08-01"],
     carryOver: 0,
   },
   {
     id: "003",
     lastName: "田中",
     firstName: "一郎",
-    joinedAt: "2023-04-01",
-    grants: [
-      { grantDate: "2024-04-01", days: 16, usedDates: ["2024-05-01"] }, // 有効
-    ],
+    joinedAt: "2023-11-20",
+    grants: [{ grantDate: "2024-11-20", days: 16, usedDates: [] }],
     total: 16,
-    used: 1,
-    leaveDates: [
-      "2024-05-01", // 2024年付与分から消化
-    ],
+    used: 0,
+    leaveDates: [],
     carryOver: 0,
   },
   {
     id: "004",
     lastName: "鈴木",
     firstName: "美咲",
-    joinedAt: "2021-04-01",
+    joinedAt: "2021-06-10",
     grants: [
+      { grantDate: "2022-06-10", days: 12, usedDates: ["2022-07-01"] },
       {
-        grantDate: "2022-04-01",
-        days: 12,
-        usedDates: ["2022-06-01", "2022-07-01"],
-      }, // 2年以上前→時効消滅
-      { grantDate: "2023-04-01", days: 14, usedDates: ["2023-08-10"] }, // 有効
-      { grantDate: "2024-04-01", days: 16, usedDates: [] }, // 有効
+        grantDate: "2023-06-10",
+        days: 14,
+        usedDates: ["2023-07-01", "2023-08-01", "2023-09-01"],
+      },
+      { grantDate: "2024-06-10", days: 16, usedDates: ["2024-07-01"] },
     ],
-    total: 42, // grants合計
-    used: 3, // leaveDates.length
+    total: 42,
+    used: 5,
     leaveDates: [
-      "2022-06-01", // 2022年付与分から消化（時効消滅）
-      "2022-07-01", // 2022年付与分から消化（時効消滅）
-      "2023-08-10", // 2023年付与分から消化
+      "2022-07-01",
+      "2023-07-01",
+      "2023-08-01",
+      "2023-09-01",
+      "2024-07-01",
     ],
-    carryOver: 12, // 2023年4月時点で2022年分12-2=10日繰越、2024年4月時点で2023年分14-1=13日繰越
+    carryOver: 0,
   },
 ];
 
