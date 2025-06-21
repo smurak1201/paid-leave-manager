@@ -1,6 +1,6 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import { X, Plus } from "lucide-react";
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Icons, inputDateStyle, inputDateSmallStyle } from "./icons";
 import { calcLeaveDays } from "./utils";
 import type { Employee } from "./types";
@@ -37,6 +37,23 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
     : null;
   if (!isOpen || !employee) return null;
   const dates = employee.leaveDates;
+  // ページネーション用
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+  const totalPages = Math.max(1, Math.ceil(dates.length / ITEMS_PER_PAGE));
+  const pagedDates = dates.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+  // ページ切り替え時にリスト先頭へスクロール
+  const listRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (listRef.current) listRef.current.scrollTop = 0;
+  }, [currentPage]);
+  // datesが減った場合にcurrentPageを自動調整
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [dates.length, totalPages]);
   // 一覧と同じ「付与＋繰越－消化」単純計算
   const now = new Date();
   let grantThisYear = 0;
@@ -165,34 +182,42 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
             取得履歴なし
           </Text>
         ) : (
-          <Box as="ul" pl={0} m={0}>
-            {dates.map((date, i) => {
+          <Box
+            as="ul"
+            pl={0}
+            m={0}
+            maxHeight="260px"
+            overflowY="auto"
+            ref={listRef}
+          >
+            {pagedDates.map((date, i) => {
+              const idx = (currentPage - 1) * ITEMS_PER_PAGE + i;
               const [y, m, d] = date.split("-");
               const jpDate = `${y}年${m}月${d}日`;
               return (
                 <Box
                   as="li"
-                  key={date + i}
+                  key={date + idx}
                   fontSize="md"
                   color="teal.700"
                   py={2}
                   px={4}
                   borderBottom={
-                    i !== dates.length - 1 ? "1px solid" : undefined
+                    idx !== dates.length - 1 ? "1px solid" : undefined
                   }
                   borderColor="teal.50"
                   borderRadius="md"
                   mb={1}
                   listStyleType="none"
-                  bg={i % 2 === 0 ? "teal.50" : "white"}
+                  bg={idx % 2 === 0 ? "teal.50" : "white"}
                   display="flex"
                   alignItems="center"
                   gap={2}
                 >
                   <Text fontWeight="bold" minW="2em">
-                    {i + 1}.
+                    {idx + 1}.
                   </Text>
-                  {editDateIdx === i ? (
+                  {editDateIdx === idx ? (
                     <input
                       type="date"
                       value={dateInput}
@@ -209,7 +234,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                     colorScheme="teal"
                     minW={"auto"}
                     px={2}
-                    onClick={() => onEditDate(i)}
+                    onClick={() => onEditDate(idx)}
                     aria-label="編集"
                   >
                     <Icons.Edit size={15} />
@@ -220,7 +245,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                     colorScheme="red"
                     minW={"auto"}
                     px={2}
-                    onClick={() => onDeleteDate(i)}
+                    onClick={() => onDeleteDate(idx)}
                     aria-label="削除"
                   >
                     <Icons.Trash2 size={15} />
@@ -228,6 +253,36 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                 </Box>
               );
             })}
+          </Box>
+        )}
+        {/* ページネーション */}
+        {dates.length > ITEMS_PER_PAGE && (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            gap={2}
+            mt={2}
+          >
+            <Button
+              size="sm"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              variant="outline"
+            >
+              前へ
+            </Button>
+            <Text fontSize="sm" mx={2}>
+              {currentPage} / {totalPages}
+            </Text>
+            <Button
+              size="sm"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              variant="outline"
+            >
+              次へ
+            </Button>
           </Box>
         )}
         <Box display="flex" justifyContent="flex-end" gap={2} mt={4}>
