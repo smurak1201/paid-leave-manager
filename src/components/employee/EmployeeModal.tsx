@@ -55,12 +55,36 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   idError,
   editId,
 }) => {
-  const employee = employeeId ? getEmployee(employeeId) : undefined;
-  const [form, setForm] = useState<Employee | undefined>(employee);
+  // 空の従業員初期値（追加時用）
+  const emptyEmployee: Employee = {
+    id: "",
+    lastName: "",
+    firstName: "",
+    joinedAt: "",
+    total: 20,
+    used: 0,
+    leaveDates: [],
+    grants: [],
+    carryOver: 0,
+  };
 
+  // employeeIdがnullなら追加モード、従業員データがあれば編集モード
+  const employee = employeeId ? getEmployee(employeeId) : undefined;
+  // 追加時は空の初期値、編集時は従業員データでformを初期化
+  const [form, setForm] = useState<Employee>(
+    employeeId ? employee ?? emptyEmployee : emptyEmployee
+  );
+
+  // employeeIdまたは従業員データが変わったらformを再初期化
   useEffect(() => {
-    setForm(employee);
-  }, [employee]);
+    if (employeeId) {
+      // 編集モード: 該当従業員データで初期化
+      setForm(employee ?? emptyEmployee);
+    } else {
+      // 追加モード: 空の初期値で初期化
+      setForm(emptyEmployee);
+    }
+  }, [employeeId, employee]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!form) return;
