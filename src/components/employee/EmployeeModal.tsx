@@ -12,6 +12,7 @@ import {
 import { User, BadgeInfo, CalendarPlus, X } from "lucide-react";
 import type { Employee } from "./types";
 import { CustomModal } from "../ui/CustomModal";
+import { Icons, inputDateStyle } from "./icons";
 
 interface EmployeeModalProps {
   isOpen: boolean;
@@ -109,14 +110,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             name="joinedAt"
             value={form.joinedAt || ""}
             onChange={onChange}
-            style={{
-              border: "1px solid #B2F5EA",
-              borderRadius: 6,
-              padding: "6px 12px",
-              fontSize: 16,
-              outline: "none",
-              width: "100%",
-            }}
+            style={inputDateStyle}
             max={new Date().toISOString().slice(0, 10)}
           />
         </Box>

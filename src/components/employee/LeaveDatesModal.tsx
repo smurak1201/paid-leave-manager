@@ -1,6 +1,7 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
-import { X, Edit, Trash2, Plus } from "lucide-react";
+import { X, Plus } from "lucide-react";
 import React from "react";
+import { Icons, inputDateStyle, inputDateSmallStyle } from "./icons";
 
 interface LeaveDatesModalProps {
   isOpen: boolean;
@@ -82,14 +83,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
             type="date"
             value={dateInput}
             onChange={(e) => onDateInputChange(e.target.value)}
-            style={{
-              border: "1px solid #B2F5EA",
-              borderRadius: 6,
-              padding: "6px 12px",
-              fontSize: 16,
-              outline: "none",
-              flex: 1,
-            }}
+            style={inputDateStyle}
             maxLength={10}
           />
           {editDateIdx === null ? (
@@ -104,7 +98,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
               px={4}
               minW={"auto"}
             >
-              <Edit size={16} style={{ marginRight: 6 }} />
+              <Icons.Edit size={16} style={{ marginRight: 6 }} />
               保存
             </Button>
           )}
@@ -146,13 +140,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                       type="date"
                       value={dateInput}
                       onChange={(e) => onDateInputChange(e.target.value)}
-                      style={{
-                        border: "1px solid #B2F5EA",
-                        borderRadius: 6,
-                        padding: "4px 8px",
-                        fontSize: 16,
-                        outline: "none",
-                      }}
+                      style={inputDateSmallStyle}
                       maxLength={10}
                     />
                   ) : (
@@ -169,7 +157,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                     }
                     aria-label="編集"
                   >
-                    <Edit size={15} />
+                    <Icons.Edit size={15} />
                   </Button>
                   <Button
                     size="xs"
@@ -180,7 +168,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                     onClick={() => onDeleteDate(i)}
                     aria-label="削除"
                   >
-                    <Trash2 size={15} />
+                    <Icons.Trash2 size={15} />
                   </Button>
                 </Box>
               );

@@ -10,7 +10,7 @@ import {
 import type { Employee } from "./components/employee/types";
 import { EmployeeTable } from "./components/employee/EmployeeTable";
 import { EmployeeModal } from "./components/employee/EmployeeModal";
-import { Plus, Info } from "lucide-react";
+import { Icons } from "./components/employee/icons";
 import { GuideModal } from "./components/ui/GuideModal";
 import { LeaveDatesModal } from "./components/employee/LeaveDatesModal";
 
@@ -216,7 +216,7 @@ function App() {
             px={6}
             boxShadow="md"
           >
-            <Info size={18} style={{ marginRight: 6 }} />
+            <Icons.Info size={18} style={{ marginRight: 6 }} />
             ガイド
           </Button>
           <Button
@@ -239,7 +239,7 @@ function App() {
             px={6}
             boxShadow="md"
           >
-            <Plus size={18} style={{ marginRight: 6 }} />
+            <Icons.Plus size={18} style={{ marginRight: 6 }} />
             従業員追加
           </Button>
         </Flex>
