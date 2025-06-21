@@ -16,6 +16,8 @@ interface LeaveDatesModalProps {
   onDeleteDate: (idx: number) => void;
   onAddDate: () => void;
   setEditDateIdx: (idx: number | null) => void;
+  onSaveLeaveDates: () => void;
+  remain: number; // 追加
 }
 
 export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
@@ -31,6 +33,8 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   onDeleteDate,
   onAddDate,
   setEditDateIdx,
+  onSaveLeaveDates,
+  remain,
 }) => {
   const overlayRef = React.useRef<HTMLDivElement>(null);
   // オーバーレイ外クリックで閉じる
@@ -104,9 +108,11 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
               onClick={onAddDate}
               px={4}
               minW={"auto"}
-              disabled={!dateInput.match(/^\d{4}-\d{2}-\d{2}$/)}
+              disabled={
+                remain === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
+              }
               cursor={
-                !dateInput.match(/^\d{4}-\d{2}-\d{2}$/)
+                remain === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
                   ? "not-allowed"
                   : "pointer"
               }
@@ -121,9 +127,11 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
               onClick={onSaveDate}
               px={4}
               minW={"auto"}
-              disabled={!dateInput.match(/^\d{4}-\d{2}-\d{2}$/)}
+              disabled={
+                remain === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
+              }
               cursor={
-                !dateInput.match(/^\d{4}-\d{2}-\d{2}$/)
+                remain === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
                   ? "not-allowed"
                   : "pointer"
               }
@@ -205,6 +213,24 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
               );
             })}
           </Box>
+        )}
+        <Box display="flex" justifyContent="flex-end" gap={2} mt={4}>
+          <Button onClick={onClose} variant="ghost" colorScheme="teal">
+            キャンセル
+          </Button>
+          <Button
+            colorScheme="teal"
+            onClick={onSaveLeaveDates}
+            disabled={remain <= 0}
+            cursor={remain <= 0 ? "not-allowed" : "pointer"}
+          >
+            保存
+          </Button>
+        </Box>
+        {remain <= 0 && (
+          <Text color="red.500" fontSize="sm" mt={2} textAlign="right">
+            残日数が0の場合、有給取得日は登録できません。
+          </Text>
         )}
       </Box>
     </Box>

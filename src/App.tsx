@@ -6,7 +6,7 @@ import { EmployeeModal } from "./components/employee/EmployeeModal";
 import { Icons } from "./components/employee/icons";
 import { GuideModal } from "./components/ui/GuideModal";
 import { LeaveDatesModal } from "./components/employee/LeaveDatesModal";
-import { calcLeaveDays } from "./components/employee/utils";
+import { calcLeaveDays, calcStrictRemain } from "./components/employee/utils";
 
 const initialEmployees: Employee[] = [
   {
@@ -214,17 +214,15 @@ function App() {
   };
 
   const handleAddDate = () => {
-    if (!viewDates || !dateInput.match(/^\d{4}-\d{2}-\d{2}$/)) return;
+    if (
+      !viewDates ||
+      !dateInput.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
+      remain === 0
+    )
+      return;
     setViewDates([...viewDates, dateInput]);
     setDateInput("");
-    // employees側も更新
-    setEmployees((prev) =>
-      prev.map((emp) =>
-        `${emp.lastName} ${emp.firstName}` === viewName
-          ? { ...emp, leaveDates: [...emp.leaveDates, dateInput] }
-          : emp
-      )
-    );
+    // employees側はここで更新しない
   };
 
   const handleEditDate = (idx: number) => {
@@ -236,7 +234,8 @@ function App() {
     if (
       !viewDates ||
       editDateIdx === null ||
-      !dateInput.match(/^\d{4}-\d{2}-\d{2}$/)
+      !dateInput.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
+      remain === 0
     )
       return;
     const newDates = viewDates.map((d, i) =>
@@ -245,13 +244,7 @@ function App() {
     setViewDates(newDates);
     setEditDateIdx(null);
     setDateInput("");
-    setEmployees((prev) =>
-      prev.map((emp) =>
-        `${emp.lastName} ${emp.firstName}` === viewName
-          ? { ...emp, leaveDates: newDates }
-          : emp
-      )
-    );
+    // employees側はここで更新しない
   };
 
   const handleDeleteDate = (idx: number) => {
@@ -260,13 +253,47 @@ function App() {
     setViewDates(newDates);
     setEditDateIdx(null);
     setDateInput("");
+    // employees側はここで更新しない
+  };
+
+  // 残日数計算（viewDatesがnullなら0、入社日より前は除外して計算）
+  const targetEmp = employees.find(
+    (emp) => `${emp.lastName} ${emp.firstName}` === viewName
+  );
+  const validDates =
+    viewDates && targetEmp
+      ? viewDates.filter((d) => d >= targetEmp.joinedAt)
+      : [];
+  const remain = targetEmp ? calcStrictRemain(targetEmp.grants, validDates) : 0;
+
+  // 有給取得日モーダルの「保存」ボタンでのみemployeesを更新
+  const handleSaveLeaveDates = () => {
+    if (!viewDates || remain === 0) return;
+    const targetEmp = employees.find(
+      (emp) => `${emp.lastName} ${emp.firstName}` === viewName
+    );
+    if (!targetEmp) return;
+    const validDates = viewDates.filter((d) => d >= targetEmp.joinedAt);
+    const newRemain = calcStrictRemain(targetEmp.grants, validDates);
+    const hasInvalidDate = viewDates.some((d) => d < targetEmp.joinedAt);
+    if (hasInvalidDate) {
+      alert("入社日より前の日付は登録できません。");
+      return;
+    }
+    if (newRemain < 0) {
+      alert("残日数を超える有給取得日は登録できません。");
+      return;
+    }
     setEmployees((prev) =>
       prev.map((emp) =>
         `${emp.lastName} ${emp.firstName}` === viewName
-          ? { ...emp, leaveDates: newDates }
+          ? { ...emp, leaveDates: viewDates }
           : emp
       )
     );
+    setViewDates(null);
+    setEditDateIdx(null);
+    setDateInput("");
   };
 
   return (
@@ -375,6 +402,8 @@ function App() {
         onDeleteDate={handleDeleteDate}
         onAddDate={handleAddDate}
         setEditDateIdx={setEditDateIdx}
+        onSaveLeaveDates={handleSaveLeaveDates}
+        remain={remain}
       />
     </Box>
   );
