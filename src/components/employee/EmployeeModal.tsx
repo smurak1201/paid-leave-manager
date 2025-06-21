@@ -7,12 +7,11 @@ import {
   Icon,
   Box,
   Text,
-  CloseButton,
 } from "@chakra-ui/react";
-import { User, BadgeInfo, CalendarPlus, X } from "lucide-react";
+import { User, BadgeInfo, X } from "lucide-react";
 import type { Employee } from "./types";
 import { CustomModal } from "../ui/CustomModal";
-import { Icons, inputDateStyle } from "./icons";
+import { inputDateStyle } from "./icons";
 
 interface EmployeeModalProps {
   isOpen: boolean;

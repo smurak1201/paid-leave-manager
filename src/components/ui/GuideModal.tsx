@@ -1,5 +1,5 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
-import { X, Edit, Trash2, Plus, Info, Eye } from "lucide-react";
+import { X, Edit, Trash2, Plus, Eye } from "lucide-react";
 import React from "react";
 
 interface GuideModalProps {
