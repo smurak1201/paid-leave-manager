@@ -1,5 +1,5 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
-import { X, Edit, Trash2, Plus, Info } from "lucide-react";
+import { X, Edit, Trash2, Plus, Info, Eye } from "lucide-react";
 import React from "react";
 
 interface GuideModalProps {
@@ -93,8 +93,8 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
                 <span>テーブルの削除ボタンで従業員を削除</span>
               </li>
               <li style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ color: "#319795" }}>「確認」ボタン</span>
-                <span>で有給取得日を一覧・編集</span>
+                <Eye size={14} />
+                <span>テーブルの確認ボタンで有給取得日を一覧・編集</span>
               </li>
             </ul>
           </Text>
