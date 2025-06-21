@@ -339,6 +339,16 @@ function App() {
         isOpen={isOpen}
         onClose={() => {
           setEditId(null);
+          setForm({
+            id: "",
+            lastName: "",
+            firstName: "",
+            joinedAt: "",
+            total: 20,
+            used: 0,
+            leaveDates: [],
+          });
+          setIdError("");
           onClose();
         }}
         form={form}
