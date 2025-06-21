@@ -223,7 +223,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         </Thead>
         <Tbody>
           <AnimatePresence>
-            {employees.map((emp) => {
+            {employees.map((emp, idx) => {
               const used = emp.leaveDates.length;
               const now = new Date();
               let grantThisYear = 0;
@@ -265,8 +265,14 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 onEdit,
                 handleDeleteClick,
               };
-              const style =
-                remain === 0 ? { background: "#FFF5F5" } : undefined;
+              const style = {
+                background:
+                  remain === 0
+                    ? "#FFF5F5"
+                    : idx % 2 === 0
+                    ? "rgba(0, 128, 128, 0.06)" // 偶数行に淡いteal系背景
+                    : undefined,
+              };
               return (
                 <FadeTableRow key={emp.id} style={style}>
                   <RowContent {...rowProps} />
