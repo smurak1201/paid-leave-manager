@@ -24,20 +24,11 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
 }) => {
   const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
-  const [recentlyAddedId, setRecentlyAddedId] = useState<string | null>(null);
   const prevEmployeesRef = useRef<Employee[]>(employees);
 
   // 追加時にrecentlyAddedIdをセットし、1秒後に解除
   useEffect(() => {
-    const prev = prevEmployeesRef.current;
-    if (employees.length > prev.length) {
-      // 新規追加された従業員を特定
-      const added = employees.find((e) => !prev.some((p) => p.id === e.id));
-      if (added) {
-        setRecentlyAddedId(added.id);
-        setTimeout(() => setRecentlyAddedId(null), 1000);
-      }
-    }
+    // 新規追加された従業員を特定（アニメーションや色付け用途がなければ何もしない）
     prevEmployeesRef.current = employees;
   }, [employees]);
 
@@ -78,8 +69,6 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     onEdit,
     handleDeleteClick,
   }) => {
-    // 残日数の厳密計算
-    const strictRemain = calcStrictRemain(emp.grants || [], emp.leaveDates);
     return (
       <>
         <Td>{emp.id}</Td>
