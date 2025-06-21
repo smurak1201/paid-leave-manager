@@ -8,9 +8,14 @@ interface GuideModalProps {
 }
 
 export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
+  const overlayRef = React.useRef<HTMLDivElement>(null);
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === overlayRef.current) onClose();
+  };
   if (!isOpen) return null;
   return (
     <Box
+      ref={overlayRef}
       position="fixed"
       top={0}
       left={0}
@@ -21,6 +26,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
       display="flex"
       alignItems="center"
       justifyContent="center"
+      onClick={handleOverlayClick}
     >
       <Box
         bg="white"
@@ -32,6 +38,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
         position="relative"
         maxHeight="80vh"
         overflowY="auto"
+        onClick={(e) => e.stopPropagation()}
       >
         <Button
           position="absolute"

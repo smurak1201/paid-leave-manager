@@ -32,9 +32,19 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   onAddDate,
   setEditDateIdx,
 }) => {
+  const overlayRef = React.useRef<HTMLDivElement>(null);
+  // オーバーレイ外クリックで閉じる
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === overlayRef.current) {
+      onClose();
+      setEditDateIdx(null);
+      onDateInputChange("");
+    }
+  };
   if (!isOpen) return null;
   return (
     <Box
+      ref={overlayRef}
       position="fixed"
       top={0}
       left={0}
@@ -45,6 +55,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
       display="flex"
       alignItems="center"
       justifyContent="center"
+      onClick={handleOverlayClick}
     >
       <Box
         bg="white"
@@ -54,6 +65,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
         minW="340px"
         maxW="90vw"
         position="relative"
+        onClick={(e) => e.stopPropagation()}
       >
         <Button
           position="absolute"
