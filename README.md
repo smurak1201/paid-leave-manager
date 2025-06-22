@@ -1,54 +1,58 @@
-# React + TypeScript + Vite
+# 有給休暇管理アプリ 技術・機能紹介
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+このアプリは、日本の有給休暇管理業務を効率化するために設計された、学習・実務両対応の Web アプリです。
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 使用技術
 
-## Expanding the ESLint configuration
+- **React**（Vite ベース）
+  - モダンな SPA 構築、状態管理、単方向データフロー
+- **TypeScript**
+  - 型安全な開発、型によるバリデーション・保守性向上
+- **Vite**
+  - 高速な開発サーバー・ビルド環境
+- **Chakra UI**
+  - 洗練された UI コンポーネント、アクセシビリティ対応、テーマカスタマイズ
+- **lucide-react**
+  - 軽量 SVG アイコン
+- **ESLint/Prettier**
+  - コード品質・自動整形
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## 主な機能
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- **従業員管理**
+  - 従業員の追加・編集・削除
+  - サンプルデータによる初期表示
+- **有給休暇管理**
+  - 有給付与日数の自動計算（日本法令準拠）
+  - 有給取得日リストの追加・編集・削除
+  - 有給消化・繰越・時効消滅ロジック
+- **バリデーション・エラーハンドリング**
+  - 入力値の即時チェック、重複エラーの即時表示
+  - フォームリセット・モーダル閉時の状態初期化
+- **UI/UX**
+  - モーダルによる直感的な操作
+  - ページネーション（従業員・有給日一覧）
+  - ガイドモーダルによる学習サポート
+- **責務分離・型安全設計**
+  - 型定義・カスタムフック・ユーティリティによるロジック分離
+  - コメント充実・初学者向け設計意図の明記
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## ファイル構成（一部抜粋）
+
+- `src/App.tsx` : 全体状態管理・UI 構成のメイン
+- `src/components/employee/` : 従業員・有給日関連 UI/ロジック
+- `src/hooks/` : カスタムフック（フォーム・日付編集・バリデーション）
+- `src/sampleData/` : サンプル従業員データ
+- `src/learning_guide.md` : 学習ガイド
+
+---
+
+## 生成 AI について
+
+本アプリの設計・リファクタリング・ドキュメント作成には、GitHub Copilot（2024 年 6 月時点）を活用しています。最新情報や仕様変更にはご注意ください。
