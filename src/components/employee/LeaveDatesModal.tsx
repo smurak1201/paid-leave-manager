@@ -26,11 +26,7 @@ import { inputDateSmallStyle } from "./icons";
 import { LeaveDateList } from "./LeaveDateList";
 
 // ===== import: サンプルデータ・集計ロジック =====
-import {
-  employees,
-  calcLeaveSummary,
-  generateLeaveGrants,
-} from "../../sampleData/dbSampleTables";
+import { employees } from "../../sampleData/dbSampleTables";
 
 // propsの型定義はtypes.tsに集約
 export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
