@@ -27,12 +27,8 @@ import { Icons } from "../employee/icons";
 export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
   return (
     <CustomModal isOpen={open} onClose={onClose}>
+      {/* CustomModal側で幅・paddingを管理するため、ここではBoxのmaxW/w/pを削除 */}
       <Box
-        maxW="900px"
-        minW="360px"
-        w="90vw"
-        maxH="80vh"
-        p={8}
         position="relative"
         bg="white"
         borderRadius="lg"

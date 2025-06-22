@@ -135,7 +135,17 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   if (!isOpen || !form) return null;
   return (
     <CustomModal isOpen={isOpen} onClose={onClose}>
-      <Box position="relative">
+      {/* GuideModalと同様、白背景・角丸・影付きBoxでラップ */}
+      <Box
+        position="relative"
+        bg="white"
+        borderRadius="lg"
+        boxShadow="lg"
+        p={6}
+        minW="320px"
+        maxW="420px"
+        w="95%"
+      >
         <HStack justify="center" gap={2} mb={6}>
           <Icon as={User} color="teal.400" boxSize={6} />
           <Text

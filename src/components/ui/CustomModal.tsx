@@ -46,17 +46,8 @@ export const CustomModal = ({
       justifyContent="center"
       onClick={handleOverlayClick}
     >
-      <Box
-        maxW="420px"
-        w="95%"
-        bg="white" // ← 透過なし
-        borderRadius="lg"
-        boxShadow="lg"
-        p={6}
-        position="relative"
-      >
-        {children}
-      </Box>
+      {/* ここではラッパーBoxのみ。bg/boxShadow/borderRadius/pは指定しない */}
+      {children}
     </Box>
   );
 };
