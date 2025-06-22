@@ -95,14 +95,13 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   };
 
   // RowContentPropsの型定義はtypes.tsに移動済み
-  const RowContent: React.FC<RowContentProps & { grantDays: number }> = ({
+  const RowContent: React.FC<RowContentProps> = ({
     emp,
     grantThisYear,
     carryOver,
     used,
     remain,
     servicePeriod,
-    grantDays,
     onView,
     onEdit,
     handleDeleteClick,
@@ -136,7 +135,6 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
             {grantThisYear + carryOver - used}
           </Badge>
         </Td>
-        <Td isNumeric>{grantDays}</Td>
         <Td>
           <HStack justify="center" gap={1}>
             <Tooltip content="確認" showArrow>
@@ -277,7 +275,6 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
             <Th isNumeric>繰越</Th>
             <Th isNumeric>消化日数</Th>
             <Th isNumeric>残日数</Th>
-            <Th isNumeric>現時点付与日数</Th>
             <Th minW="120px">操作</Th>
           </Tr>
         </Thead>
@@ -292,16 +289,13 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               const carryOver = summary?.carryOver ?? 0;
               const used = summary?.used ?? 0;
               const remain = summary?.remain ?? 0;
-              const grantDays = summary?.grantDays ?? 0;
-              const servicePeriod = getServicePeriod(emp.joinedAt);
               const rowProps = {
                 emp,
                 grantThisYear,
                 carryOver,
                 used,
                 remain,
-                servicePeriod,
-                grantDays,
+                servicePeriod: getServicePeriod(emp.joinedAt),
                 onView,
                 onEdit,
                 handleDeleteClick,
