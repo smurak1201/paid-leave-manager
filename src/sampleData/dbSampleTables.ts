@@ -47,44 +47,44 @@ export interface LeaveUsage {
   grantDate: string;
 }
 export const leaveUsages: LeaveUsage[] = [
-  // 山田: 有効分（2024-02-15付与分から2日消化）、無効分（2022-02-15付与分から11日消化）
-  { id: 1, employeeId: 1, usedDate: "2022-03-01", grantDate: "2022-02-15" }, // 無効
-  { id: 2, employeeId: 1, usedDate: "2022-04-01", grantDate: "2022-02-15" }, // 無効
-  { id: 3, employeeId: 1, usedDate: "2022-05-01", grantDate: "2022-02-15" }, // 無効
-  { id: 4, employeeId: 1, usedDate: "2022-06-01", grantDate: "2022-02-15" }, // 無効
-  { id: 5, employeeId: 1, usedDate: "2022-07-01", grantDate: "2022-02-15" }, // 無効
-  { id: 6, employeeId: 1, usedDate: "2022-08-01", grantDate: "2022-02-15" }, // 無効
-  { id: 7, employeeId: 1, usedDate: "2022-09-01", grantDate: "2022-02-15" }, // 無効
-  { id: 8, employeeId: 1, usedDate: "2022-10-01", grantDate: "2022-02-15" }, // 無効
-  { id: 9, employeeId: 1, usedDate: "2022-11-01", grantDate: "2022-02-15" }, // 無効
-  { id: 10, employeeId: 1, usedDate: "2022-12-01", grantDate: "2022-02-15" }, // 無効
-  { id: 11, employeeId: 1, usedDate: "2023-01-01", grantDate: "2022-02-15" }, // 無効
-  { id: 101, employeeId: 1, usedDate: "2024-09-01", grantDate: "2024-08-14" }, // 有効
-  { id: 102, employeeId: 1, usedDate: "2024-10-01", grantDate: "2024-08-14" }, // 有効
+  // 山田: 有効分（2024-08-15付与分から2日消化）、無効分（2022-08-15付与分から11日消化）
+  { id: 1, employeeId: 1, usedDate: "2022-09-01", grantDate: "2022-08-15" }, // 無効
+  { id: 2, employeeId: 1, usedDate: "2022-10-01", grantDate: "2022-08-15" }, // 無効
+  { id: 3, employeeId: 1, usedDate: "2022-11-01", grantDate: "2022-08-15" }, // 無効
+  { id: 4, employeeId: 1, usedDate: "2022-12-01", grantDate: "2022-08-15" }, // 無効
+  { id: 5, employeeId: 1, usedDate: "2023-01-01", grantDate: "2022-08-15" }, // 無効
+  { id: 6, employeeId: 1, usedDate: "2023-02-01", grantDate: "2022-08-15" }, // 無効
+  { id: 7, employeeId: 1, usedDate: "2023-03-01", grantDate: "2022-08-15" }, // 無効
+  { id: 8, employeeId: 1, usedDate: "2023-04-01", grantDate: "2022-08-15" }, // 無効
+  { id: 9, employeeId: 1, usedDate: "2023-05-01", grantDate: "2022-08-15" }, // 無効
+  { id: 10, employeeId: 1, usedDate: "2023-06-01", grantDate: "2022-08-15" }, // 無効
+  { id: 11, employeeId: 1, usedDate: "2023-07-01", grantDate: "2022-08-15" }, // 無効
+  { id: 101, employeeId: 1, usedDate: "2024-09-01", grantDate: "2024-08-15" }, // 有効
+  { id: 102, employeeId: 1, usedDate: "2024-10-01", grantDate: "2024-08-15" }, // 有効
 
-  // 佐藤: 有効分（2024-07-01付与分から2日消化）、無効分（2023-07-01付与分から2日消化）
-  { id: 12, employeeId: 2, usedDate: "2023-08-01", grantDate: "2023-07-01" }, // 無効
-  { id: 13, employeeId: 2, usedDate: "2023-12-01", grantDate: "2023-07-01" }, // 無効
-  { id: 103, employeeId: 2, usedDate: "2024-07-10", grantDate: "2024-07-01" }, // 有効
-  { id: 104, employeeId: 2, usedDate: "2024-07-11", grantDate: "2024-07-01" }, // 有効
+  // 佐藤: 有効分（2024-01-01付与分から2日消化）、無効分（2023-01-01付与分から2日消化）
+  { id: 12, employeeId: 2, usedDate: "2023-02-01", grantDate: "2023-01-01" }, // 無効
+  { id: 13, employeeId: 2, usedDate: "2023-06-01", grantDate: "2023-01-01" }, // 無効
+  { id: 103, employeeId: 2, usedDate: "2024-01-10", grantDate: "2024-01-01" }, // 有効
+  { id: 104, employeeId: 2, usedDate: "2024-01-11", grantDate: "2024-01-01" }, // 有効
 
-  // 田中: 有効分（2024-03-20付与分から1日消化）、無効分なし
-  { id: 27, employeeId: 3, usedDate: "2024-04-10", grantDate: "2024-03-20" }, // 有効
+  // 田中: 有効分（2024-05-20付与分から1日消化）、無効分なし
+  { id: 27, employeeId: 3, usedDate: "2024-06-10", grantDate: "2024-05-20" }, // 有効
 
-  // 鈴木: 有効分なし、無効分（2022-06-10付与分から2日消化）
-  { id: 29, employeeId: 4, usedDate: "2023-07-01", grantDate: "2022-06-10" }, // 無効
-  { id: 30, employeeId: 4, usedDate: "2023-08-01", grantDate: "2022-06-10" }, // 無効
+  // 鈴木: 有効分なし、無効分（2022-12-10付与分から2日消化）
+  { id: 29, employeeId: 4, usedDate: "2023-01-10", grantDate: "2022-12-10" }, // 無効
+  { id: 30, employeeId: 4, usedDate: "2023-02-10", grantDate: "2022-12-10" }, // 無効
 
-  // 高橋: 有効分（2024-04-01付与分から1日消化）、無効分なし
-  { id: 105, employeeId: 5, usedDate: "2024-05-01", grantDate: "2024-04-01" }, // 有効
+  // 高橋: 有効分（2024-10-01付与分から1日消化）、無効分なし
+  { id: 105, employeeId: 5, usedDate: "2024-11-01", grantDate: "2024-10-01" }, // 有効
 
-  // 伊藤: 有効分（2024-01-15付与分から2日消化）、無効分なし
-  { id: 31, employeeId: 6, usedDate: "2024-02-01", grantDate: "2024-01-15" }, // 有効
-  { id: 32, employeeId: 6, usedDate: "2024-02-15", grantDate: "2024-01-15" }, // 有効
+  // 伊藤: 有効分（2024-07-15付与分から2日消化）、無効分なし
+  { id: 31, employeeId: 6, usedDate: "2024-08-01", grantDate: "2024-07-15" }, // 有効
+  { id: 32, employeeId: 6, usedDate: "2024-08-15", grantDate: "2024-07-15" }, // 有効
 
-  // 渡辺: 有効分なし、無効分（2021-10-01付与分から2日消化）
-  { id: 41, employeeId: 7, usedDate: "2022-11-01", grantDate: "2021-10-01" }, // 無効
-  { id: 42, employeeId: 7, usedDate: "2023-01-10", grantDate: "2021-10-01" }, // 無効
+  // 渡辺: 有効分なし、無効分（2021-04-01付与分から2日消化）
+  { id: 41, employeeId: 7, usedDate: "2022-05-01", grantDate: "2021-04-01" }, // 無効
+  { id: 42, employeeId: 7, usedDate: "2022-07-10", grantDate: "2021-04-01" }, // 無効
 
   // 中村: 有効分（2024-10-10付与分から1日消化）、無効分なし
   { id: 106, employeeId: 8, usedDate: "2024-11-01", grantDate: "2024-10-10" }, // 有効
@@ -99,8 +99,8 @@ export const leaveUsages: LeaveUsage[] = [
   // 山本: 有効分（2024-12-01付与分から1日消化）、無効分なし
   { id: 108, employeeId: 12, usedDate: "2024-12-10", grantDate: "2024-12-01" }, // 有効
 
-  // 斎藤: 有効分なし、無効分（2021-08-15付与分から1日消化）
-  { id: 109, employeeId: 13, usedDate: "2022-01-10", grantDate: "2021-08-15" }, // 無効
+  // 斎藤: 有効分なし、無効分（2021-02-15付与分から1日消化）
+  { id: 109, employeeId: 13, usedDate: "2022-03-10", grantDate: "2021-02-15" }, // 無効
 
   // 森田: 有効分（2024-12-10付与分から1日消化）、無効分なし
   { id: 110, employeeId: 14, usedDate: "2024-12-20", grantDate: "2024-12-10" }, // 有効
@@ -108,8 +108,8 @@ export const leaveUsages: LeaveUsage[] = [
   // 石井: 有効分なし、無効分なし
 
   // 上田: 有効分（2024-11-11付与分から1日消化）、無効分（2022-11-11付与分から1日消化）
-  { id: 111, employeeId: 16, usedDate: "2022-12-01", grantDate: "2022-11-11" }, // 無効
-  { id: 112, employeeId: 16, usedDate: "2024-12-01", grantDate: "2024-11-11" }, // 有効
+  { id: 111, employeeId: 16, usedDate: "2022-12-11", grantDate: "2022-11-11" }, // 無効
+  { id: 112, employeeId: 16, usedDate: "2024-12-11", grantDate: "2024-11-11" }, // 有効
 ];
 
 // =============================
@@ -151,7 +151,7 @@ export function getGrantMasterByMonths(months: number) {
  */
 export function generateLeaveGrants(employee: { joinedAt: string }, now: string) {
   const grants = [];
-  const [jy, jm] = employee.joinedAt.split('-').map(Number);
+  const [jy, jm, jd] = employee.joinedAt.split('-').map(Number); // ← 日も取得
   for (let i = 0; i < leaveGrantMaster.length; i++) {
     const master = leaveGrantMaster[i];
     // 年月を合算して日付を生成（setMonth/setFullYearの副作用回避）
@@ -162,8 +162,8 @@ export function generateLeaveGrants(employee: { joinedAt: string }, now: string)
       y += Math.floor((m - 1) / 12);
       m = ((m - 1) % 12) + 1;
     }
-    // 日付は常に入社日と同じ日（jd）でなく「15日固定」とする
-    const date = new Date(y, m - 1, 15);
+    // 日付は入社日と同じ日（jd）で固定
+    const date = new Date(y, m - 1, jd);
     if (date > new Date(now)) continue;
     grants.push({ grantDate: date.toISOString().slice(0, 10), days: master.days });
   }
