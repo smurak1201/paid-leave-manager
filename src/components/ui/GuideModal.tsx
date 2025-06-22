@@ -504,7 +504,10 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
               </tbody>
             </table>
             <Text fontSize="xs" color="gray.500" mt={1}>
-              ※週所定労働日数や労働時間によって異なる場合があります
+              ※この表は「週5日・年間217日以上勤務する通常のフルタイム労働者（正社員等）」の場合の目安です。パートタイムや週所定労働日数が少ない場合は付与日数が異なります。
+            </Text>
+            <Text fontSize="xs" color="gray.400" mt={0}>
+              （参考：労働基準法第39条・厚生労働省ガイドライン）
             </Text>
           </Box>
         </Stack>
