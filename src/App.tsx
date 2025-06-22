@@ -35,7 +35,7 @@ import { useEmployeeForm } from "./hooks/useEmployeeForm";
 import { useLeaveDates } from "./hooks/useLeaveDates";
 
 // ===== import: サンプルデータ =====
-import { initialEmployees } from "./sampleData/employees";
+import { employees as initialEmployees } from "./sampleData/employees";
 
 function App() {
   // --- グローバル状態管理 ---
