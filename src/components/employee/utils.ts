@@ -131,8 +131,8 @@ export function calcStrictRemain(
  */
 export function getEmployeeLeaveSummary(
   employeeId: number,
-  leaveUsages: { employeeId: number; usedDate: string; grantDate: string }[],
-  employees: Employee[],
+  leaveUsages: { employeeId: number; usedDate: string; grantDate: string }[] | undefined,
+  employees: Employee[] | undefined,
   now: Date = new Date()
 ): {
   grantThisYear: number;
@@ -140,6 +140,9 @@ export function getEmployeeLeaveSummary(
   used: number;
   remain: number;
 } {
+  if (!employees || !Array.isArray(employees)) {
+    return { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
+  }
   const emp = employees.find((e) => e.id === employeeId);
   if (!emp) return { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
   // 付与履歴を生成
@@ -164,7 +167,7 @@ export function getEmployeeLeaveSummary(
     }
   });
   // 消化日数
-  const used = leaveUsages.filter((u) => u.employeeId === employeeId).length;
+  const used = (leaveUsages || []).filter((u) => u.employeeId === employeeId).length;
   const remain = grantThisYear + carryOver - used;
   return { grantThisYear, carryOver, used, remain };
 }
