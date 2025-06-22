@@ -26,7 +26,6 @@ import { EmployeeTable } from "./components/employee/EmployeeTable";
 import { EmployeeModal } from "./components/employee/EmployeeModal";
 import { LeaveDatesModal } from "./components/employee/LeaveDatesModal";
 import { Icons } from "./components/employee/icons";
-import { calcLeaveDays } from "./components/employee/utils";
 
 // ===== import: UI/ガイド =====
 import { GuideModal } from "./components/ui/GuideModal";
@@ -65,8 +64,6 @@ function App() {
           lastName: "",
           firstName: "",
           joinedAt: "",
-          total: 20,
-          used: 0,
           leaveDates: [],
         },
     employees,
@@ -108,8 +105,6 @@ function App() {
       lastName: "",
       firstName: "",
       joinedAt: "",
-      total: 20,
-      used: 0,
       leaveDates: [],
     });
     setActiveEmployeeId(null);
@@ -128,8 +123,6 @@ function App() {
       lastName: "",
       firstName: "",
       joinedAt: "",
-      total: 20,
-      used: 0,
       leaveDates: [],
     });
   };
@@ -217,10 +210,7 @@ function App() {
               );
               return;
             }
-            // 勤続年数から付与日数を自動計算
-            const autoTotal = calcLeaveDays(form.joinedAt);
-            const newEmp = { ...form, total: autoTotal };
-            setEmployees([...employees, { ...newEmp }]);
+            setEmployees([...employees, { ...form }]);
             // 追加後に最終ページへ移動
             const ITEMS_PER_PAGE = 15;
             const newTotal = employees.length + 1;
@@ -230,8 +220,6 @@ function App() {
               lastName: "",
               firstName: "",
               joinedAt: "",
-              total: 20,
-              used: 0,
               leaveDates: [],
             });
             setActiveEmployeeId(null);
@@ -249,12 +237,9 @@ function App() {
               setIdError("全ての項目を正しく入力してください");
               return;
             }
-            // 勤続年数から付与日数を自動計算
-            const autoTotal = calcLeaveDays(form.joinedAt);
-            const newEmp = { ...form, total: autoTotal };
             setEmployees((prev) =>
               prev.map((emp) =>
-                emp.id === activeEmployeeId ? { ...newEmp } : emp
+                emp.id === activeEmployeeId ? { ...form } : emp
               )
             );
             setForm({
@@ -262,8 +247,6 @@ function App() {
               lastName: "",
               firstName: "",
               joinedAt: "",
-              total: 20,
-              used: 0,
               leaveDates: [],
             });
             setActiveEmployeeId(null);

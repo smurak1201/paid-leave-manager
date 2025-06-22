@@ -7,8 +7,10 @@
 // ・アプリ全体で使う初期従業員データを一元管理
 //
 // 設計意図:
-// ・実運用時はAPI等で取得する想定
+// ・実運用時はAPI/DBから取得する想定
 // ・型安全性のためEmployee型を利用
+// ・集計値（消化日数・残日数・繰越など）は持たず、付与履歴と取得日だけを保持
+//   → 集計値はフロントエンドで都度計算
 
 // ===== import: 型定義 =====
 import type { Employee } from "../components/employee/types";
@@ -42,8 +44,6 @@ export const initialEmployees: Employee[] = [
       { grantDate: "2023-02-15", days: 14, usedDates: [] },
       { grantDate: "2024-02-15", days: 16, usedDates: [] },
     ],
-    total: 42,
-    used: 11,
     leaveDates: [
       "2022-03-01",
       "2022-04-01",
@@ -57,7 +57,6 @@ export const initialEmployees: Employee[] = [
       "2022-12-01",
       "2023-01-01",
     ],
-    carryOver: 0,
   },
   // 2人目: 佐藤 花子
   {
@@ -73,10 +72,7 @@ export const initialEmployees: Employee[] = [
       },
       { grantDate: "2024-07-01", days: 16, usedDates: ["2024-08-01"] },
     ],
-    total: 30,
-    used: 3,
     leaveDates: ["2023-08-01", "2023-12-01", "2024-08-01"],
-    carryOver: 0,
   },
   // 3人目: 田中 一郎
   {
@@ -84,11 +80,16 @@ export const initialEmployees: Employee[] = [
     lastName: "田中",
     firstName: "一郎",
     joinedAt: "2023-11-20",
-    grants: [{ grantDate: "2024-11-20", days: 16, usedDates: [] }],
-    total: 16,
-    used: 0,
-    leaveDates: [],
-    carryOver: 0,
+    grants: [
+      { grantDate: "2024-05-20", days: 10, usedDates: [
+        "2024-05-21", "2024-05-22", "2024-05-23", "2024-05-24", "2024-05-27",
+        "2024-05-28", "2024-05-29", "2024-05-30", "2024-05-31", "2024-06-03"
+      ] }
+    ],
+    leaveDates: [
+      "2024-05-21", "2024-05-22", "2024-05-23", "2024-05-24", "2024-05-27",
+      "2024-05-28", "2024-05-29", "2024-05-30", "2024-05-31", "2024-06-03"
+    ],
   },
   // 4人目: 鈴木 美咲
   {
@@ -105,8 +106,6 @@ export const initialEmployees: Employee[] = [
       },
       { grantDate: "2024-06-10", days: 16, usedDates: ["2024-07-01"] },
     ],
-    total: 42,
-    used: 5,
     leaveDates: [
       "2022-07-01",
       "2023-07-01",
@@ -114,7 +113,6 @@ export const initialEmployees: Employee[] = [
       "2023-09-01",
       "2024-07-01",
     ],
-    carryOver: 0,
   },
   // 5人目: 高橋 健
   {
@@ -132,10 +130,7 @@ export const initialEmployees: Employee[] = [
       { grantDate: "2023-04-01", days: 14, usedDates: ["2023-07-01"] },
       { grantDate: "2024-04-01", days: 16, usedDates: [] },
     ],
-    total: 52,
-    used: 4,
     leaveDates: ["2021-05-10", "2022-06-15", "2022-09-20", "2023-07-01"],
-    carryOver: 2,
   },
   // 6人目: 伊藤 彩
   {
@@ -147,10 +142,7 @@ export const initialEmployees: Employee[] = [
       { grantDate: "2023-01-15", days: 14, usedDates: ["2023-02-10"] },
       { grantDate: "2024-01-15", days: 16, usedDates: ["2024-03-05"] },
     ],
-    total: 30,
-    used: 2,
     leaveDates: ["2023-02-10", "2024-03-05"],
-    carryOver: 0,
   },
   // 7人目: 渡辺 大輔
   {
@@ -165,10 +157,7 @@ export const initialEmployees: Employee[] = [
       { grantDate: "2023-10-01", days: 16, usedDates: ["2023-12-01"] },
       { grantDate: "2024-10-01", days: 18, usedDates: [] },
     ],
-    total: 70,
-    used: 4,
     leaveDates: ["2020-11-01", "2021-12-01", "2022-11-01", "2023-12-01"],
-    carryOver: 5,
   },
   // 8人目: 中村 さくら
   {
@@ -177,10 +166,7 @@ export const initialEmployees: Employee[] = [
     firstName: "さくら",
     joinedAt: "2023-04-10",
     grants: [{ grantDate: "2024-04-10", days: 16, usedDates: ["2024-05-20"] }],
-    total: 16,
-    used: 1,
     leaveDates: ["2024-05-20"],
-    carryOver: 0,
   },
   // 9人目: 小林 直樹
   {
@@ -193,10 +179,7 @@ export const initialEmployees: Employee[] = [
       { grantDate: "2022-12-01", days: 14, usedDates: ["2023-02-15"] },
       { grantDate: "2023-12-01", days: 16, usedDates: [] },
     ],
-    total: 42,
-    used: 2,
     leaveDates: ["2022-01-10", "2023-02-15"],
-    carryOver: 1,
   },
   // 10人目: 加藤 美優
   {
@@ -208,10 +191,7 @@ export const initialEmployees: Employee[] = [
       { grantDate: "2023-09-01", days: 14, usedDates: ["2023-10-01"] },
       { grantDate: "2024-09-01", days: 16, usedDates: [] },
     ],
-    total: 30,
-    used: 1,
     leaveDates: ["2023-10-01"],
-    carryOver: 0,
   },
   // 11人目: 吉田 翔
   {
@@ -224,10 +204,7 @@ export const initialEmployees: Employee[] = [
       { grantDate: "2023-03-20", days: 14, usedDates: ["2023-05-01"] },
       { grantDate: "2024-03-20", days: 16, usedDates: [] },
     ],
-    total: 42,
-    used: 2,
     leaveDates: ["2022-04-10", "2023-05-01"],
-    carryOver: 0,
   },
   // 12人目: 山本 里奈
   {
@@ -236,10 +213,7 @@ export const initialEmployees: Employee[] = [
     firstName: "里奈",
     joinedAt: "2023-06-01",
     grants: [{ grantDate: "2024-06-01", days: 16, usedDates: [] }],
-    total: 16,
-    used: 0,
     leaveDates: [],
-    carryOver: 0,
   },
   // 13人目: 斎藤 拓海
   {
@@ -253,10 +227,7 @@ export const initialEmployees: Employee[] = [
       { grantDate: "2023-08-15", days: 16, usedDates: ["2023-11-01"] },
       { grantDate: "2024-08-15", days: 18, usedDates: [] },
     ],
-    total: 60,
-    used: 3,
     leaveDates: ["2021-09-01", "2022-10-01", "2023-11-01"],
-    carryOver: 2,
   },
   // 14人目: 森田 さやか
   {
@@ -268,10 +239,7 @@ export const initialEmployees: Employee[] = [
       { grantDate: "2022-12-10", days: 14, usedDates: ["2023-01-10"] },
       { grantDate: "2023-12-10", days: 16, usedDates: [] },
     ],
-    total: 30,
-    used: 1,
     leaveDates: ["2023-01-10"],
-    carryOver: 0,
   },
   // 15人目: 石井 亮
   {
@@ -283,10 +251,7 @@ export const initialEmployees: Employee[] = [
       { grantDate: "2023-03-01", days: 14, usedDates: ["2023-04-01"] },
       { grantDate: "2024-03-01", days: 16, usedDates: ["2024-04-01"] },
     ],
-    total: 30,
-    used: 2,
     leaveDates: ["2023-04-01", "2024-04-01"],
-    carryOver: 0,
   },
   // 16人目: 上田 美穂
   {
@@ -299,9 +264,6 @@ export const initialEmployees: Employee[] = [
       { grantDate: "2022-11-11", days: 14, usedDates: ["2023-01-11"] },
       { grantDate: "2023-11-11", days: 16, usedDates: [] },
     ],
-    total: 42,
-    used: 2,
     leaveDates: ["2022-01-11", "2023-01-11"],
-    carryOver: 1,
   },
 ];

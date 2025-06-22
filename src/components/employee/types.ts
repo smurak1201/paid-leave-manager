@@ -28,6 +28,7 @@ export interface LeaveGrant {
  * 従業員データ構造
  * - アプリのメインデータ
  * - EmployeeTable, EmployeeModal, hooks等で利用
+ * - 集計値（total, used, carryOver）は今後は持たず、付与履歴と取得日だけを保持する設計推奨
  */
 export interface Employee {
   id: number;             // 従業員コード(数値型)
@@ -35,10 +36,10 @@ export interface Employee {
   firstName: string;      // 名
   joinedAt: string;       // 入社年月日 (YYYY-MM-DD)
   grants?: LeaveGrant[];  // 年度ごとの有給付与履歴
-  total: number;          // 付与日数(理論値)
-  used: number;           // 消化日数
   leaveDates: string[];   // 有給取得日(YYYY-MM-DD)
-  carryOver?: number;     // 前年からの繰越日数(省略時は0)
+  // total?: number;      // ← 今後は不要（集計値は都度計算）
+  // used?: number;       // ← 今後は不要
+  // carryOver?: number;  // ← 今後は不要
 }
 
 // ====== UI部品・props型 ======
