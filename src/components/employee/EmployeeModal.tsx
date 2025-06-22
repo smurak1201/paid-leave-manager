@@ -55,7 +55,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   onSave,
   idError,
   editId,
-  employees,
+  employees, // ← ここでpropsとして受け取っているので、handleChange内もemployeesでOK
   setIdError,
 }) => {
   // 空の従業員初期値（追加時用）
@@ -109,7 +109,23 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     if (!form) return;
     if (e.target.name === "id") {
       setIdInputValue(e.target.value); // 入力値はそのまま表示
-      // バリデーションはuseEmployeeForm側で一元管理するため、ここではsetFormのみ
+      // 入力のたびにバリデーション（数字以外・重複・必須を即時チェック）
+      if (e.target.value && !/^[0-9]*$/.test(e.target.value)) {
+        setIdError("従業員コードは半角数字のみ入力できます");
+      } else if (
+        e.target.value &&
+        employees.some(
+          (emp) =>
+            emp.id === Number(e.target.value) &&
+            (editId === null || emp.id !== editId)
+        )
+      ) {
+        setIdError("従業員コードが重複しています");
+      } else if (!e.target.value) {
+        setIdError("従業員コードは必須です");
+      } else {
+        setIdError("");
+      }
       setForm({ ...form, id: e.target.value ? Number(e.target.value) : NaN });
     } else {
       setForm({ ...form, [e.target.name]: e.target.value });
@@ -165,12 +181,8 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
               autoComplete="off"
               disabled={!!editId}
             />
-            {idInputValue && !/^[0-9]*$/.test(idInputValue) && (
-              <Text color="red.500" fontSize="sm" mt={1}>
-                数字を入力してください
-              </Text>
-            )}
-            {idError && (
+            {/* 入力中のidエラーを即時表示（1回のみ表示） */}
+            {idInputValue && idError && (
               <Text color="red.500" fontSize="sm" mt={1}>
                 {idError}
               </Text>
