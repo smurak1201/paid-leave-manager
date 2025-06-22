@@ -339,6 +339,8 @@ function App() {
   const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null);
   // ガイドモーダルの開閉制御
   const guideDisclosure = useDisclosure();
+  // LeaveDatesModal用ページネーションstate
+  const [leaveDatesPage, setLeaveDatesPage] = useState(1);
 
   // 現在選択中の従業員データを取得
   const currentEmployee = activeEmployeeId
@@ -563,13 +565,17 @@ function App() {
             // 日付追加時のロジック
             const emp = employees.find((e) => e.id === activeEmployeeId);
             if (!emp) return;
-            handleAddDate(date, (dates) =>
+            handleAddDate(date, (dates) => {
               setEmployees((prev) =>
                 prev.map((e) =>
                   e.id === emp.id ? { ...e, leaveDates: dates } : e
                 )
-              )
-            );
+              );
+              // 追加後に最終ページへ移動
+              const ITEMS_PER_PAGE = 10;
+              const newTotal = dates.length;
+              setLeaveDatesPage(Math.ceil(newTotal / ITEMS_PER_PAGE));
+            });
           }}
           onEditDate={handleEditDate}
           onSaveDate={() => {
@@ -596,6 +602,8 @@ function App() {
               )
             );
           }}
+          currentPage={leaveDatesPage}
+          onPageChange={setLeaveDatesPage}
         />
       </Box>
     </Box>

@@ -25,7 +25,7 @@
 
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import { X } from "lucide-react";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { calcLeaveDays } from "./utils";
 import type { Employee } from "./types";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
@@ -46,6 +46,8 @@ interface LeaveDatesModalProps {
   onEditDate: (idx: number) => void;
   onSaveDate: () => void;
   onDeleteDate: (idx: number) => void;
+  currentPage: number; // 追加
+  onPageChange: (page: number) => void; // 追加
 }
 
 // モーダル本体
@@ -61,12 +63,13 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   onEditDate,
   onSaveDate,
   onDeleteDate,
+  currentPage,
+  onPageChange,
 }) => {
   const employee = employeeId ? getEmployee(employeeId) : undefined;
   if (!isOpen || !employee) return null;
   const dates = employee.leaveDates;
   // ページネーション用
-  const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
   const totalPages = Math.max(1, Math.ceil(dates.length / ITEMS_PER_PAGE));
   const pagedDates = dates.slice(
@@ -80,7 +83,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   }, [currentPage]);
   // datesが減った場合にcurrentPageを自動調整
   useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages);
+    if (currentPage > totalPages) onPageChange(totalPages);
   }, [dates.length, totalPages]);
   // 一覧と同じ「付与＋繰越－消化」単純計算
   const now = new Date();
@@ -108,8 +111,8 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   }
   const remainSimple = grantThisYear + carryOver - dates.length;
   // 削除確認モーダル用
-  const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
-  const [isDeleteOpen, setDeleteOpen] = useState(false);
+  const [deleteIdx, setDeleteIdx] = React.useState<number | null>(null);
+  const [isDeleteOpen, setDeleteOpen] = React.useState(false);
   const handleDeleteClick = (idx: number) => {
     setDeleteIdx(idx);
     setDeleteOpen(true);
@@ -194,7 +197,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
               >
                 <Button
                   size="sm"
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  onClick={() => onPageChange(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
                   variant="outline"
                 >
@@ -206,7 +209,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                 <Button
                   size="sm"
                   onClick={() =>
-                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                    onPageChange(Math.min(totalPages, currentPage + 1))
                   }
                   disabled={currentPage === totalPages}
                   variant="outline"
