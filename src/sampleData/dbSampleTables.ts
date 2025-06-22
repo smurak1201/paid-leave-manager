@@ -105,15 +105,17 @@ export const leaveUsages: LeaveUsage[] = [
 // =============================
 
 /**
- * 勤続年数（月単位）を計算
+ * 勤続年数（月単位）を正確に計算（年・月・日を考慮）
  * @param joinedAt 入社日（YYYY-MM-DD）
  * @param now 現在日付（YYYY-MM-DD）
  * @returns 勤続月数
  */
 export function calcMonthsOfService(joinedAt: string, now: string): number {
-  const [jy, jm] = joinedAt.split("-").map(Number);
-  const [ny, nm] = now.split("-").map(Number);
-  return (ny - jy) * 12 + (nm - jm);
+  const [jy, jm, jd] = joinedAt.split("-").map(Number);
+  const [ny, nm, nd] = now.split("-").map(Number);
+  let months = (ny - jy) * 12 + (nm - jm);
+  if (nd < jd) months -= 1; // 今月の日が入社日より前なら1か月引く
+  return months;
 }
 
 /**
@@ -263,6 +265,48 @@ export function getEmployeeLeaveSummary(
   const remain = grantDetails.filter(g => g.isValid).reduce((sum, g) => sum + g.remain, 0);
 
   return { grantThisYear, carryOver, used, remain };
+}
+
+/**
+ * 集計済み従業員一覧データを返す（UIはこれを表示するだけでOK）
+ * @param now 現在日付（YYYY-MM-DD、省略時は今日）
+ * @returns Array<{ id, employeeCode, lastName, firstName, joinedAt, years, months, remain, used, grantThisYear, carryOver }>
+ */
+export function getEmployeeSummaryList(
+  now: string = new Date().toISOString().slice(0, 10)
+) {
+  return employees.map(emp => {
+    // 勤続年数
+    const months = calcMonthsOfService(emp.joinedAt, now);
+    const years = Math.floor(months / 12);
+    const restMonths = months % 12;
+    // 有給集計
+    const summary = getEmployeeLeaveSummary(emp.id, leaveUsages, employees, now);
+    // 現時点での付与日数（法定マスタ参照）
+    const grantDays = getCurrentGrantDays(emp.joinedAt, now);
+    return {
+      ...emp,
+      years,
+      months: restMonths,
+      remain: summary.remain,
+      used: summary.used,
+      grantThisYear: summary.grantThisYear,
+      carryOver: summary.carryOver,
+      grantDays, // ← 追加
+    };
+  });
+}
+
+/**
+ * 現時点での付与日数を返す（勤続年数→マスタ参照）
+ * @param joinedAt 入社年月日（YYYY-MM-DD）
+ * @param now 現在日付（YYYY-MM-DD、省略時は今日）
+ * @returns 付与日数
+ */
+export function getCurrentGrantDays(joinedAt: string, now: string = new Date().toISOString().slice(0, 10)) {
+  const months = calcMonthsOfService(joinedAt, now);
+  const master = getGrantMasterByMonths(months);
+  return master.days;
 }
 
 // =============================

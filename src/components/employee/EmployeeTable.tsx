@@ -24,7 +24,8 @@ import type { Employee, RowContentProps } from "./types";
 
 // ===== import: アイコン・ユーティリティ =====
 import { Icons, getServicePeriod } from "./icons";
-import { getEmployeeLeaveSummary } from "./utils";
+import { getEmployeeLeaveSummary } from "../../sampleData/dbSampleTables";
+import { getEmployeeSummaryList } from "../../sampleData/dbSampleTables";
 
 // ===== import: UI部品 =====
 import { Tooltip } from "../ui/tooltip";
@@ -95,13 +96,14 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   };
 
   // RowContentPropsの型定義はtypes.tsに移動済み
-  const RowContent: React.FC<RowContentProps> = ({
+  const RowContent: React.FC<RowContentProps & { grantDays: number }> = ({
     emp,
     grantThisYear,
     carryOver,
     used,
     remain,
     servicePeriod,
+    grantDays,
     onView,
     onEdit,
     handleDeleteClick,
@@ -135,6 +137,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
             {grantThisYear + carryOver - used}
           </Badge>
         </Td>
+        <Td isNumeric>{grantDays}</Td>
         <Td>
           <HStack justify="center" gap={1}>
             <Tooltip content="確認" showArrow>
@@ -237,7 +240,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         colorScheme="teal"
         size="sm"
         sx={{
-          minWidth: 600,
+          minWidth: 650, // grantDays列追加で幅拡張
           width: "100%",
           "th, td": {
             fontSize: "sm",
@@ -275,15 +278,22 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
             <Th isNumeric>繰越</Th>
             <Th isNumeric>消化日数</Th>
             <Th isNumeric>残日数</Th>
+            <Th isNumeric>現時点付与日数</Th>
             <Th minW="120px">操作</Th>
           </Tr>
         </Thead>
         <Tbody>
           <AnimatePresence>
             {pagedEmployees.map((emp, idx) => {
-              // 有給サマリー計算をutilsの共通関数で取得
-              const { grantThisYear, carryOver, used, remain } =
-                getEmployeeLeaveSummary(emp);
+              // getEmployeeSummaryListで集計済みデータを取得する前提
+              const summary = getEmployeeSummaryList().find(
+                (e) => e.id === emp.id
+              );
+              const grantThisYear = summary?.grantThisYear ?? 0;
+              const carryOver = summary?.carryOver ?? 0;
+              const used = summary?.used ?? 0;
+              const remain = summary?.remain ?? 0;
+              const grantDays = summary?.grantDays ?? 0;
               const servicePeriod = getServicePeriod(emp.joinedAt);
               const rowProps = {
                 emp,
@@ -292,6 +302,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 used,
                 remain,
                 servicePeriod,
+                grantDays,
                 onView,
                 onEdit,
                 handleDeleteClick,
