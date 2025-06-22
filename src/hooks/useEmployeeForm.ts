@@ -12,10 +12,7 @@
 // 使い方:
 // - useEmployeeFormを呼び出し、返却された状態・関数をフォームコンポーネントで利用
 // - 初期値、従業員一覧、編集中のIDを引数に渡す
-//
-// 例:
-// const { form, idError, handleChange } = useEmployeeForm(initialEmployee, employeeList, editingEmployeeId);
-//
+
 // ===== import: 外部ライブラリ =====
 import { useState } from "react";
 

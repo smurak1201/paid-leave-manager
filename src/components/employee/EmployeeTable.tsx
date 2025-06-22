@@ -12,7 +12,7 @@
 // 設計意図:
 // ・型安全・責務分離・UI/UX・可読性重視
 // ・props/stateの流れ・UI部品の責務を日本語コメントで明記
-//
+
 // ===== import: 外部ライブラリ =====
 import React, { useState, useEffect, useRef } from "react";
 import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
@@ -37,8 +37,8 @@ interface EmployeeTableProps {
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
   onView: (id: number) => void;
-  currentPage: number; // 追加: 現在のページ番号
-  onPageChange: (page: number) => void; // 追加: ページ切替ハンドラ
+  currentPage: number; // 現在のページ番号
+  onPageChange: (page: number) => void; // ページ切替ハンドラ
 }
 
 // 従業員一覧テーブル本体

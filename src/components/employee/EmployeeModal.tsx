@@ -10,7 +10,7 @@
 // 設計意図:
 // ・型安全・責務分離・UI/UX・可読性重視
 // ・props/stateの流れ・UI部品の責務を日本語コメントで明記
-//
+
 // ===== import: 型定義 =====
 import type { Employee } from "./types";
 

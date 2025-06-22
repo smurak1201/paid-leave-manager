@@ -24,37 +24,27 @@
 ## 2. ソースコードを読むおすすめの順序
 
 1. **`App.tsx`**
-
    - アプリ全体の状態管理・UI 構成・props/state の流れ・イベントハンドラの全体像を把握。
    - コメントで設計意図や流れが明記されているので、まずここをじっくり読みましょう。
-
 2. **型定義・サンプルデータ**
-
    - `components/employee/types.ts`（型定義）
    - `sampleData/employees.ts`（初期データ）
    - どんなデータ構造を扱うか、型安全性の担保方法を確認。
-
 3. **主要 UI コンポーネント**
-
    - `components/employee/EmployeeTable.tsx`（従業員一覧テーブル）
    - `components/employee/EmployeeModal.tsx`（従業員追加・編集モーダル）
-   - `components/employee/LeaveDatesModal.tsx`（有給取得日管理モーダル）
+   - `components/employee/LeaveDatesModal.tsx`（有給日管理モーダル）
    - `components/employee/LeaveDateList.tsx`（有給日リスト）
    - それぞれの責務・props・UI/UX 設計・バリデーションの流れを追いましょう。
-
 4. **カスタムフック・ユーティリティ**
-
    - `hooks/useEmployeeForm.ts`（従業員フォーム管理・バリデーション）
    - `hooks/useLeaveDates.ts`（有給日編集ロジック）
    - `components/employee/utils.ts`（日数計算などの業務ロジック）
    - 共通化・再利用性・ロジック分離の工夫を確認。
-
 5. **UI 部品・アイコン・ガイド**
-
    - `components/employee/icons.ts`（アイコン管理）
    - `components/ui/GuideModal.tsx`（学習ガイドモーダル）
    - UI の細部や学習サポートの工夫を観察。
-
 6. **設定ファイル**
    - `.gitignore`, `package.json`, `tsconfig.*.json`, `vite.config.ts`, `eslint.config.js` など
    - 必要最小限の設定・不要記述の排除・型/構文チェックの工夫を確認。
@@ -64,7 +54,7 @@
 ## 3. 学びを深めるためのアクション例
 
 - コメントを参考に、props/state の流れや型定義を自分で図解してみる
-- バリデーションやロジック部分を一部書き換えて動作を試す
+- バリデーションやロジック部分を書き換えて動作を試す
 - UI/UX 改善案を考え、実際にコードを修正してみる
 - 新しい従業員属性や有給ルールを追加してみる
 - コード分割や型定義の工夫を他のプロジェクトにも応用してみる

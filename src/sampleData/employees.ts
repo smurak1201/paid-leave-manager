@@ -9,7 +9,7 @@
 // 設計意図:
 // ・実運用時はAPI等で取得する想定
 // ・型安全性のためEmployee型を利用
-//
+
 // ===== import: 型定義 =====
 import type { Employee } from "../components/employee/types";
 

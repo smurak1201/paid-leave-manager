@@ -10,7 +10,7 @@
 // 設計意図:
 // ・型安全・責務分離・UI/UX・可読性重視
 // ・props/stateの流れ・UI部品の責務を日本語コメントで明記
-//
+
 // ===== import: 外部ライブラリ =====
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import React, { useRef, useEffect } from "react";
@@ -26,7 +26,7 @@ import { DateInputRow } from "./DateInputRow";
 import { inputDateSmallStyle } from "./icons";
 import { LeaveDateList } from "./LeaveDateList";
 
-// propsの型定義はtypes.tsに移動済み
+// propsの型定義はtypes.tsに集約
 export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   isOpen,
   onClose,

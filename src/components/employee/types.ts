@@ -8,27 +8,27 @@
 //
 // 設計意図:
 // ・型安全性・保守性・可読性向上
-//
+
 // ===== import: なし =====
 //
 // 型定義ファイル。従業員(Employee)や有給付与履歴(LeaveGrant)の構造を定義します。
 // アプリ全体で型の一元管理を行うことで、型安全性・保守性を高めています。
 export interface LeaveGrant {
-  grantDate: string; // 付与日（YYYY-MM-DD）
+  grantDate: string; // 付与日(YYYY-MM-DD)
   days: number;      // 付与日数
   usedDates: string[]; // この付与分から消化した日付
 }
 
 export interface Employee {
-  id: number; // 従業員コード（数値型）
+  id: number; // 従業員コード(数値型)
   lastName: string; // 姓
   firstName: string; // 名
   joinedAt: string; // 入社年月日 (YYYY-MM-DD)
   grants?: LeaveGrant[]; // 年度ごとの有給付与履歴
-  total: number; // 付与日数（理論値）
+  total: number; // 付与日数(理論値)
   used: number; // 消化日数
-  leaveDates: string[]; // 有給取得日（YYYY-MM-DD）
-  carryOver?: number; // 前年からの繰越日数（省略時は0）
+  leaveDates: string[]; // 有給取得日(YYYY-MM-DD)
+  carryOver?: number; // 前年からの繰越日数(省略時は0)
 }
 
 /**

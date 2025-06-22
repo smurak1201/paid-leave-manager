@@ -12,42 +12,6 @@
 // 使い方:
 // - useLeaveDates(employee) を呼び出し、返却されるメソッドをコンポーネント内で利用
 // - employeeには編集対象の従業員データを渡す
-// - handleAddDate, handleEditDate, handleSaveDate, handleDeleteDate
-//   をそれぞれの日付追加・編集・保存・削除処理に紐付け
-//
-// バリデーションルール:
-// - 日付はYYYY-MM-DD形式
-// - 既存の有給取得日と重複不可
-// - 入力日付は従業員の入社日以降である必要あり
-//
-// 型定義:
-// - Employee: 従業員データの型
-// - useLeaveDates: 有給取得日編集用カスタムフック
-//
-// カスタムフック内で使用する状態:
-// - editDateIdx: 現在編集中の日付のインデックス
-// - dateInput: 入力中の日付
-//
-// 各種ロジック:
-// - handleAddDate: 日付追加処理
-// - handleEditDate: 編集開始処理
-// - handleSaveDate: 編集保存処理
-// - handleDeleteDate: 日付削除処理
-//
-// 注意点:
-// - employeeがnullの場合、処理は何も行わない
-// - 日付の状態更新はonUpdateコールバックを通じて親コンポーネントに通知
-//
-// 例外処理:
-// - 不正な日付形式や論理エラーの場合、処理を中断し何も更新しない
-//
-// 参考:
-// - ReactのuseStateを利用した状態管理
-// - TypeScriptによる型安全なコーディング
-//
-// カスタムフック: 有給取得日編集用の状態・ロジックを管理します。
- // モーダルの入力値や編集中インデックス、追加・編集・削除のロジックを一元化。
-
 //
 // ===== import: 外部ライブラリ =====
 import { useState } from "react";

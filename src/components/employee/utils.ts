@@ -8,11 +8,11 @@
 //
 // 設計意図:
 // ・UI部品から分離し、再利用性・可読性・テスト容易性を向上
-//
+
 // ===== import: 型定義 =====
 import type { LeaveGrant } from "./types";
 
-// 勤続年数（月単位）から付与日数を返す関数
+// 勤続年数(月単位)から付与日数を返す関数
 // 日本の有給休暇制度に基づき、入社日と現在日から自動計算します。
 export function calcLeaveDays(
   joinedAt: string,
