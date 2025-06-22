@@ -184,6 +184,42 @@ export function getGrantDetails(employeeId: number, now: string) {
   });
 }
 
+/**
+ * 指定従業員の有給休暇サマリー（今年度付与・繰越・消化・残日数）を返す共通関数
+ * @param employeeId 従業員ID
+ * @param leaveUsages 有給消化履歴
+ * @param employees 従業員テーブル
+ * @param now 現在日付（YYYY-MM-DD、省略時は今日）
+ * @returns { grantThisYear, carryOver, used, remain }
+ */
+export function getEmployeeLeaveSummary(
+  employeeId: number,
+  leaveUsages: LeaveUsage[],
+  employees: Array<{ id: number; employeeCode: number; lastName: string; firstName: string; joinedAt: string }>,
+  now: string = new Date().toISOString().slice(0, 10)
+) {
+  const emp = employees.find((e) => e.id === employeeId);
+  if (!emp) return { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
+  const grants = generateLeaveGrants(emp, now);
+  let grantThisYear = 0;
+  let carryOver = 0;
+  const nowYear = new Date(now).getFullYear();
+  grants.forEach((g) => {
+    const grantYear = new Date(g.grantDate).getFullYear();
+    const diffMonth =
+      (new Date(now).getFullYear() - new Date(g.grantDate).getFullYear()) * 12 +
+      (new Date(now).getMonth() - new Date(g.grantDate).getMonth());
+    if (grantYear === nowYear && diffMonth < 24) {
+      grantThisYear += g.days;
+    } else if (grantYear === nowYear - 1 && diffMonth < 24) {
+      carryOver += g.days;
+    }
+  });
+  const used = leaveUsages.filter((u) => u.employeeId === employeeId).length;
+  const remain = grantThisYear + carryOver - used;
+  return { grantThisYear, carryOver, used, remain };
+}
+
 // =============================
 // 使い方例（学習用）
 // =============================
