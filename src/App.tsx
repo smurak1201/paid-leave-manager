@@ -423,6 +423,15 @@ function App() {
     setEditDateIdx(null);
     setDateInput("");
     setIdError("");
+    setForm({
+      id: NaN,
+      lastName: "",
+      firstName: "",
+      joinedAt: "",
+      total: 20,
+      used: 0,
+      leaveDates: [],
+    });
   };
 
   // =============================

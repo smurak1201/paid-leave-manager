@@ -103,6 +103,15 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     }
   }, [employeeId, employee]);
 
+  // モーダルが閉じられたときにフォーム内容を初期化
+  useEffect(() => {
+    if (!isOpen) {
+      setForm(emptyEmployee);
+      setIdInputValue("");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!form) return;
     if (e.target.name === "id") {
