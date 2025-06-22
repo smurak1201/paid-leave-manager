@@ -1,35 +1,47 @@
 // =============================
 // types.ts
-// 型定義ファイル
+// アプリ全体の型定義ファイル
 // =============================
 //
 // 役割:
-// ・アプリ全体で使う型定義を一元管理
+// ・従業員・有給付与履歴・UI部品propsなど全体で使う型定義を一元管理
 //
 // 設計意図:
 // ・型安全性・保守性・可読性向上
+// ・props/stateの流れ・UI部品の責務を明確化
+// ・初学者が「どの型がどこで使われるか」理解しやすいようにコメント充実
 
-// ===== import: なし =====
-//
-// 型定義ファイル。従業員(Employee)や有給付与履歴(LeaveGrant)の構造を定義します。
-// アプリ全体で型の一元管理を行うことで、型安全性・保守性を高めています。
+// ====== 業務データ型 ======
+
+/**
+ * 有給付与履歴（年度ごと）
+ * - 各従業員の「いつ・何日付与されたか」「その付与分から何日使ったか」を管理
+ * - Employee.grantsで利用
+ */
 export interface LeaveGrant {
-  grantDate: string; // 付与日(YYYY-MM-DD)
-  days: number;      // 付与日数
-  usedDates: string[]; // この付与分から消化した日付
+  grantDate: string;      // 付与日(YYYY-MM-DD)
+  days: number;           // 付与日数
+  usedDates: string[];    // この付与分から消化した日付
 }
 
+/**
+ * 従業員データ構造
+ * - アプリのメインデータ
+ * - EmployeeTable, EmployeeModal, hooks等で利用
+ */
 export interface Employee {
-  id: number; // 従業員コード(数値型)
-  lastName: string; // 姓
-  firstName: string; // 名
-  joinedAt: string; // 入社年月日 (YYYY-MM-DD)
-  grants?: LeaveGrant[]; // 年度ごとの有給付与履歴
-  total: number; // 付与日数(理論値)
-  used: number; // 消化日数
-  leaveDates: string[]; // 有給取得日(YYYY-MM-DD)
-  carryOver?: number; // 前年からの繰越日数(省略時は0)
+  id: number;             // 従業員コード(数値型)
+  lastName: string;       // 姓
+  firstName: string;      // 名
+  joinedAt: string;       // 入社年月日 (YYYY-MM-DD)
+  grants?: LeaveGrant[];  // 年度ごとの有給付与履歴
+  total: number;          // 付与日数(理論値)
+  used: number;           // 消化日数
+  leaveDates: string[];   // 有給取得日(YYYY-MM-DD)
+  carryOver?: number;     // 前年からの繰越日数(省略時は0)
 }
+
+// ====== UI部品・props型 ======
 
 /**
  * EmployeeTableの各行(RowContent)で使うprops型
@@ -94,3 +106,49 @@ export interface GuideModalProps {
   open: boolean;
   onClose: () => void;
 }
+
+// ====== hooks用型（例: useEmployeeForm, useLeaveDates等） ======
+
+/**
+ * useEmployeeForm/useLeaveDates等のカスタムフックで返す値の型例
+ * - hooksの責務・返却値を明確化
+ * - 必要に応じて拡張
+ */
+export interface UseEmployeeFormReturn {
+  values: Employee;
+  errors: Partial<Record<keyof Employee, string>>;
+  handleChange: (field: keyof Employee, value: string | number) => void;
+  validate: () => boolean;
+  reset: () => void;
+}
+
+export interface UseLeaveDatesReturn {
+  leaveDates: string[];
+  addLeaveDate: (date: string) => void;
+  editLeaveDate: (idx: number, date: string) => void;
+  deleteLeaveDate: (idx: number) => void;
+  validateLeaveDate: (date: string) => string | null;
+}
+
+// ====== サンプルデータ型（sampleData等で利用） ======
+
+/**
+ * サンプル従業員データ型
+ * - sampleData.ts等で利用
+ */
+export type SampleEmployee = Omit<Employee, 'id'> & { id: number | string };
+
+// ====== 共通ユーティリティ型 ======
+
+/**
+ * ページネーション用汎用型
+ */
+export interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+// =============================
+// 追加・修正時は「どこで使うか」「設計意図」を必ずコメントで明記すること！
+// =============================

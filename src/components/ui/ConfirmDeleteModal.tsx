@@ -1,3 +1,22 @@
+// =============================
+// ConfirmDeleteModal.tsx
+// 削除確認用モーダルUI部品
+// =============================
+//
+// 役割:
+// ・削除操作時の確認ダイアログ表示
+//
+// 設計意図:
+// ・誤操作防止・UI/UX向上・責務分離
+//
+// 使い方:
+// <ConfirmDeleteModal isOpen={...} onClose={...} onConfirm={...} targetName={...} />
+//
+// - isOpen: モーダル表示状態
+// - onClose: 閉じる処理
+// - onConfirm: 削除確定処理
+// - targetName: 削除対象名（任意）
+
 import { Button, Text, HStack } from "@chakra-ui/react";
 import React from "react";
 import { CustomModal } from "./CustomModal";
@@ -34,3 +53,7 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
     </HStack>
   </CustomModal>
 );
+
+// =============================
+// 追加・修正時は「どこで使うか」「設計意図」を必ずコメントで明記すること！
+// =============================

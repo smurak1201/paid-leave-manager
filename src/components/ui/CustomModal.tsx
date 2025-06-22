@@ -1,12 +1,31 @@
+// =============================
+// CustomModal.tsx
+// 共通モーダルオーバーレイUI
+// =============================
+//
+// 役割:
+// ・モーダルのオーバーレイ・中央寄せ・ESC/外クリック閉じ
+// ・中身のUI（白背景・角丸・影など）はchildren側で制御
+//
+// 設計意図:
+// ・UI部品の責務分離・再利用性・アクセシビリティ向上
+// ・Chakra UIのBoxでシンプルに実装
+
 import { useEffect, useRef } from "react";
 import { Box } from "@chakra-ui/react";
 
+// ===== 型定義 =====
 interface CustomModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
+  isOpen: boolean; // モーダル表示状態
+  onClose: () => void; // 閉じるハンドラ
+  children: React.ReactNode; // モーダル中身
 }
 
+/**
+ * 共通モーダルオーバーレイ
+ * - ESCキー/オーバーレイ外クリックで閉じる
+ * - 中身のデザインはchildren側で制御
+ */
 export const CustomModal = ({
   isOpen,
   onClose,
@@ -45,6 +64,8 @@ export const CustomModal = ({
       alignItems="center"
       justifyContent="center"
       onClick={handleOverlayClick}
+      aria-modal="true"
+      role="dialog"
     >
       {/* ここではラッパーBoxのみ。bg/boxShadow/borderRadius/pは指定しない */}
       {children}

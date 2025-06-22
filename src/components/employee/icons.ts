@@ -48,8 +48,10 @@ export const inputDateSmallStyle: React.CSSProperties = {
 // ユーティリティ関数
 // =============================
 
-// 勤続年数を「X年Yか月」形式で返す関数
-// 入社日と現在日から年・月を計算し、UI表示用に整形します。
+/**
+ * 勤続年数を「X年Yか月」形式で返す関数
+ * 入社日と現在日から年・月を計算し、UI表示用に整形
+ */
 export function getServicePeriod(joinedAt: string, now: Date = new Date()): string {
   // YYYY-MM-DDまたはYYYY-MM形式に対応
   const match = joinedAt.match(/^\d{4}-(\d{2})(?:-(\d{2}))?$/);

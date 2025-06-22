@@ -40,7 +40,7 @@ import { initialEmployees } from "./sampleData/employees";
 
 function App() {
   // --- グローバル状態管理 ---
-  const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
+  const [employees, setEmployees] = useState<Employee[]>(initialEmployees); // 従業員リスト
   const [currentPage, setCurrentPage] = useState(1); // 従業員一覧テーブルのページ番号
   const [leaveDatesPage, setLeaveDatesPage] = useState(1); // 有給取得日モーダルのページ番号
   const [activeModal, setActiveModal] = useState<

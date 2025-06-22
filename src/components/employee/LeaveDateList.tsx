@@ -8,7 +8,7 @@
 //
 // 設計意図:
 // ・型安全・責務分離・UI/UX・可読性重視
-//
+
 // ===== import: 外部ライブラリ =====
 import { Box, Button, Text } from "@chakra-ui/react";
 import React from "react";

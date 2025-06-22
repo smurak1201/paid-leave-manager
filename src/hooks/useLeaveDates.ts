@@ -8,17 +8,26 @@
 //
 // 設計意図:
 // ・UI部品から分離し、再利用性・保守性・可読性向上
+// ・初学者が「どの関数がどこで使われるか」理解しやすいようにコメント充実
 //
 // 使い方:
 // - useLeaveDates(employee) を呼び出し、返却されるメソッドをコンポーネント内で利用
 // - employeeには編集対象の従業員データを渡す
-//
+
 // ===== import: 外部ライブラリ =====
 import { useState } from "react";
 
 // ===== import: 型定義 =====
 import type { Employee } from "../components/employee/types";
 
+/**
+ * useLeaveDates
+ * @param employee 編集対象の従業員データ
+ * @returns 編集用state・バリデーション・編集ロジック一式
+ *
+ * - LeaveDatesModal, LeaveDateList等で利用
+ * - 日付追加・編集・削除・バリデーションを一元管理
+ */
 export function useLeaveDates(employee: Employee | null) {
   const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
   const [dateInput, setDateInput] = useState<string>("");
@@ -27,6 +36,7 @@ export function useLeaveDates(employee: Employee | null) {
   const handleAddDate = (date: string, onUpdate: (dates: string[]) => void) => {
     if (!employee) return;
     const newDate = date;
+    // バリデーション: 日付形式・重複・入社日より前
     if (
       !newDate.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
       employee.leaveDates.includes(newDate) ||
@@ -48,6 +58,7 @@ export function useLeaveDates(employee: Employee | null) {
   const handleSaveDate = (onUpdate: (dates: string[]) => void) => {
     if (!employee || editDateIdx === null) return;
     const newDate = dateInput;
+    // バリデーション: 日付形式・重複・入社日より前
     if (
       !newDate.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
       employee.leaveDates.includes(newDate) ||
@@ -80,3 +91,7 @@ export function useLeaveDates(employee: Employee | null) {
     handleDeleteDate,
   };
 }
+
+// =============================
+// 追加・修正時は「どこで使うか」「設計意図」を必ずコメントで明記すること！
+// =============================

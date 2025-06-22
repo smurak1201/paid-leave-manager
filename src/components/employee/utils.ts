@@ -8,17 +8,26 @@
 //
 // 設計意図:
 // ・UI部品から分離し、再利用性・可読性・テスト容易性を向上
+// ・日本の有給休暇法令に即したロジックを一元管理
+// ・初学者が「どの関数がどこで使われるか」理解しやすいようにコメント充実
 
 // ===== import: 型定義 =====
-import type { LeaveGrant } from "./types";
+import type { LeaveGrant, Employee } from "./types";
 
-// 勤続年数(月単位)から付与日数を返す関数
-// 日本の有給休暇制度に基づき、入社日と現在日から自動計算します。
+/**
+ * 勤続年数（月単位）から付与日数を返す関数
+ * @param joinedAt 入社年月日(YYYY-MM-DD)
+ * @param now 現在日時（省略時はnew Date()）
+ * @returns 付与日数（日本の有給休暇制度に基づく）
+ *
+ * - EmployeeModal, getEmployeeLeaveSummary等で利用
+ * - 入社半年未満は0日、以降は法定通り段階的に増加
+ */
 export function calcLeaveDays(
   joinedAt: string,
   now: Date = new Date()
 ): number {
-  if (!joinedAt.match(/^\d{4}-\d{2}-\d{2}$/)) return 10;
+  if (!joinedAt.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) return 10;
   const join = new Date(joinedAt);
   const diff =
     (now.getFullYear() - join.getFullYear()) * 12 +
@@ -33,8 +42,16 @@ export function calcLeaveDays(
   return 20;
 }
 
-// 付与履歴・消化履歴から有効な残日数を厳密に計算する関数
-// 2年時効・古い付与分から消化など、日本法令に即したロジックです。
+/**
+ * 付与履歴・消化履歴から有効な残日数を厳密に計算する関数
+ * @param grants LeaveGrant[] 付与履歴
+ * @param leaveDates string[] 有給取得日
+ * @param now 現在日時（省略時はnew Date()）
+ * @returns 残日数（2年時効・古い付与分から消化など日本法令に即す）
+ *
+ * - EmployeeTable, LeaveDatesModal等で利用
+ * - 2年以内の付与分のみ有効、古い付与分から順に消化
+ */
 export function calcStrictRemain(
   grants: LeaveGrant[] = [],
   leaveDates: string[] = [],
@@ -72,13 +89,15 @@ export function calcStrictRemain(
 
 /**
  * 指定従業員の有給休暇サマリー（今年度付与・繰越・消化・残日数）を返す共通関数
- * - grant/carryOver/used/remainの計算を一元化
- * - テーブル・モーダル等で共通利用
  * @param emp Employee型（従業員情報）
  * @param now 現在日時（省略時はnew Date()）
+ * @returns grantThisYear:今年度付与, carryOver:繰越, used:消化, remain:残
+ *
+ * - EmployeeTable, EmployeeModal等で利用
+ * - grant/carryOver/used/remainの計算を一元化
  */
 export function getEmployeeLeaveSummary(
-  emp: import("./types").Employee,
+  emp: Employee,
   now: Date = new Date()
 ): {
   grantThisYear: number;
@@ -112,3 +131,7 @@ export function getEmployeeLeaveSummary(
   const remain = grantThisYear + carryOver - used;
   return { grantThisYear, carryOver, used, remain };
 }
+
+// =============================
+// 追加・修正時は「どこで使うか」「設計意図」を必ずコメントで明記すること！
+// =============================

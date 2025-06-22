@@ -4,20 +4,11 @@
 
 ---
 
-## 使用技術
+## 使い方（クイックスタート）
 
-- **React**（Vite ベース）
-  - モダンな SPA 構築、状態管理、単方向データフロー
-- **TypeScript**
-  - 型安全な開発、型によるバリデーション・保守性向上
-- **Vite**
-  - 高速な開発サーバー・ビルド環境
-- **Chakra UI**
-  - 洗練された UI コンポーネント、アクセシビリティ対応、テーマカスタマイズ
-- **lucide-react**
-  - 軽量 SVG アイコン
-- **ESLint/Prettier**
-  - コード品質・自動整形
+1. `npm install` で依存パッケージをインストール
+2. `npm run dev` でローカル開発サーバー起動
+3. ブラウザで `http://localhost:5173` を開く
 
 ---
 
@@ -43,16 +34,34 @@
 
 ---
 
-## ファイル構成（一部抜粋）
+## 技術スタック
+
+- React (Vite ベース)
+- TypeScript
+- Chakra UI
+- lucide-react
+- ESLint/Prettier
+
+---
+
+## ファイル構成（抜粋）
 
 - `src/App.tsx` : 全体状態管理・UI 構成のメイン
 - `src/components/employee/` : 従業員・有給日関連 UI/ロジック
 - `src/hooks/` : カスタムフック（フォーム・日付編集・バリデーション）
+- `src/components/ui/` : 汎用 UI 部品
 - `src/sampleData/` : サンプル従業員データ
 - `src/learning_guide.md` : 学習ガイド
 
 ---
 
-## 生成 AI について
+## 学習ガイド
 
-本アプリの設計・リファクタリング・ドキュメント作成には、GitHub Copilot（2024 年 6 月時点）を活用しています。最新情報や仕様変更にはご注意ください。
+- `src/learning_guide.md` を参照してください。
+- 設計意図・学び方・設計思想・ファイルの読み方を体系的に解説しています。
+
+---
+
+## ライセンス
+
+MIT

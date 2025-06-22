@@ -1,13 +1,34 @@
-import { Tooltip as ChakraTooltip, Portal } from "@chakra-ui/react"
-import * as React from "react"
+// =============================
+// tooltip.tsx
+// 汎用ツールチップUI部品
+// =============================
+//
+// 役割:
+// ・Chakra UIベースのカスタムツールチップ
+//
+// 設計意図:
+// ・再利用性・アクセシビリティ・柔軟なカスタマイズ性向上
+// ・UI部品の責務分離・props型の明示
+//
+// 使い方:
+// <Tooltip content="説明文">...</Tooltip>
+//
+// - showArrow: 矢印表示
+// - portalled: Portalでbody直下に描画するか
+// - content: ツールチップ内容
+// - contentProps: ChakraTooltip.ContentPropsを追加で渡せる
+// - disabled: 無効化
+
+import { Tooltip as ChakraTooltip, Portal } from "@chakra-ui/react";
+import * as React from "react";
 
 export interface TooltipProps extends ChakraTooltip.RootProps {
-  showArrow?: boolean
-  portalled?: boolean
-  portalRef?: React.RefObject<HTMLElement>
-  content: React.ReactNode
-  contentProps?: ChakraTooltip.ContentProps
-  disabled?: boolean
+  showArrow?: boolean;
+  portalled?: boolean;
+  portalRef?: React.RefObject<HTMLElement>;
+  content: React.ReactNode;
+  contentProps?: ChakraTooltip.ContentProps;
+  disabled?: boolean;
 }
 
 export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
@@ -21,9 +42,9 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
       contentProps,
       portalRef,
       ...rest
-    } = props
+    } = props;
 
-    if (disabled) return children
+    if (disabled) return children;
 
     return (
       <ChakraTooltip.Root {...rest}>
@@ -41,6 +62,10 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
           </ChakraTooltip.Positioner>
         </Portal>
       </ChakraTooltip.Root>
-    )
-  },
-)
+    );
+  }
+);
+
+// =============================
+// 追加・修正時は「どこで使うか」「設計意図」を必ずコメントで明記すること！
+// =============================

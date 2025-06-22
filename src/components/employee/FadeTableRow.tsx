@@ -29,7 +29,6 @@
 //
 // =============================
 
-/// framer-motionを使い、行の追加・削除時に自然なフェード効果を付与します。
 import React from "react";
 import { motion } from "framer-motion";
 
