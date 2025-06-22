@@ -180,10 +180,11 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             </FormLabel>
             <Input
               name="id"
-              value={idInputValue}
+              value={editId ? String(form.id) : idInputValue}
               onChange={handleChange}
               borderColor="teal.300"
-              bg="whiteAlpha.900"
+              bg={editId ? "gray.100" : "whiteAlpha.900"}
+              color={editId ? "gray.500" : undefined}
               _placeholder={{ color: "teal.200" }}
               type="text"
               inputMode="numeric"
