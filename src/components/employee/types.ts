@@ -21,7 +21,7 @@ export interface LeaveGrant {
 }
 
 export interface Employee {
-  id: string; // 従業員コード
+  id: number; // 従業員コード（数値型）
   lastName: string; // 姓
   firstName: string; // 名
   joinedAt: string; // 入社年月日 (YYYY-MM-DD)

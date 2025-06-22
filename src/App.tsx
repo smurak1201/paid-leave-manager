@@ -33,7 +33,7 @@ import { useLeaveDates } from "./hooks/useLeaveDates";
 const initialEmployees: Employee[] = [
   // 1人目: 山田 太郎
   {
-    id: "001",
+    id: 1,
     lastName: "山田",
     firstName: "太郎",
     joinedAt: "2021-02-15",
@@ -77,7 +77,7 @@ const initialEmployees: Employee[] = [
   },
   // 2人目: 佐藤 花子
   {
-    id: "002",
+    id: 2,
     lastName: "佐藤",
     firstName: "花子",
     joinedAt: "2022-07-01",
@@ -96,7 +96,7 @@ const initialEmployees: Employee[] = [
   },
   // 3人目: 田中 一郎
   {
-    id: "003",
+    id: 3,
     lastName: "田中",
     firstName: "一郎",
     joinedAt: "2023-11-20",
@@ -108,7 +108,7 @@ const initialEmployees: Employee[] = [
   },
   // 4人目: 鈴木 美咲
   {
-    id: "004",
+    id: 4,
     lastName: "鈴木",
     firstName: "美咲",
     joinedAt: "2021-06-10",
@@ -134,7 +134,7 @@ const initialEmployees: Employee[] = [
   },
   // 5人目: 高橋 健
   {
-    id: "005",
+    id: 5,
     lastName: "高橋",
     firstName: "健",
     joinedAt: "2020-04-01",
@@ -155,7 +155,7 @@ const initialEmployees: Employee[] = [
   },
   // 6人目: 伊藤 彩
   {
-    id: "006",
+    id: 6,
     lastName: "伊藤",
     firstName: "彩",
     joinedAt: "2022-01-15",
@@ -170,7 +170,7 @@ const initialEmployees: Employee[] = [
   },
   // 7人目: 渡辺 大輔
   {
-    id: "007",
+    id: 7,
     lastName: "渡辺",
     firstName: "大輔",
     joinedAt: "2019-10-01",
@@ -188,7 +188,7 @@ const initialEmployees: Employee[] = [
   },
   // 8人目: 中村 さくら
   {
-    id: "008",
+    id: 8,
     lastName: "中村",
     firstName: "さくら",
     joinedAt: "2023-04-10",
@@ -200,7 +200,7 @@ const initialEmployees: Employee[] = [
   },
   // 9人目: 小林 直樹
   {
-    id: "009",
+    id: 9,
     lastName: "小林",
     firstName: "直樹",
     joinedAt: "2020-12-01",
@@ -216,7 +216,7 @@ const initialEmployees: Employee[] = [
   },
   // 10人目: 加藤 美優
   {
-    id: "010",
+    id: 10,
     lastName: "加藤",
     firstName: "美優",
     joinedAt: "2022-09-01",
@@ -231,7 +231,7 @@ const initialEmployees: Employee[] = [
   },
   // 11人目: 吉田 翔
   {
-    id: "011",
+    id: 11,
     lastName: "吉田",
     firstName: "翔",
     joinedAt: "2021-03-20",
@@ -247,7 +247,7 @@ const initialEmployees: Employee[] = [
   },
   // 12人目: 山本 里奈
   {
-    id: "012",
+    id: 12,
     lastName: "山本",
     firstName: "里奈",
     joinedAt: "2023-06-01",
@@ -259,7 +259,7 @@ const initialEmployees: Employee[] = [
   },
   // 13人目: 斎藤 拓海
   {
-    id: "013",
+    id: 13,
     lastName: "斎藤",
     firstName: "拓海",
     joinedAt: "2020-08-15",
@@ -276,7 +276,7 @@ const initialEmployees: Employee[] = [
   },
   // 14人目: 森田 さやか
   {
-    id: "014",
+    id: 14,
     lastName: "森田",
     firstName: "さやか",
     joinedAt: "2021-12-10",
@@ -291,7 +291,7 @@ const initialEmployees: Employee[] = [
   },
   // 15人目: 石井 亮
   {
-    id: "015",
+    id: 15,
     lastName: "石井",
     firstName: "亮",
     joinedAt: "2022-03-01",
@@ -306,7 +306,7 @@ const initialEmployees: Employee[] = [
   },
   // 16人目: 上田 美穂
   {
-    id: "016",
+    id: 16,
     lastName: "上田",
     firstName: "美穂",
     joinedAt: "2020-11-11",
@@ -337,16 +337,17 @@ function App() {
     null | "add" | "edit" | "leaveDates"
   >(null);
   // 操作対象の従業員ID
-  const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null);
+  const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null);
   // ガイドモーダルの開閉制御
   const guideDisclosure = useDisclosure();
 
   // =============================
   // 選択中従業員データ取得
   // =============================
-  const currentEmployee = activeEmployeeId
-    ? employees.find((e) => e.id === activeEmployeeId) || null
-    : null;
+  const currentEmployee =
+    activeEmployeeId !== null
+      ? employees.find((e) => e.id === activeEmployeeId) || null
+      : null;
 
   // =============================
   // 従業員フォームの状態・バリデーション管理（カスタムフック）
@@ -356,7 +357,7 @@ function App() {
     activeModal === "edit" && currentEmployee
       ? currentEmployee
       : {
-          id: "",
+          id: NaN,
           lastName: "",
           firstName: "",
           joinedAt: "",
@@ -386,14 +387,14 @@ function App() {
   // UIイベントハンドラ
   // =============================
   // テーブルの「確認」ボタン押下時
-  const handleView = (id: string) => {
+  const handleView = (id: number) => {
     setActiveEmployeeId(id);
     setActiveModal("leaveDates");
     setEditDateIdx(null);
     setDateInput("");
   };
   // テーブルの「編集」ボタン押下時
-  const handleEdit = (id: string) => {
+  const handleEdit = (id: number) => {
     const emp = employees.find((e) => e.id === id);
     if (emp) setForm(emp);
     setActiveEmployeeId(id);
@@ -403,7 +404,7 @@ function App() {
   // 「従業員追加」ボタン押下時
   const handleAdd = () => {
     setForm({
-      id: "",
+      id: NaN,
       lastName: "",
       firstName: "",
       joinedAt: "",
@@ -501,9 +502,12 @@ function App() {
               !form.lastName ||
               !form.firstName ||
               !form.joinedAt ||
-              idError
+              idError ||
+              employees.some((emp) => emp.id === form.id) // 追加: 重複チェック
             ) {
-              setIdError("全ての項目を正しく入力してください");
+              setIdError(
+                "従業員コードが重複しています、または全ての項目を正しく入力してください"
+              );
               return;
             }
             // 勤続年数から付与日数を自動計算
@@ -515,7 +519,7 @@ function App() {
             const newTotal = employees.length + 1;
             setCurrentPage(Math.ceil(newTotal / ITEMS_PER_PAGE));
             setForm({
-              id: "",
+              id: NaN,
               lastName: "",
               firstName: "",
               joinedAt: "",
@@ -547,7 +551,7 @@ function App() {
               )
             );
             setForm({
-              id: "",
+              id: NaN,
               lastName: "",
               firstName: "",
               joinedAt: "",

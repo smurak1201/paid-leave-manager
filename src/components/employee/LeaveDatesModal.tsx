@@ -40,8 +40,8 @@ import { LeaveDateList } from "./LeaveDateList";
 interface LeaveDatesModalProps {
   isOpen: boolean;
   onClose: () => void;
-  employeeId: string | null;
-  getEmployee: (id: string) => Employee | undefined;
+  employeeId: number | null;
+  getEmployee: (id: number) => Employee | undefined;
   editDateIdx: number | null;
   dateInput: string;
   onChangeDateInput: (v: string) => void;

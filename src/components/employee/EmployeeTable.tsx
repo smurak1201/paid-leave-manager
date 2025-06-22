@@ -38,9 +38,9 @@ import { AnimatePresence } from "framer-motion";
 // propsの型定義。データと操作関数を親(App)から受け取る
 interface EmployeeTableProps {
   employees: Employee[];
-  onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
-  onView: (id: string) => void;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
+  onView: (id: number) => void;
   currentPage: number; // 追加: 現在のページ番号
   onPageChange: (page: number) => void; // 追加: ページ切替ハンドラ
 }
@@ -71,7 +71,8 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     if (currentPage > totalPages) onPageChange(totalPages);
   }, [employees.length, totalPages]);
 
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  // 削除対象の従業員ID（number型に修正）
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const prevEmployeesRef = useRef<Employee[]>(employees);
 
@@ -81,12 +82,14 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     prevEmployeesRef.current = employees;
   }, [employees]);
 
-  const handleDeleteClick = (id: string) => {
+  // 削除ボタンクリック時のハンドラ（number型に修正）
+  const handleDeleteClick = (id: number) => {
     setDeleteTarget(id);
     setDeleteOpen(true);
   };
+  // 削除確定時のハンドラ（number型に修正）
   const handleDeleteConfirm = () => {
-    if (deleteTarget) onDelete(deleteTarget);
+    if (deleteTarget !== null) onDelete(deleteTarget);
     setDeleteOpen(false);
     setDeleteTarget(null);
   };
@@ -95,6 +98,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     setDeleteTarget(null);
   };
 
+  // RowContentPropsのid関連をnumber型に修正
   interface RowContentProps {
     emp: Employee;
     grantThisYear: number;
@@ -102,9 +106,9 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     used: number;
     remain: number;
     servicePeriod: string;
-    onView: (id: string) => void;
-    onEdit: (id: string) => void;
-    handleDeleteClick: (id: string) => void;
+    onView: (id: number) => void;
+    onEdit: (id: number) => void;
+    handleDeleteClick: (id: number) => void;
   }
 
   const RowContent: React.FC<RowContentProps> = ({
@@ -356,7 +360,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         onClose={handleDeleteClose}
         onConfirm={handleDeleteConfirm}
         targetName={
-          deleteTarget
+          deleteTarget !== null
             ? (() => {
                 const emp = employees.find((e) => e.id === deleteTarget);
                 return emp ? `${emp.lastName} ${emp.firstName}` : undefined;

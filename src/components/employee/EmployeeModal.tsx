@@ -21,12 +21,12 @@
 interface EmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  employeeId: string | null;
-  getEmployee: (id: string) => Employee | undefined;
+  employeeId: number | null;
+  getEmployee: (id: number) => Employee | undefined;
   onAdd: (form: Employee) => void;
   onSave: (form: Employee) => void;
   idError: string;
-  editId: string | null;
+  editId: number | null;
 }
 
 // 型定義のインポート
@@ -60,7 +60,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
 }) => {
   // 空の従業員初期値（追加時用）
   const emptyEmployee: Employee = {
-    id: "",
+    id: NaN, // number型の初期値に修正
     lastName: "",
     firstName: "",
     joinedAt: "",
@@ -79,11 +79,13 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   );
 
   // id入力欄の値（数字以外も含めて表示）
-  const [idInputValue, setIdInputValue] = useState(form.id);
+  const [idInputValue, setIdInputValue] = useState(
+    form.id ? String(form.id) : ""
+  );
 
   useEffect(() => {
     // 編集モードや初期化時にidInputValueも同期
-    setIdInputValue(form.id);
+    setIdInputValue(form.id ? String(form.id) : "");
   }, [employeeId, employee]);
 
   // employeeIdまたは従業員データが変わったらformを再初期化
@@ -116,8 +118,8 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
           const event = new CustomEvent("setIdError", { detail: "" });
           window.dispatchEvent(event);
         }
-        // form.idも数字のみ反映
-        setForm({ ...form, id: e.target.value });
+        // form.idも数字のみ反映（number型で保持）
+        setForm({ ...form, id: e.target.value ? Number(e.target.value) : NaN });
       }
     } else {
       setForm({ ...form, [e.target.name]: e.target.value });

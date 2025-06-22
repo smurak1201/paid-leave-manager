@@ -33,7 +33,7 @@ import { useState } from "react";
 import type { Employee } from "../components/employee/types";
 import { calcLeaveDays } from "../components/employee/utils";
 
-export function useEmployeeForm(initial: Employee, employees: Employee[], activeEmployeeId: string | null) {
+export function useEmployeeForm(initial: Employee, employees: Employee[], activeEmployeeId: number | null) {
   const [form, setForm] = useState<Employee>(initial);
   const [idError, setIdError] = useState("");
 
@@ -41,14 +41,16 @@ export function useEmployeeForm(initial: Employee, employees: Employee[], active
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === "id") {
-      setForm((prev) => ({ ...prev, id: value }));
+      // 入力値が空ならNaN、そうでなければ数値化
+      const numValue = value === "" ? NaN : Number(value);
+      setForm((prev) => ({ ...prev, id: numValue } as Employee));
       // コードは半角数字のみ・重複禁止
       if (value && !/^[0-9]*$/.test(value)) {
         setIdError("従業員コードは半角数字のみ入力できます");
       } else if (
         value &&
         employees.some(
-          (emp) => emp.id === value && (activeEmployeeId === null || emp.id !== activeEmployeeId)
+          (emp) => emp.id === numValue && (activeEmployeeId === null || emp.id !== activeEmployeeId)
         )
       ) {
         setIdError("従業員コードが重複しています");
