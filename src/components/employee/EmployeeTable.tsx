@@ -24,7 +24,6 @@ import type { Employee, RowContentProps } from "./types";
 
 // ===== import: アイコン・ユーティリティ =====
 import { Icons, getServicePeriod } from "./icons";
-import { getEmployeeLeaveSummary } from "../../sampleData/dbSampleTables";
 import { getEmployeeSummaryList } from "../../sampleData/dbSampleTables";
 
 // ===== import: UI部品 =====
