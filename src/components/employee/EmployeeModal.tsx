@@ -14,6 +14,9 @@
 // - 業務ロジックや状態管理は親(App)で一元化
 // - 初学者でも理解しやすいように全体の流れ・propsの意味を日本語コメントで明記
 //
+// UI/UX:
+// - 入力欄バリデーション、エラー表示、フォーム初期化、UI一貫性
+//
 // propsの型定義。親(App)から必要な情報・関数を受け取る
 interface EmployeeModalProps {
   isOpen: boolean;
