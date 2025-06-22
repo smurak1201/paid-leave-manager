@@ -8,7 +8,8 @@
 //
 // 設計意図:
 // ・UI部品の責務分離・可読性向上
-
+//
+// ===== import: 型定義 =====
 import type { GuideModalProps } from "../employee/types";
 
 // props型はtypes.tsで一元管理

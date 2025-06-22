@@ -11,10 +11,10 @@
 // ・型安全・責務分離・UI/UX・可読性重視
 // ・props/stateの流れ・UI部品の責務を日本語コメントで明記
 //
-// UI/UX:
-// - 入力欄バリデーション、エラー表示、フォーム初期化、UI一貫性
-
+// ===== import: 型定義 =====
 import type { Employee } from "./types";
+
+// ===== import: 外部ライブラリ =====
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -27,6 +27,8 @@ import {
 } from "@chakra-ui/react";
 import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import { User, X, BadgeInfo } from "lucide-react";
+
+// ===== import: アイコン・UI部品 =====
 import { inputDateStyle } from "./icons";
 import { CustomModal } from "../ui/CustomModal";
 

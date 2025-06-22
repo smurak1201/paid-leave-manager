@@ -11,23 +11,16 @@
 // ・型安全・責務分離・UI/UX・可読性重視
 // ・props/stateの流れ・UI部品の責務を日本語コメントで明記
 //
-// UI/UX:
-// - ページネーション、残日数計算、エラー表示、リスト編集UI
-//
-// このファイルを通じて、従業員の有給取得日を簡単に確認・編集できるモーダルの実装方法を学べます。
-// - 具体的には、Reactのfunctional component、propsの受け渡し、カスタムフックによる状態管理、
-//   Chakra UIを用いたスタイリング、TypeScriptによる型安全なコーディング手法などが含まれます。
-//
-// 初学者の方は、まずはこのコンポーネントがどのように組み立てられているか、
-// どのように親コンポーネントと連携しているかを中心に注目してみてください。
-// その後、実際に手を動かして同様のコンポーネントを作成することで、
-// ReactやTypeScript、Chakra UIの理解を深めることができるでしょう。
-
+// ===== import: 外部ライブラリ =====
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
-import { X } from "lucide-react";
 import React, { useRef, useEffect } from "react";
-import { getEmployeeLeaveSummary } from "./utils";
+import { X } from "lucide-react";
+
+// ===== import: 型定義 =====
 import type { LeaveDatesModalProps } from "./types";
+
+// ===== import: ユーティリティ・UI部品 =====
+import { getEmployeeLeaveSummary } from "./utils";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { DateInputRow } from "./DateInputRow";
 import { inputDateSmallStyle } from "./icons";

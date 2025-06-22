@@ -9,33 +9,15 @@
 // 設計意図:
 // ・型安全・責務分離・UI/UX・可読性重視
 //
-// Props:
-// - dates: 日付のリスト
-// - editDateIdx: 編集中の日付のインデックス
-// - dateInput: 入力中の日付
-// - onChangeDateInput: 日付入力変更時のハンドラ
-// - onEditDate: 編集ボタン押下時のハンドラ
-// - onDeleteDate: 削除ボタン押下時のハンドラ
-// - inputDateSmallStyle: 日付入力欄のスタイル
-// - pagedDates: ページネーションされた日付のリスト
-// - currentPage: 現在のページ番号
-// - ITEMS_PER_PAGE: 1ページあたりのアイテム数
-//
-// State:
-// - なし（親コンポーネントから全てのデータをpropsで受け取るため）
-//
-// UI部品の役割:
-// - 日付リストの表示
-// - 編集・削除ボタンの表示
-// - ページネーション対応
-// - 編集中の日付のインライン編集対応
-
-// 有給取得日リストのUI部品。リスト表示・編集・削除ボタンなどをまとめて管理します。
-// ページネーションや編集インデックスもpropsで制御し、再利用性を高めています。
+// ===== import: 外部ライブラリ =====
 import { Box, Button, Text } from "@chakra-ui/react";
-import { Icons } from "./icons";
 import React from "react";
+
+// ===== import: 型定義 =====
 import type { LeaveDateListProps } from "./types";
+
+// ===== import: アイコン =====
+import { Icons } from "./icons";
 
 /**
  * 有給取得日リスト部品

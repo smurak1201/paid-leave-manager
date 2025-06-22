@@ -47,7 +47,12 @@
 //
 // カスタムフック: 有給取得日編集用の状態・ロジックを管理します。
  // モーダルの入力値や編集中インデックス、追加・編集・削除のロジックを一元化。
+
+//
+// ===== import: 外部ライブラリ =====
 import { useState } from "react";
+
+// ===== import: 型定義 =====
 import type { Employee } from "../components/employee/types";
 
 export function useLeaveDates(employee: Employee | null) {

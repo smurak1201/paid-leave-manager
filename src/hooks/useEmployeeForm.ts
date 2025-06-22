@@ -16,20 +16,20 @@
 // 例:
 // const { form, idError, handleChange } = useEmployeeForm(initialEmployee, employeeList, editingEmployeeId);
 //
-// 型定義:
-// - Employee: 従業員情報の型
-// - handleChange: 入力値変更時のイベントハンドラ
-//
-// バリデーション:
-// - 従業員コード(id)は必須、半角数字、重複禁止
-// - 入力値変更時にリアルタイムでバリデーションチェック
-//
-// カスタムフック: 従業員フォームの状態・バリデーション共通化カスタムフック
-// Appから渡された初期値・従業員一覧・編集中IDを元に、入力値やエラー状態を一元管理します。
+// ===== import: 外部ライブラリ =====
 import { useState } from "react";
+
+// ===== import: 型定義 =====
 import type { Employee } from "../components/employee/types";
+
+// ===== import: ユーティリティ =====
 import { calcLeaveDays } from "../components/employee/utils";
 
+// =============================
+// カスタムフック: useEmployeeForm
+// 従業員フォームの状態・バリデーション共通化カスタムフック
+// Appから渡された初期値・従業員一覧・編集中IDを元に、入力値やエラー状態を一元管理します。
+// =============================
 export function useEmployeeForm(initial: Employee, employees: Employee[], activeEmployeeId: number | null) {
   const [form, setForm] = useState<Employee>(initial);
   const [idError, setIdError] = useState("");

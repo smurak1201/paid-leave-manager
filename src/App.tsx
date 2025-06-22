@@ -14,17 +14,28 @@
 // ・単方向データフロー、props/stateの最小化、カスタムフック活用、責務分離、型・バリデーション共通化、小コンポーネント化
 // ・全てのprops/stateの流れ・UI部品の責務・業務ロジック・型定義・バリデーション・設計意図を日本語コメントで明記
 
+// ===== import: 外部ライブラリ =====
 import { useState } from "react";
 import { Box, Heading, Button, Flex, useDisclosure } from "@chakra-ui/react";
+
+// ===== import: 型定義 =====
 import type { Employee } from "./components/employee/types";
+
+// ===== import: 従業員関連コンポーネント・ユーティリティ =====
 import { EmployeeTable } from "./components/employee/EmployeeTable";
 import { EmployeeModal } from "./components/employee/EmployeeModal";
-import { Icons } from "./components/employee/icons";
-import { GuideModal } from "./components/ui/GuideModal";
 import { LeaveDatesModal } from "./components/employee/LeaveDatesModal";
+import { Icons } from "./components/employee/icons";
 import { calcLeaveDays } from "./components/employee/utils";
+
+// ===== import: UI/ガイド =====
+import { GuideModal } from "./components/ui/GuideModal";
+
+// ===== import: カスタムフック =====
 import { useEmployeeForm } from "./hooks/useEmployeeForm";
 import { useLeaveDates } from "./hooks/useLeaveDates";
+
+// ===== import: サンプルデータ =====
 import { initialEmployees } from "./sampleData/employees";
 
 function App() {

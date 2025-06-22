@@ -13,27 +13,23 @@
 // ・型安全・責務分離・UI/UX・可読性重視
 // ・props/stateの流れ・UI部品の責務を日本語コメントで明記
 //
-// UI/UX:
-// - 奇数行背景色（rgba(0,128,128,0.06)）で視認性向上
-// - ページネーション・中央揃え・操作ボタン・削除モーダル・Fadeアニメ等
-// - 残日数が少ない場合は色分けバッジ
-//
-// 各従業員の勤続年数に応じた有給休暇の付与日数を計算し、残日数がわかるように色分け表示
-// 削除確認モーダルや行のフェードアニメーションも実装
-//
-// 従業員一覧テーブルのUI部品です。
-// 一覧表示・操作ボタン・残日数計算などをまとめて管理し、propsでデータと操作関数を受け取ります。
+// ===== import: 外部ライブラリ =====
 import React, { useState, useEffect, useRef } from "react";
 import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
-import type { Employee } from "./types";
 import { Box, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
+import { AnimatePresence } from "framer-motion";
+
+// ===== import: 型定義 =====
+import type { Employee, RowContentProps } from "./types";
+
+// ===== import: アイコン・ユーティリティ =====
 import { Icons, getServicePeriod } from "./icons";
 import { getEmployeeLeaveSummary } from "./utils";
+
+// ===== import: UI部品 =====
 import { Tooltip } from "../ui/tooltip";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { FadeTableRow } from "./FadeTableRow";
-import { AnimatePresence } from "framer-motion";
-import type { RowContentProps } from "./types";
 
 // propsの型定義。データと操作関数を親(App)から受け取る
 interface EmployeeTableProps {

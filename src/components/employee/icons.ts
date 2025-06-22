@@ -9,20 +9,15 @@
 // 設計意図:
 // ・UI部品の可読性・保守性向上
 //
-// アイコン一覧:
-// - X: 閉じる
-// - Edit: 編集
-// - Trash2: 削除
-// - Plus: 追加
-// - Info: 情報
-// - Eye: 表示
-//
-// 使用例:
-// import { Icons } from 'path/to/icons';
-// <Icons.Edit /> // 編集アイコン
-//
-
+// ===== import: 外部ライブラリ =====
 import { X, Edit, Trash2, Plus, Info, Eye } from "lucide-react";
+
+// ===== import: 内部モジュール =====
+// なし
+
+// =============================
+// アイコン・スタイル定義
+// =============================
 
 export const Icons = {
   X,
@@ -52,6 +47,10 @@ export const inputDateSmallStyle: React.CSSProperties = {
   outline: "none",
 };
 
+// =============================
+// ユーティリティ関数
+// =============================
+
 // 勤続年数を「X年Yか月」形式で返す関数
 // 入社日と現在日から年・月を計算し、UI表示用に整形します。
 export function getServicePeriod(joinedAt: string, now: Date = new Date()): string {
@@ -80,4 +79,7 @@ export function getServicePeriod(joinedAt: string, now: Date = new Date()): stri
   return `${years}年${months}か月`;
 }
 
-// Chakra UI/Reactで使うアイコン・スタイル・ユーティリティ関数を一元管理
+// =============================
+// コンポーネント
+// =============================
+// なし
