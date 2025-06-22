@@ -197,6 +197,12 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
                 {idError}
               </Text>
             )}
+            {/* 編集時は従業員コードが編集不可である旨を薄く表示 */}
+            {editId && (
+              <Text color="gray.400" fontSize="xs" mt={1}>
+                ※従業員コードは編集できません
+              </Text>
+            )}
           </FormControl>
           <FormControl isRequired>
             <FormLabel>
