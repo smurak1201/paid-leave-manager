@@ -43,6 +43,32 @@ export function calcLeaveDays(
 }
 
 /**
+ * 勤続年数・付与回数から法定付与日数を返すマスタ関数
+ * @param joinedAt 入社日
+ * @param grantDate 付与日
+ * @returns 付与日数
+ */
+export function getLegalGrantDays(
+  joinedAt: string,
+  grantDate: string
+): number {
+  // 入社日と付与日から勤続月数を算出
+  const join = new Date(joinedAt);
+  const grant = new Date(grantDate);
+  const diff =
+    (grant.getFullYear() - join.getFullYear()) * 12 +
+    (grant.getMonth() - join.getMonth());
+  if (diff < 6) return 0;
+  if (diff < 18) return 10;
+  if (diff < 30) return 11;
+  if (diff < 42) return 12;
+  if (diff < 54) return 14;
+  if (diff < 66) return 16;
+  if (diff < 78) return 18;
+  return 20;
+}
+
+/**
  * 付与履歴・消化履歴から有効な残日数を厳密に計算する関数
  * @param grants LeaveGrant[] 付与履歴
  * @param leaveDates string[] 有給取得日
@@ -55,7 +81,8 @@ export function calcLeaveDays(
 export function calcStrictRemain(
   grants: LeaveGrant[] = [],
   leaveDates: string[] = [],
-  now: Date = new Date()
+  now: Date = new Date(),
+  joinedAt?: string
 ): number {
   // 1. 2年以内の付与分のみ有効
   const validGrants = grants
@@ -73,7 +100,10 @@ export function calcStrictRemain(
 
   // 2. 古い付与分から順に消化
   const usedDates = [...leaveDates].sort(); // 昇順（日付が古い順）
-  let remainList = validGrants.map((g) => ({ days: g.days, used: 0 }));
+  let remainList = validGrants.map((g) => ({
+    days: joinedAt ? getLegalGrantDays(joinedAt, g.grantDate) : 0,
+    used: 0
+  }));
   let usedIdx = 0;
   for (let i = 0; i < remainList.length && usedIdx < usedDates.length; ) {
     if (remainList[i].days - remainList[i].used > 0) {
@@ -108,7 +138,7 @@ export function getEmployeeLeaveSummary(
   let grantThisYear = 0;
   let carryOver = 0;
   let foundGrant = false;
-  const used = emp.leaveDates.length;
+  const used = emp.leaveDates ? emp.leaveDates.length : 0;
   if (emp.grants && emp.grants.length > 0) {
     emp.grants.forEach((g) => {
       const grantDate = new Date(g.grantDate);
@@ -117,11 +147,12 @@ export function getEmployeeLeaveSummary(
       const diffMonth =
         (now.getFullYear() - grantDate.getFullYear()) * 12 +
         (now.getMonth() - grantDate.getMonth());
+      const days = getLegalGrantDays(emp.joinedAt, g.grantDate);
       if (grantYear === nowYear && diffMonth < 24) {
-        grantThisYear += g.days;
+        grantThisYear += days;
         foundGrant = true;
       } else if (grantYear === nowYear - 1 && diffMonth < 24) {
-        carryOver += g.days;
+        carryOver += days;
       }
     });
   }

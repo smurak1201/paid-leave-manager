@@ -15,12 +15,12 @@
 
 /**
  * 有給付与履歴（年度ごと）
- * - 各従業員の「いつ・何日付与されたか」「その付与分から何日使ったか」を管理
+ * - 各従業員の「いつ付与されたか」「その付与分から何日使ったか」を管理
  * - Employee.grantsで利用
+ * - 付与日数はマスタ参照・ロジックで算出
  */
 export interface LeaveGrant {
   grantDate: string;      // 付与日(YYYY-MM-DD)
-  days: number;           // 付与日数
   usedDates: string[];    // この付与分から消化した日付
 }
 
@@ -35,8 +35,8 @@ export interface Employee {
   lastName: string;       // 姓
   firstName: string;      // 名
   joinedAt: string;       // 入社年月日 (YYYY-MM-DD)
-  grants?: LeaveGrant[];  // 年度ごとの有給付与履歴
-  leaveDates: string[];   // 有給取得日(YYYY-MM-DD)
+  grants?: LeaveGrant[];  // 年度ごとの有給付与履歴（バックエンド連携時は省略可）
+  leaveDates?: string[];  // 有給取得日(YYYY-MM-DD)（バックエンド連携時は省略可）
   // total?: number;      // ← 今後は不要（集計値は都度計算）
   // used?: number;       // ← 今後は不要
   // carryOver?: number;  // ← 今後は不要
