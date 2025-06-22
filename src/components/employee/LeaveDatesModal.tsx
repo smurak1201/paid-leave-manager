@@ -56,18 +56,27 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   const now = new Date();
   const nowStr = now.toISOString().slice(0, 10);
   type Grant = { grantDate: string; days: number };
-  const validGrantDates = employee
-    ? (generateLeaveGrants(employee, nowStr) as Grant[])
-        .filter((g: Grant) => {
-          const expire = new Date(g.grantDate);
-          expire.setFullYear(expire.getFullYear() + 2);
-          return now < expire;
-        })
-        .map((g: Grant) => g.grantDate)
+  const validGrants = employee
+    ? (generateLeaveGrants(employee, nowStr) as Grant[]).filter((g: Grant) => {
+        const expire = new Date(g.grantDate);
+        expire.setFullYear(expire.getFullYear() + 2);
+        return now < expire;
+      })
     : [];
-  // 有効な付与分に紐づく消化履歴のみ抽出
+  // 有効な付与分の期間リスト
+  const validPeriods = validGrants.map((g) => ({
+    start: g.grantDate,
+    end: new Date(
+      new Date(g.grantDate).setFullYear(new Date(g.grantDate).getFullYear() + 2)
+    )
+      .toISOString()
+      .slice(0, 10),
+  }));
+  // 有効な付与分の期間内にある消化履歴のみ抽出
   const usages = leaveUsages.filter(
-    (u) => u.employeeId === employee.id && validGrantDates.includes(u.grantDate)
+    (u) =>
+      u.employeeId === employee.id &&
+      validPeriods.some((p) => u.usedDate >= p.start && u.usedDate < p.end)
   );
   const dates = usages.map((u) => u.usedDate).sort();
   // --- 残日数等の集計 ---
