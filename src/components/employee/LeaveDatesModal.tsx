@@ -33,7 +33,6 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   isOpen,
   onClose,
   employeeId,
-  leaveUsages,
   onAddDate,
   onDeleteDate,
   editDateIdx,
