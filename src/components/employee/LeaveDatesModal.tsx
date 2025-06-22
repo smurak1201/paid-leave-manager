@@ -73,8 +73,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
     if (currentPage > totalPages) onPageChange(totalPages);
   }, [dates.length, totalPages]);
   // 有給サマリー計算をutilsの共通関数で取得
-  const { grantThisYear, carryOver, used, remain } =
-    getEmployeeLeaveSummary(employee);
+  const { remain } = getEmployeeLeaveSummary(employee);
 
   // 削除モーダル用状態
   const [deleteIdx, setDeleteIdx] = React.useState<number | null>(null);
