@@ -29,11 +29,12 @@ import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
 import type { Employee } from "./types";
 import { Box, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
 import { Icons, getServicePeriod } from "./icons";
-import { calcLeaveDays } from "./utils";
+import { getEmployeeLeaveSummary } from "./utils";
 import { Tooltip } from "../ui/tooltip";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { FadeTableRow } from "./FadeTableRow";
 import { AnimatePresence } from "framer-motion";
+import type { RowContentProps } from "./types";
 
 // propsの型定義。データと操作関数を親(App)から受け取る
 interface EmployeeTableProps {
@@ -98,19 +99,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     setDeleteTarget(null);
   };
 
-  // RowContentPropsのid関連をnumber型に修正
-  interface RowContentProps {
-    emp: Employee;
-    grantThisYear: number;
-    carryOver: number;
-    used: number;
-    remain: number;
-    servicePeriod: string;
-    onView: (id: number) => void;
-    onEdit: (id: number) => void;
-    handleDeleteClick: (id: number) => void;
-  }
-
+  // RowContentPropsの型定義はtypes.tsに移動済み
   const RowContent: React.FC<RowContentProps> = ({
     emp,
     grantThisYear,
@@ -297,35 +286,9 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         <Tbody>
           <AnimatePresence>
             {pagedEmployees.map((emp, idx) => {
-              const used = emp.leaveDates.length;
-              const now = new Date();
-              let grantThisYear = 0;
-              let carryOver = 0;
-              let foundGrant = false;
-              if (emp.grants && emp.grants.length > 0) {
-                emp.grants.forEach((g) => {
-                  const grantDate = new Date(g.grantDate);
-                  const grantYear = grantDate.getFullYear();
-                  const nowYear = now.getFullYear();
-                  const diffMonth =
-                    (now.getFullYear() - grantDate.getFullYear()) * 12 +
-                    (now.getMonth() - grantDate.getMonth());
-                  if (grantYear === nowYear && diffMonth < 24) {
-                    // 今年付与された分（消化数は考慮しない）
-                    grantThisYear += g.days;
-                    foundGrant = true;
-                  } else if (grantYear === nowYear - 1 && diffMonth < 24) {
-                    // 前年度分のみ繰越対象（2年以内かつ前年付与分のみ）
-                    carryOver += g.days;
-                  }
-                });
-              }
-              // grantがなければ勤続年数から日本の制度通りの付与日数を算出
-              if (!foundGrant) {
-                // 勤続年数（月単位）から付与日数を返す
-                grantThisYear = calcLeaveDays(emp.joinedAt, now);
-              }
-              const remain = grantThisYear + carryOver - used;
+              // 有給サマリー計算をutilsの共通関数で取得
+              const { grantThisYear, carryOver, used, remain } =
+                getEmployeeLeaveSummary(emp);
               const servicePeriod = getServicePeriod(emp.joinedAt);
               const rowProps = {
                 emp,
@@ -343,7 +306,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   remain === 0
                     ? "#FFF5F5"
                     : idx % 2 === 1
-                    ? "rgba(0, 128, 128, 0.06)" // 奇数行に淡いteal系背景
+                    ? "rgba(0, 128, 128, 0.06)"
                     : undefined,
               };
               return (

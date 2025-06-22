@@ -16,22 +16,7 @@
 //
 // UI/UX:
 // - 入力欄バリデーション、エラー表示、フォーム初期化、UI一貫性
-//
-// propsの型定義。親(App)から必要な情報・関数を受け取る
-interface EmployeeModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  employeeId: number | null;
-  getEmployee: (id: number) => Employee | undefined;
-  onAdd: (form: Employee) => void;
-  onSave: (form: Employee) => void;
-  idError: string;
-  editId: number | null;
-  employees: Employee[]; // 追加: 重複チェック用
-  setIdError: (msg: string) => void; // 追加: エラー即時反映用
-}
 
-// 型定義のインポート
 import type { Employee } from "./types";
 import React, { useState, useEffect } from "react";
 import {
@@ -43,13 +28,25 @@ import {
   Text,
   Input,
 } from "@chakra-ui/react";
-import { FormControl } from "@chakra-ui/form-control";
-import { FormLabel } from "@chakra-ui/form-control";
+import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import { User, X, BadgeInfo } from "lucide-react";
 import { inputDateStyle } from "./icons";
 import { CustomModal } from "../ui/CustomModal";
 
-// モーダル本体
+// propsの型定義。親(App)から必要な情報・関数を受け取る
+interface EmployeeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  employeeId: number | null;
+  getEmployee: (id: number) => Employee | undefined;
+  onAdd: (form: Employee) => void;
+  onSave: (form: Employee) => void;
+  idError: string;
+  editId: number | null;
+  employees: Employee[];
+  setIdError: (msg: string) => void;
+}
+
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   isOpen,
   onClose,
@@ -64,7 +61,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
 }) => {
   // 空の従業員初期値（追加時用）
   const emptyEmployee: Employee = {
-    id: NaN, // number型の初期値に修正
+    id: NaN,
     lastName: "",
     firstName: "",
     joinedAt: "",
@@ -81,24 +78,21 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   const [form, setForm] = useState<Employee>(
     employeeId ? employee ?? emptyEmployee : emptyEmployee
   );
-
   // id入力欄の値（数字以外も含めて表示）
   const [idInputValue, setIdInputValue] = useState(
     form.id ? String(form.id) : ""
   );
 
+  // 編集モードや初期化時にidInputValueも同期
   useEffect(() => {
-    // 編集モードや初期化時にidInputValueも同期
     setIdInputValue(form.id ? String(form.id) : "");
   }, [employeeId, employee]);
 
   // employeeIdまたは従業員データが変わったらformを再初期化
   useEffect(() => {
     if (employeeId) {
-      // 編集モード: 該当従業員データで初期化
       setForm(employee ?? emptyEmployee);
     } else {
-      // 追加モード: 空の初期値で初期化
       setForm(emptyEmployee);
     }
   }, [employeeId, employee]);
@@ -109,9 +103,9 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
       setForm(emptyEmployee);
       setIdInputValue("");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
+  // 入力欄のonChangeハンドラ（id重複・数字バリデーション即時反映）
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!form) return;
     if (e.target.name === "id") {
@@ -136,19 +130,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
       setForm({ ...form, [e.target.name]: e.target.value });
     }
   };
-
-  // setIdErrorをAppから受け取るためのwindowイベントリスナー
-  useEffect(() => {
-    const handler = (e: any) => {
-      if (typeof e.detail === "string" && typeof idError === "string") {
-        if (idError !== e.detail) {
-          // idErrorがpropsで渡されている場合はApp側で管理
-        }
-      }
-    };
-    window.addEventListener("setIdError", handler);
-    return () => window.removeEventListener("setIdError", handler);
-  }, [idError]);
 
   if (!isOpen || !form) return null;
   return (

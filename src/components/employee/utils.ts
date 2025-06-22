@@ -78,3 +78,46 @@ export function calcStrictRemain(
   // 3. 残日数合計
   return remainList.reduce((sum, g) => sum + (g.days - g.used), 0);
 }
+
+/**
+ * 指定従業員の有給休暇サマリー（今年度付与・繰越・消化・残日数）を返す共通関数
+ * - grant/carryOver/used/remainの計算を一元化
+ * - テーブル・モーダル等で共通利用
+ * @param emp Employee型（従業員情報）
+ * @param now 現在日時（省略時はnew Date()）
+ */
+export function getEmployeeLeaveSummary(
+  emp: import("./types").Employee,
+  now: Date = new Date()
+): {
+  grantThisYear: number;
+  carryOver: number;
+  used: number;
+  remain: number;
+} {
+  let grantThisYear = 0;
+  let carryOver = 0;
+  let foundGrant = false;
+  const used = emp.leaveDates.length;
+  if (emp.grants && emp.grants.length > 0) {
+    emp.grants.forEach((g) => {
+      const grantDate = new Date(g.grantDate);
+      const grantYear = grantDate.getFullYear();
+      const nowYear = now.getFullYear();
+      const diffMonth =
+        (now.getFullYear() - grantDate.getFullYear()) * 12 +
+        (now.getMonth() - grantDate.getMonth());
+      if (grantYear === nowYear && diffMonth < 24) {
+        grantThisYear += g.days;
+        foundGrant = true;
+      } else if (grantYear === nowYear - 1 && diffMonth < 24) {
+        carryOver += g.days;
+      }
+    });
+  }
+  if (!foundGrant) {
+    grantThisYear = calcLeaveDays(emp.joinedAt, now);
+  }
+  const remain = grantThisYear + carryOver - used;
+  return { grantThisYear, carryOver, used, remain };
+}

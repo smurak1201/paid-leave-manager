@@ -40,22 +40,12 @@
 import { Box, Button, Text } from "@chakra-ui/react";
 import { Icons } from "./icons";
 import React from "react";
-
-interface LeaveDateListProps {
-  dates: string[];
-  editDateIdx: number | null;
-  dateInput: string;
-  onChangeDateInput: (v: string) => void;
-  onEditDate: (idx: number) => void;
-  onDeleteDate: (idx: number) => void;
-  inputDateSmallStyle: React.CSSProperties;
-  pagedDates: string[];
-  currentPage: number;
-  ITEMS_PER_PAGE: number;
-}
+import type { LeaveDateListProps } from "./types";
 
 /**
- * 有給取得日リスト部分（LeaveDatesModalから分離）
+ * 有給取得日リスト部品
+ * - props型はtypes.tsで一元管理
+ * - UI/UX・責務分離・コメント充実
  */
 export const LeaveDateList: React.FC<LeaveDateListProps> = ({
   dates,

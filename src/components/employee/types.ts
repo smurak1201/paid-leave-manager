@@ -31,3 +31,67 @@ export interface Employee {
   leaveDates: string[]; // 有給取得日（YYYY-MM-DD）
   carryOver?: number; // 前年からの繰越日数（省略時は0）
 }
+
+/**
+ * EmployeeTableの各行(RowContent)で使うprops型
+ * - grant/carryOver/used/remainはutilsで計算した値を受け取る
+ * - UI部品の型定義も一元管理
+ */
+export interface RowContentProps {
+  emp: Employee;
+  grantThisYear: number;
+  carryOver: number;
+  used: number;
+  remain: number;
+  servicePeriod: string;
+  onView: (id: number) => void;
+  onEdit: (id: number) => void;
+  handleDeleteClick: (id: number) => void;
+}
+
+/**
+ * LeaveDatesModalのprops型
+ * - 有給取得日編集モーダルで使用
+ * - UI部品の型定義も一元管理
+ */
+export interface LeaveDatesModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  employeeId: number | null;
+  getEmployee: (id: number) => Employee | undefined;
+  editDateIdx: number | null;
+  dateInput: string;
+  onChangeDateInput: (v: string) => void;
+  onAddDate: (date: string) => void;
+  onEditDate: (idx: number) => void;
+  onSaveDate: () => void;
+  onDeleteDate: (idx: number) => void;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+}
+
+/**
+ * LeaveDateListのprops型
+ * - LeaveDatesModal配下の有給取得日リスト部品で使用
+ */
+export interface LeaveDateListProps {
+  dates: string[];
+  editDateIdx: number | null;
+  dateInput: string;
+  onChangeDateInput: (v: string) => void;
+  onEditDate: (idx: number) => void;
+  onDeleteDate: (idx: number) => void;
+  inputDateSmallStyle: React.CSSProperties;
+  pagedDates: string[];
+  currentPage: number;
+  ITEMS_PER_PAGE: number;
+}
+
+/**
+ * GuideModalのprops型
+ * - アプリの使い方ガイドモーダルで使用
+ */
+export interface GuideModalProps {
+  open: boolean;
+  onClose: () => void;
+}

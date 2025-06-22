@@ -27,8 +27,8 @@
 // - 従業員コード(id)は必須、半角数字、重複禁止
 // - 入力値変更時にリアルタイムでバリデーションチェック
 //
-// カスタムフック: 従業員フォームの状態・バリデーションを管理します。
- // Appから渡された初期値・従業員一覧・編集中IDを元に、入力値やエラー状態を一元管理します。
+// カスタムフック: 従業員フォームの状態・バリデーション共通化カスタムフック
+// Appから渡された初期値・従業員一覧・編集中IDを元に、入力値やエラー状態を一元管理します。
 import { useState } from "react";
 import type { Employee } from "../components/employee/types";
 import { calcLeaveDays } from "../components/employee/utils";

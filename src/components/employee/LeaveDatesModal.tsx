@@ -29,31 +29,14 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import { X } from "lucide-react";
 import React, { useRef, useEffect } from "react";
-import { calcLeaveDays } from "./utils";
-import type { Employee } from "./types";
+import { getEmployeeLeaveSummary } from "./utils";
+import type { LeaveDatesModalProps } from "./types";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { DateInputRow } from "./DateInputRow";
 import { inputDateSmallStyle } from "./icons";
 import { LeaveDateList } from "./LeaveDateList";
 
-// propsの型定義。親(App)から必要な情報・関数を受け取る
-interface LeaveDatesModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  employeeId: number | null;
-  getEmployee: (id: number) => Employee | undefined;
-  editDateIdx: number | null;
-  dateInput: string;
-  onChangeDateInput: (v: string) => void;
-  onAddDate: (date: string) => void;
-  onEditDate: (idx: number) => void;
-  onSaveDate: () => void;
-  onDeleteDate: (idx: number) => void;
-  currentPage: number; // 追加
-  onPageChange: (page: number) => void; // 追加
-}
-
-// モーダル本体
+// propsの型定義はtypes.tsに移動済み
 export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   isOpen,
   onClose,
@@ -69,6 +52,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   currentPage,
   onPageChange,
 }) => {
+  // 対象従業員データ取得
   const employee = employeeId ? getEmployee(employeeId) : undefined;
   if (!isOpen || !employee) return null;
   const dates = employee.leaveDates;
@@ -79,7 +63,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
-  // ページ切り替え時にリスト先頭へスクロール
+  // ページ切替時にリスト先頭へスクロール
   const listRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = 0;
@@ -88,32 +72,11 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   useEffect(() => {
     if (currentPage > totalPages) onPageChange(totalPages);
   }, [dates.length, totalPages]);
-  // 一覧と同じ「付与＋繰越－消化」単純計算
-  const now = new Date();
-  let grantThisYear = 0;
-  let carryOver = 0;
-  let foundGrant = false;
-  if (employee.grants && employee.grants.length > 0) {
-    employee.grants.forEach((g) => {
-      const grantDate = new Date(g.grantDate);
-      const grantYear = grantDate.getFullYear();
-      const nowYear = now.getFullYear();
-      const diffMonth =
-        (now.getFullYear() - grantDate.getFullYear()) * 12 +
-        (now.getMonth() - grantDate.getMonth());
-      if (grantYear === nowYear && diffMonth < 24) {
-        grantThisYear += g.days;
-        foundGrant = true;
-      } else if (grantYear === nowYear - 1 && diffMonth < 24) {
-        carryOver += g.days;
-      }
-    });
-  }
-  if (!foundGrant) {
-    grantThisYear = calcLeaveDays(employee.joinedAt, now);
-  }
-  const remainSimple = grantThisYear + carryOver - dates.length;
-  // 削除確認モーダル用
+  // 有給サマリー計算をutilsの共通関数で取得
+  const { grantThisYear, carryOver, used, remain } =
+    getEmployeeLeaveSummary(employee);
+
+  // 削除モーダル用状態
   const [deleteIdx, setDeleteIdx] = React.useState<number | null>(null);
   const [isDeleteOpen, setDeleteOpen] = React.useState(false);
   const handleDeleteClick = (idx: number) => {
@@ -129,6 +92,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
     setDeleteOpen(false);
     setDeleteIdx(null);
   };
+
   return (
     <Box
       position="fixed"
@@ -173,7 +137,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
           消化日数：{dates.length}日
         </Text>
         <Text color="teal.700" fontWeight="bold" mb={2} textAlign="center">
-          残日数：{remainSimple}日
+          残日数：{remain}日
         </Text>
         <DateInputRow
           dateInput={dateInput}
@@ -181,7 +145,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
           onAddDate={onAddDate}
           onSaveDate={onSaveDate}
           editDateIdx={editDateIdx}
-          remainSimple={remainSimple}
+          remainSimple={remain}
         />
         {dates.length === 0 ? (
           <Text color="gray.500" textAlign="center">
@@ -240,7 +204,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
             キャンセル
           </Button>
         </Box>
-        {remainSimple <= 0 && (
+        {remain <= 0 && (
           <Text color="red.500" fontSize="sm" mt={2} textAlign="right">
             残日数が0の場合、有給取得日は登録できません。
           </Text>

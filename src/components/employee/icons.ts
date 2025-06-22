@@ -81,3 +81,5 @@ export function getServicePeriod(joinedAt: string, now: Date = new Date()): stri
   if (years < 0) return "-";
   return `${years}年${months}か月`;
 }
+
+// Chakra UI/Reactで使うアイコン・スタイル・ユーティリティ関数を一元管理
