@@ -46,42 +46,17 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   setDateInput,
   currentPage,
   onPageChange,
+  summary,
+  grantDetails,
 }) => {
   // 対象従業員データ取得
   const employee = employeeId
     ? employees.find((e) => e.id === employeeId)
     : undefined;
   if (!isOpen || !employee) return null;
-  // --- leaveUsagesからこの従業員の消化履歴を抽出（有効な付与分のみ） ---
-  const now = new Date();
-  const nowStr = now.toISOString().slice(0, 10);
-  type Grant = { grantDate: string; days: number };
-  const validGrants = employee
-    ? (generateLeaveGrants(employee, nowStr) as Grant[]).filter((g: Grant) => {
-        const expire = new Date(g.grantDate);
-        expire.setFullYear(expire.getFullYear() + 2);
-        return now < expire;
-      })
-    : [];
-  // 有効な付与分の期間リスト
-  const validPeriods = validGrants.map((g) => ({
-    start: g.grantDate,
-    end: new Date(
-      new Date(g.grantDate).setFullYear(new Date(g.grantDate).getFullYear() + 2)
-    )
-      .toISOString()
-      .slice(0, 10),
-  }));
-  // 有効な付与分の期間内にある消化履歴のみ抽出
-  const usages = leaveUsages.filter(
-    (u) =>
-      u.employeeId === employee.id &&
-      validPeriods.some((p) => u.usedDate >= p.start && u.usedDate < p.end)
-  );
-  const dates = usages.map((u) => u.usedDate).sort();
-  // --- 残日数等の集計 ---
-  const summary = calcLeaveSummary(employee.id, now.toISOString().slice(0, 10));
-  const remain = summary ? summary.remain : 0;
+  // --- propsで受け取った集計済みデータを利用 ---
+  const dates = grantDetails.flatMap((g) => g.usedDates).sort();
+  const remain = summary.remain;
 
   // ページネーション用
   const ITEMS_PER_PAGE = 10;
@@ -163,6 +138,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
         <Text color="teal.700" fontWeight="bold" mb={2} textAlign="center">
           残日数：{remain}日
         </Text>
+        {/* 付与ごとの詳細を表示したい場合はgrantDetailsを利用してテーブル等で表示可能 */}
         <DateInputRow
           dateInput={dateInput}
           onChangeDateInput={setDateInput}

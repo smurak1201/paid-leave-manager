@@ -39,7 +39,11 @@ import {
   employees as employeeTable,
   leaveUsages as leaveUsagesTable,
 } from "./sampleData/dbSampleTables";
-import { generateLeaveGrants } from "./sampleData/dbSampleTables";
+import {
+  generateLeaveGrants,
+  getEmployeeLeaveSummary,
+  getGrantDetails,
+} from "./sampleData/dbSampleTables";
 
 function App() {
   // --- グローバル状態管理 ---
@@ -309,6 +313,24 @@ function App() {
           setDateInput={setDateInput}
           currentPage={leaveDatesPage}
           onPageChange={setLeaveDatesPage}
+          summary={
+            activeEmployeeId
+              ? getEmployeeLeaveSummary(
+                  activeEmployeeId,
+                  leaveUsages,
+                  employees,
+                  new Date().toISOString().slice(0, 10)
+                )
+              : { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 }
+          }
+          grantDetails={
+            activeEmployeeId
+              ? getGrantDetails(
+                  activeEmployeeId,
+                  new Date().toISOString().slice(0, 10)
+                )
+              : []
+          }
         />
       </Box>
     </Box>

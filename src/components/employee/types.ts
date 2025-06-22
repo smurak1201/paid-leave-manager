@@ -61,6 +61,9 @@ export interface RowContentProps {
  * LeaveDatesModalのprops型
  * - 有給取得日編集モーダルで使用
  * - UI部品の型定義も一元管理
+ *
+ * summary: getEmployeeLeaveSummaryの返却型
+ * grantDetails: getGrantDetailsの返却型
  */
 export interface LeaveDatesModalProps {
   isOpen: boolean;
@@ -75,6 +78,19 @@ export interface LeaveDatesModalProps {
   setDateInput: (v: string) => void;
   currentPage: number;
   onPageChange: (page: number) => void;
+  summary: {
+    grantThisYear: number;
+    carryOver: number;
+    used: number;
+    remain: number;
+  };
+  grantDetails: Array<{
+    grantDate: string;
+    days: number;
+    used: number;
+    remain: number;
+    usedDates: string[];
+  }>;
 }
 
 /**
