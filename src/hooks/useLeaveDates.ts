@@ -91,7 +91,3 @@ export function useLeaveDates(employee: Employee | null) {
     handleDeleteDate,
   };
 }
-
-// =============================
-// 追加・修正時は「どこで使うか」「設計意図」を必ずコメントで明記すること！
-// =============================
