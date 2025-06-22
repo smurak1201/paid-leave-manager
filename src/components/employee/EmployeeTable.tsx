@@ -36,6 +36,8 @@ interface EmployeeTableProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onView: (id: string) => void;
+  currentPage: number; // 追加: 現在のページ番号
+  onPageChange: (page: number) => void; // 追加: ページ切替ハンドラ
 }
 
 // 従業員一覧テーブル本体
@@ -44,10 +46,11 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   onEdit,
   onDelete,
   onView,
+  currentPage,
+  onPageChange,
 }) => {
   // ページネーション用
   const ITEMS_PER_PAGE = 15;
-  const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.max(1, Math.ceil(employees.length / ITEMS_PER_PAGE));
   const pagedEmployees = employees.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -60,7 +63,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   }, [currentPage]);
   // 削除等でページ数が減った場合にcurrentPageを自動調整
   useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages);
+    if (currentPage > totalPages) onPageChange(totalPages);
   }, [employees.length, totalPages]);
 
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
@@ -204,7 +207,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
           mb={2}
         >
           <button
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            onClick={() => onPageChange(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
             style={{
               padding: "4px 12px",
@@ -221,7 +224,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
             {currentPage} / {totalPages}
           </span>
           <button
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
             style={{
               padding: "4px 12px",

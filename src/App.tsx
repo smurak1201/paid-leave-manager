@@ -329,6 +329,8 @@ const initialEmployees: Employee[] = [
 function App() {
   // 従業員一覧の状態
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
+  // ページネーションの現在ページ
+  const [currentPage, setCurrentPage] = useState(1);
   // 現在開いているモーダルの種類
   const [activeModal, setActiveModal] = useState<
     null | "add" | "edit" | "leaveDates"
@@ -472,6 +474,8 @@ function App() {
             setEmployees((prev) => prev.filter((e) => e.id !== id))
           }
           onView={handleView}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
         />
         {/* 従業員追加・編集モーダル */}
         <EmployeeModal
@@ -495,6 +499,10 @@ function App() {
             const autoTotal = calcLeaveDays(form.joinedAt);
             const newEmp = { ...form, total: autoTotal };
             setEmployees([...employees, { ...newEmp }]);
+            // 追加後に最終ページへ移動
+            const ITEMS_PER_PAGE = 15;
+            const newTotal = employees.length + 1;
+            setCurrentPage(Math.ceil(newTotal / ITEMS_PER_PAGE));
             setForm({
               id: "",
               lastName: "",
