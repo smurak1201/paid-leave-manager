@@ -564,6 +564,8 @@ function App() {
           }}
           idError={idError}
           editId={activeModal === "edit" ? activeEmployeeId : null}
+          employees={employees} // 追加
+          setIdError={setIdError} // 追加
         />
         {/* 有給取得日モーダル */}
         <LeaveDatesModal

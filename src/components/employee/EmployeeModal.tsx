@@ -27,6 +27,8 @@ interface EmployeeModalProps {
   onSave: (form: Employee) => void;
   idError: string;
   editId: number | null;
+  employees: Employee[]; // 追加: 重複チェック用
+  setIdError: (msg: string) => void; // 追加: エラー即時反映用
 }
 
 // 型定義のインポート
@@ -57,6 +59,8 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   onSave,
   idError,
   editId,
+  employees,
+  setIdError,
 }) => {
   // 空の従業員初期値（追加時用）
   const emptyEmployee: Employee = {
@@ -105,20 +109,18 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
       setIdInputValue(e.target.value); // 入力値はそのまま表示
       // 数字以外が含まれていればエラー
       if (e.target.value && !/^[0-9]*$/.test(e.target.value)) {
-        // setIdErrorはAppから渡されるので、数字以外ならエラー
-        if (typeof window !== "undefined") {
-          const event = new CustomEvent("setIdError", {
-            detail: "数字を入力してください",
-          });
-          window.dispatchEvent(event);
-        }
+        setIdError("数字を入力してください");
+      } else if (
+        e.target.value &&
+        employees.some(
+          (emp) =>
+            emp.id === Number(e.target.value) &&
+            Number(e.target.value) !== editId
+        )
+      ) {
+        setIdError("従業員コードが重複しています");
       } else {
-        // setIdErrorをクリア
-        if (typeof window !== "undefined") {
-          const event = new CustomEvent("setIdError", { detail: "" });
-          window.dispatchEvent(event);
-        }
-        // form.idも数字のみ反映（number型で保持）
+        setIdError("");
         setForm({ ...form, id: e.target.value ? Number(e.target.value) : NaN });
       }
     } else {
