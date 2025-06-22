@@ -27,13 +27,18 @@ import { Icons } from "../employee/icons";
 export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
   return (
     <CustomModal isOpen={open} onClose={onClose}>
-      {/* CustomModal側で幅・paddingを管理するため、ここではBoxのmaxW/w/pを削除 */}
+      {/* スクロール可能にするためmaxH/overflowYを追加 */}
       <Box
         position="relative"
         bg="white"
         borderRadius="lg"
         boxShadow="lg"
+        maxH="80vh"
         overflowY="auto"
+        p={8}
+        minW="360px"
+        maxW="900px"
+        w="90vw"
       >
         <Button
           position="absolute"
@@ -98,6 +103,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                       border: "1px solid #b2f5ea",
                       padding: 4,
                       fontWeight: "bold",
+                      textAlign: "center",
                     }}
                   >
                     勤続年数
@@ -107,6 +113,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                       border: "1px solid #b2f5ea",
                       padding: 4,
                       fontWeight: "bold",
+                      textAlign: "center",
                     }}
                   >
                     付与日数
@@ -119,6 +126,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     6か月
@@ -127,6 +135,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     10日
@@ -137,6 +146,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     1年6か月
@@ -145,6 +155,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     11日
@@ -155,6 +166,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     2年6か月
@@ -163,6 +175,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     12日
@@ -173,6 +186,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     3年6か月
@@ -181,6 +195,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     14日
@@ -191,6 +206,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     4年6か月
@@ -199,6 +215,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     16日
@@ -209,6 +226,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     5年6か月
@@ -217,6 +235,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     18日
@@ -227,6 +246,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     6年6か月以降
@@ -235,6 +255,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                     style={{
                       border: "1px solid #b2f5ea",
                       padding: 4,
+                      textAlign: "center",
                     }}
                   >
                     20日
