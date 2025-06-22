@@ -1,5 +1,5 @@
 // =============================
-// sampleData/employees.ts
+// sampleData/dbSampleTables.ts
 // バックエンドDBテーブルを想定したサンプルデータ集約
 // =============================
 //
