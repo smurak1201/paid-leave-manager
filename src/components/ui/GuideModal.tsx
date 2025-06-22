@@ -12,15 +12,7 @@
 // ===== import: 型定義 =====
 import type { GuideModalProps } from "../employee/types";
 // ===== import: 外部ライブラリ・UI部品 =====
-import {
-  Box,
-  Heading,
-  Text,
-  Button,
-  Stack,
-  Icon,
-  HStack,
-} from "@chakra-ui/react";
+import { Box, Heading, Text, Button, Stack, Icon } from "@chakra-ui/react";
 import { CustomModal } from "./CustomModal";
 import { Icons } from "../employee/icons";
 
