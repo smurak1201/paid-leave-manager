@@ -1,18 +1,18 @@
 // =============================
 // App.tsx
-// アプリのメインエントリポイント
+// 有給休暇管理アプリのメインコンポーネント
 // =============================
 //
-// このファイルは有給休暇管理アプリの最上位コンポーネントです。
-// - 全体の状態管理（従業員リスト、モーダルの開閉、選択中の従業員IDなど）
-// - 主要なUI部品（テーブル・モーダル等）の呼び出しとpropsの受け渡し
-// - カスタムフックによるフォーム・日付編集の状態・バリデーション共通化
-// - props/stateの流れを「idのみ受け取り、データ参照はAppのstateから行う」形に統一
-// - 日本法令に即した有給付与・消化・繰越・時効消滅のロジックをUI/UX重視で実装
+// 役割:
+// ・全体の状態管理（従業員リスト、モーダルの開閉、選択中の従業員IDなど）
+// ・主要なUI部品（テーブル・モーダル等）の呼び出しとprops受け渡し
+// ・カスタムフックによるフォーム・日付編集・バリデーションの共通化
+// ・props/stateの流れは「idのみ渡し、データ参照はAppのstateから行う」
+// ・日本法令に即した有給付与・消化・繰越・時効消滅ロジックをUI/UX重視で実装
 //
 // 設計意図:
-// - React公式推奨の「単方向データフロー」「props/stateの最小化」「カスタムフックの活用」「責務分離」「型・バリデーションの共通化」「UI部品の小コンポーネント化」など、可読性・保守性を最大限高める構成
-// - 全てのprops/stateの流れ・UI部品の責務・業務ロジック・型定義・バリデーション・設計意図を日本語コメントで明記
+// ・単方向データフロー、props/stateの最小化、カスタムフック活用、責務分離、型・バリデーション共通化、小コンポーネント化
+// ・全てのprops/stateの流れ・UI部品の責務・業務ロジック・型定義・バリデーション・設計意図を日本語コメントで明記
 
 import { useState } from "react";
 import { Box, Heading, Button, Flex, useDisclosure } from "@chakra-ui/react";
@@ -25,42 +25,26 @@ import { LeaveDatesModal } from "./components/employee/LeaveDatesModal";
 import { calcLeaveDays } from "./components/employee/utils";
 import { useEmployeeForm } from "./hooks/useEmployeeForm";
 import { useLeaveDates } from "./hooks/useLeaveDates";
-// =============================
-// 初期従業員データ（サンプル）
-// =============================
-// - 実運用時はAPI等で取得する想定
 import { initialEmployees } from "./sampleData/employees";
 
 function App() {
-  // =============================
-  // グローバル状態管理
-  // =============================
-  // 従業員一覧
+  // --- グローバル状態管理 ---
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
-  // 従業員一覧テーブルのページ番号
-  const [currentPage, setCurrentPage] = useState(1);
-  // LeaveDatesModalのページ番号
-  const [leaveDatesPage, setLeaveDatesPage] = useState(1);
-  // 現在開いているモーダルの種類
+  const [currentPage, setCurrentPage] = useState(1); // 従業員一覧テーブルのページ番号
+  const [leaveDatesPage, setLeaveDatesPage] = useState(1); // 有給取得日モーダルのページ番号
   const [activeModal, setActiveModal] = useState<
     null | "add" | "edit" | "leaveDates"
-  >(null);
-  // 操作対象の従業員ID
-  const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null);
-  // ガイドモーダルの開閉制御
-  const guideDisclosure = useDisclosure();
+  >(null); // 開いているモーダル種別
+  const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null); // 操作対象従業員ID
+  const guideDisclosure = useDisclosure(); // ガイドモーダル開閉
 
-  // =============================
-  // 選択中従業員データ取得
-  // =============================
+  // --- 選択中従業員データ取得 ---
   const currentEmployee =
     activeEmployeeId !== null
       ? employees.find((e) => e.id === activeEmployeeId) || null
       : null;
 
-  // =============================
-  // 従業員フォームの状態・バリデーション管理（カスタムフック）
-  // =============================
+  // --- 従業員フォームの状態・バリデーション管理（カスタムフック） ---
   // form, handleChangeはこのファイル内では直接使わないため分割代入から除外
   const { setForm, idError, setIdError } = useEmployeeForm(
     activeModal === "edit" && currentEmployee
@@ -78,9 +62,7 @@ function App() {
     activeEmployeeId
   );
 
-  // =============================
-  // 有給取得日編集用の状態・ロジック（カスタムフック）
-  // =============================
+  // --- 有給取得日編集用の状態・ロジック（カスタムフック） ---
   const {
     editDateIdx,
     setEditDateIdx,
@@ -92,17 +74,15 @@ function App() {
     handleDeleteDate,
   } = useLeaveDates(currentEmployee);
 
-  // =============================
-  // UIイベントハンドラ
-  // =============================
-  // テーブルの「確認」ボタン押下時
+  // --- UIイベントハンドラ ---
+  // テーブル「確認」ボタン
   const handleView = (id: number) => {
     setActiveEmployeeId(id);
     setActiveModal("leaveDates");
     setEditDateIdx(null);
     setDateInput("");
   };
-  // テーブルの「編集」ボタン押下時
+  // テーブル「編集」ボタン
   const handleEdit = (id: number) => {
     const emp = employees.find((e) => e.id === id);
     if (emp) setForm(emp);
@@ -110,7 +90,7 @@ function App() {
     setActiveModal("edit");
     setIdError("");
   };
-  // 「従業員追加」ボタン押下時
+  // 「従業員追加」ボタン
   const handleAdd = () => {
     setForm({
       id: NaN,
@@ -125,7 +105,7 @@ function App() {
     setActiveModal("add");
     setIdError("");
   };
-  // モーダルを閉じる処理
+  // モーダルを閉じる
   const handleCloseModal = () => {
     setActiveModal(null);
     setActiveEmployeeId(null);
@@ -143,9 +123,7 @@ function App() {
     });
   };
 
-  // =============================
-  // 画面描画
-  // =============================
+  // --- 画面描画 ---
   return (
     <Box minH="100vh" bgGradient="linear(to-br, teal.50, white)" py={10}>
       <Box
@@ -221,7 +199,7 @@ function App() {
               !form.firstName ||
               !form.joinedAt ||
               idError ||
-              employees.some((emp) => emp.id === form.id) // 追加: 重複チェック
+              employees.some((emp) => emp.id === form.id)
             ) {
               setIdError(
                 "従業員コードが重複しています、または全ての項目を正しく入力してください"
@@ -282,8 +260,8 @@ function App() {
           }}
           idError={idError}
           editId={activeModal === "edit" ? activeEmployeeId : null}
-          employees={employees} // 追加
-          setIdError={setIdError} // 追加
+          employees={employees}
+          setIdError={setIdError}
         />
         {/* 有給取得日モーダル */}
         <LeaveDatesModal
