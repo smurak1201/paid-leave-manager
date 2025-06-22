@@ -13,6 +13,7 @@
 
 // ===== import: 型定義 =====
 import type { LeaveGrant, Employee } from "./types";
+import { generateLeaveGrants } from "../../sampleData/dbSampleTables";
 
 /**
  * 勤続年数（月単位）から付与日数を返す関数
@@ -119,7 +120,9 @@ export function calcStrictRemain(
 
 /**
  * 指定従業員の有給休暇サマリー（今年度付与・繰越・消化・残日数）を返す共通関数
- * @param emp Employee型（従業員情報）
+ * @param employeeId 従業員ID
+ * @param leaveUsages 有給消化履歴
+ * @param employees 従業員テーブル
  * @param now 現在日時（省略時はnew Date()）
  * @returns grantThisYear:今年度付与, carryOver:繰越, used:消化, remain:残
  *
@@ -127,7 +130,9 @@ export function calcStrictRemain(
  * - grant/carryOver/used/remainの計算を一元化
  */
 export function getEmployeeLeaveSummary(
-  emp: Employee,
+  employeeId: number,
+  leaveUsages: { employeeId: number; usedDate: string; grantDate: string }[],
+  employees: Employee[],
   now: Date = new Date()
 ): {
   grantThisYear: number;
@@ -135,30 +140,31 @@ export function getEmployeeLeaveSummary(
   used: number;
   remain: number;
 } {
+  const emp = employees.find((e) => e.id === employeeId);
+  if (!emp) return { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
+  // 付与履歴を生成
+  const grants: { grantDate: string; days: number }[] = generateLeaveGrants(
+    emp,
+    now.toISOString().slice(0, 10)
+  );
   let grantThisYear = 0;
   let carryOver = 0;
-  let foundGrant = false;
-  const used = emp.leaveDates ? emp.leaveDates.length : 0;
-  if (emp.grants && emp.grants.length > 0) {
-    emp.grants.forEach((g) => {
-      const grantDate = new Date(g.grantDate);
-      const grantYear = grantDate.getFullYear();
-      const nowYear = now.getFullYear();
-      const diffMonth =
-        (now.getFullYear() - grantDate.getFullYear()) * 12 +
-        (now.getMonth() - grantDate.getMonth());
-      const days = getLegalGrantDays(emp.joinedAt, g.grantDate);
-      if (grantYear === nowYear && diffMonth < 24) {
-        grantThisYear += days;
-        foundGrant = true;
-      } else if (grantYear === nowYear - 1 && diffMonth < 24) {
-        carryOver += days;
-      }
-    });
-  }
-  if (!foundGrant) {
-    grantThisYear = calcLeaveDays(emp.joinedAt, now);
-  }
+  // 今年度・前年度の付与分を集計
+  grants.forEach((g) => {
+    const grantDate = new Date(g.grantDate);
+    const grantYear = grantDate.getFullYear();
+    const nowYear = now.getFullYear();
+    const diffMonth =
+      (now.getFullYear() - grantDate.getFullYear()) * 12 +
+      (now.getMonth() - grantDate.getMonth());
+    if (grantYear === nowYear && diffMonth < 24) {
+      grantThisYear += g.days;
+    } else if (grantYear === nowYear - 1 && diffMonth < 24) {
+      carryOver += g.days;
+    }
+  });
+  // 消化日数
+  const used = leaveUsages.filter((u) => u.employeeId === employeeId).length;
   const remain = grantThisYear + carryOver - used;
   return { grantThisYear, carryOver, used, remain };
 }

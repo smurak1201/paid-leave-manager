@@ -20,32 +20,42 @@ import { X } from "lucide-react";
 import type { LeaveDatesModalProps } from "./types";
 
 // ===== import: ユーティリティ・UI部品 =====
-import { getEmployeeLeaveSummary } from "./utils";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { DateInputRow } from "./DateInputRow";
 import { inputDateSmallStyle } from "./icons";
 import { LeaveDateList } from "./LeaveDateList";
+
+// ===== import: サンプルデータ・集計ロジック =====
+import { employees, calcLeaveSummary } from "../../sampleData/dbSampleTables";
 
 // propsの型定義はtypes.tsに集約
 export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   isOpen,
   onClose,
   employeeId,
-  getEmployee,
-  editDateIdx,
-  dateInput,
-  onChangeDateInput,
+  leaveUsages,
   onAddDate,
-  onEditDate,
-  onSaveDate,
   onDeleteDate,
+  editDateIdx,
+  setEditDateIdx,
+  dateInput,
+  setDateInput,
   currentPage,
   onPageChange,
 }) => {
   // 対象従業員データ取得
-  const employee = employeeId ? getEmployee(employeeId) : undefined;
+  const employee = employeeId
+    ? employees.find((e) => e.id === employeeId)
+    : undefined;
   if (!isOpen || !employee) return null;
-  const dates = employee.leaveDates;
+  // --- leaveUsagesからこの従業員の消化履歴を抽出 ---
+  const usages = leaveUsages.filter((u) => u.employeeId === employee.id);
+  const dates = usages.map((u) => u.usedDate).sort();
+  // --- 残日数等の集計 ---
+  const now = new Date();
+  const summary = calcLeaveSummary(employee.id, now.toISOString().slice(0, 10));
+  const remain = summary ? summary.remain : 0;
+
   // ページネーション用
   const ITEMS_PER_PAGE = 10;
   const totalPages = Math.max(1, Math.ceil(dates.length / ITEMS_PER_PAGE));
@@ -62,8 +72,6 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   useEffect(() => {
     if (currentPage > totalPages) onPageChange(totalPages);
   }, [dates.length, totalPages]);
-  // 有給サマリー計算をutilsの共通関数で取得
-  const { remain } = getEmployeeLeaveSummary(employee);
 
   // 削除モーダル用状態
   const [deleteIdx, setDeleteIdx] = React.useState<number | null>(null);
@@ -130,9 +138,9 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
         </Text>
         <DateInputRow
           dateInput={dateInput}
-          onChangeDateInput={onChangeDateInput}
+          onChangeDateInput={setDateInput}
           onAddDate={onAddDate}
-          onSaveDate={onSaveDate}
+          onSaveDate={() => onAddDate(dateInput)}
           editDateIdx={editDateIdx}
           remainSimple={remain}
         />
@@ -178,8 +186,11 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
               dates={dates}
               editDateIdx={editDateIdx}
               dateInput={dateInput}
-              onChangeDateInput={onChangeDateInput}
-              onEditDate={onEditDate}
+              onChangeDateInput={setDateInput}
+              onEditDate={(idx) => {
+                setEditDateIdx(idx);
+                setDateInput(pagedDates[idx] ?? "");
+              }}
               onDeleteDate={handleDeleteClick}
               inputDateSmallStyle={inputDateSmallStyle}
               pagedDates={pagedDates}

@@ -20,6 +20,7 @@ import { Box, Heading, Button, Flex, useDisclosure } from "@chakra-ui/react";
 
 // ===== import: 型定義 =====
 import type { Employee } from "./components/employee/types";
+import type { LeaveUsage } from "./sampleData/dbSampleTables";
 
 // ===== import: 従業員関連コンポーネント・ユーティリティ =====
 import { EmployeeTable } from "./components/employee/EmployeeTable";
@@ -32,14 +33,19 @@ import { GuideModal } from "./components/ui/GuideModal";
 
 // ===== import: カスタムフック =====
 import { useEmployeeForm } from "./hooks/useEmployeeForm";
-import { useLeaveDates } from "./hooks/useLeaveDates";
 
-// ===== import: サンプルデータ =====
-import { employees as initialEmployees } from "./sampleData/dbSampleTables";
+// ===== import: サンプルデータ（DBテーブル想定） =====
+import {
+  employees as employeeTable,
+  leaveUsages as leaveUsagesTable,
+} from "./sampleData/dbSampleTables";
+import { generateLeaveGrants } from "./sampleData/dbSampleTables";
 
 function App() {
   // --- グローバル状態管理 ---
-  const [employees, setEmployees] = useState<Employee[]>(initialEmployees); // 従業員リスト
+  const [employees, setEmployees] = useState<Employee[]>(employeeTable); // 従業員リスト
+  const [leaveUsages, setLeaveUsages] =
+    useState<LeaveUsage[]>(leaveUsagesTable); // 有給消化履歴
   const [currentPage, setCurrentPage] = useState(1); // 従業員一覧テーブルのページ番号
   const [leaveDatesPage, setLeaveDatesPage] = useState(1); // 有給取得日モーダルのページ番号
   const [activeModal, setActiveModal] = useState<
@@ -61,26 +67,56 @@ function App() {
       ? currentEmployee
       : {
           id: NaN,
+          employeeCode: NaN,
           lastName: "",
           firstName: "",
           joinedAt: "",
-          leaveDates: [],
         },
     employees,
     activeEmployeeId
   );
 
-  // --- 有給取得日編集用の状態・ロジック（カスタムフック） ---
-  const {
-    editDateIdx,
-    setEditDateIdx,
-    dateInput,
-    setDateInput,
-    handleAddDate,
-    handleEditDate,
-    handleSaveDate,
-    handleDeleteDate,
-  } = useLeaveDates(currentEmployee);
+  // --- 有給取得日編集用の状態・ロジック（leaveUsages操作型に変更） ---
+  const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
+  const [dateInput, setDateInput] = useState("");
+
+  // 日付追加
+  const handleAddDate = (date: string) => {
+    if (!activeEmployeeId) return;
+    // grantDateは最新付与日を仮でセット（本来はロジックで割り当て）
+    const now = new Date();
+    const emp = employees.find((e) => e.id === activeEmployeeId);
+    if (!emp) return;
+    // 付与履歴を生成し、最新のgrantDateを取得
+    const grants = emp
+      ? typeof emp.joinedAt === "string"
+        ? generateLeaveGrants(emp, now.toISOString().slice(0, 10))
+        : []
+      : [];
+    const latestGrant =
+      grants.length > 0 ? grants[grants.length - 1].grantDate : emp.joinedAt;
+    setLeaveUsages((prev) => [
+      ...prev,
+      {
+        id: prev.length ? Math.max(...prev.map((u) => u.id)) + 1 : 1,
+        employeeId: activeEmployeeId,
+        usedDate: date,
+        grantDate: latestGrant,
+      },
+    ]);
+    setDateInput("");
+  };
+  // 日付削除
+  const handleDeleteDate = (idx: number) => {
+    if (!activeEmployeeId) return;
+    // 該当従業員のusedDateリストを取得
+    const empUsages = leaveUsages.filter(
+      (u) => u.employeeId === activeEmployeeId
+    );
+    if (!empUsages[idx]) return;
+    const target = empUsages[idx];
+    setLeaveUsages((prev) => prev.filter((u) => u.id !== target.id));
+  };
 
   // --- UIイベントハンドラ ---
   // テーブル「確認」ボタン
@@ -102,10 +138,10 @@ function App() {
   const handleAdd = () => {
     setForm({
       id: NaN,
+      employeeCode: NaN,
       lastName: "",
       firstName: "",
       joinedAt: "",
-      leaveDates: [],
     });
     setActiveEmployeeId(null);
     setActiveModal("add");
@@ -120,10 +156,10 @@ function App() {
     setIdError("");
     setForm({
       id: NaN,
+      employeeCode: NaN,
       lastName: "",
       firstName: "",
       joinedAt: "",
-      leaveDates: [],
     });
   };
 
@@ -199,6 +235,7 @@ function App() {
             // 入力バリデーション
             if (
               !form.id ||
+              !form.employeeCode ||
               !form.lastName ||
               !form.firstName ||
               !form.joinedAt ||
@@ -217,10 +254,10 @@ function App() {
             setCurrentPage(Math.ceil(newTotal / ITEMS_PER_PAGE));
             setForm({
               id: NaN,
+              employeeCode: NaN,
               lastName: "",
               firstName: "",
               joinedAt: "",
-              leaveDates: [],
             });
             setActiveEmployeeId(null);
             setActiveModal(null);
@@ -229,6 +266,7 @@ function App() {
             // 入力バリデーション
             if (
               !form.id ||
+              !form.employeeCode ||
               !form.lastName ||
               !form.firstName ||
               !form.joinedAt ||
@@ -244,10 +282,10 @@ function App() {
             );
             setForm({
               id: NaN,
+              employeeCode: NaN,
               lastName: "",
               firstName: "",
               joinedAt: "",
-              leaveDates: [],
             });
             setActiveEmployeeId(null);
             setActiveModal(null);
@@ -262,51 +300,13 @@ function App() {
           isOpen={activeModal === "leaveDates"}
           onClose={handleCloseModal}
           employeeId={activeEmployeeId}
-          getEmployee={(id) => employees.find((e) => e.id === id)}
+          leaveUsages={leaveUsages}
+          onAddDate={handleAddDate}
+          onDeleteDate={handleDeleteDate}
           editDateIdx={editDateIdx}
+          setEditDateIdx={setEditDateIdx}
           dateInput={dateInput}
-          onChangeDateInput={setDateInput}
-          onAddDate={(date) => {
-            // 日付追加時のロジック
-            const emp = employees.find((e) => e.id === activeEmployeeId);
-            if (!emp) return;
-            handleAddDate(date, (dates) => {
-              setEmployees((prev) =>
-                prev.map((e) =>
-                  e.id === emp.id ? { ...e, leaveDates: dates } : e
-                )
-              );
-              // 追加後に最終ページへ移動
-              const ITEMS_PER_PAGE = 10;
-              const newTotal = dates.length;
-              setLeaveDatesPage(Math.ceil(newTotal / ITEMS_PER_PAGE));
-            });
-          }}
-          onEditDate={handleEditDate}
-          onSaveDate={() => {
-            // 日付編集保存時のロジック
-            const emp = employees.find((e) => e.id === activeEmployeeId);
-            if (!emp) return;
-            handleSaveDate((dates) =>
-              setEmployees((prev) =>
-                prev.map((e) =>
-                  e.id === emp.id ? { ...e, leaveDates: dates } : e
-                )
-              )
-            );
-          }}
-          onDeleteDate={(idx) => {
-            // 日付削除時のロジック
-            const emp = employees.find((e) => e.id === activeEmployeeId);
-            if (!emp) return;
-            handleDeleteDate(idx, (dates) =>
-              setEmployees((prev) =>
-                prev.map((e) =>
-                  e.id === emp.id ? { ...e, leaveDates: dates } : e
-                )
-              )
-            );
-          }}
+          setDateInput={setDateInput}
           currentPage={leaveDatesPage}
           onPageChange={setLeaveDatesPage}
         />

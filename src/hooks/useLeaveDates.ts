@@ -33,49 +33,47 @@ export function useLeaveDates(employee: Employee | null) {
   const [dateInput, setDateInput] = useState<string>("");
 
   // 日付追加時のバリデーション・状態更新
-  const handleAddDate = (date: string, onUpdate: (dates: string[]) => void) => {
+  const handleAddDate = (date: string, onUpdate: (dates: string[]) => void, currentDates: string[] = []) => {
     if (!employee) return;
     const newDate = date;
     // バリデーション: 日付形式・重複・入社日より前
     if (
       !newDate.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
-      employee.leaveDates.includes(newDate) ||
       newDate < employee.joinedAt
     )
       return;
-    onUpdate([...employee.leaveDates, newDate]);
+    onUpdate([...currentDates, newDate]);
     setDateInput("");
   };
 
   // 編集開始時の処理
-  const handleEditDate = (idx: number) => {
+  const handleEditDate = (idx: number, currentDates: string[] = []) => {
     if (!employee) return;
     setEditDateIdx(idx);
-    setDateInput(employee.leaveDates[idx]);
+    setDateInput(currentDates[idx] ?? "");
   };
 
   // 編集保存時のバリデーション・状態更新
-  const handleSaveDate = (onUpdate: (dates: string[]) => void) => {
+  const handleSaveDate = (onUpdate: (dates: string[]) => void, currentDates: string[] = []) => {
     if (!employee || editDateIdx === null) return;
     const newDate = dateInput;
     // バリデーション: 日付形式・重複・入社日より前
     if (
       !newDate.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ||
-      employee.leaveDates.includes(newDate) ||
       newDate < employee.joinedAt
     )
       return;
-    onUpdate(
-      employee.leaveDates.map((d, i) => (i === editDateIdx ? newDate : d))
-    );
+    const updated = currentDates.map((d, i) => (i === editDateIdx ? newDate : d));
+    onUpdate(updated);
     setEditDateIdx(null);
     setDateInput("");
   };
 
   // 日付削除時の処理
-  const handleDeleteDate = (idx: number, onUpdate: (dates: string[]) => void) => {
+  const handleDeleteDate = (idx: number, onUpdate: (dates: string[]) => void, currentDates: string[] = []) => {
     if (!employee) return;
-    onUpdate(employee.leaveDates.filter((_, i) => i !== idx));
+    const updated = currentDates.filter((_, i) => i !== idx);
+    onUpdate(updated);
     setEditDateIdx(null);
     setDateInput("");
   };
@@ -91,3 +89,7 @@ export function useLeaveDates(employee: Employee | null) {
     handleDeleteDate,
   };
 }
+
+// このファイルのロジックはleaveUsagesテーブル参照型にリファクタリングが必要です。
+// 例: employeeIdでleaveUsagesをfilterして日付リストを取得・編集する形に変更
+// 既存のemployee.leaveDates依存ロジックは削除・修正してください。

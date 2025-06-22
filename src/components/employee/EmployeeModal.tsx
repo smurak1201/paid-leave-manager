@@ -61,14 +61,10 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   // 空の従業員初期値（追加時用）
   const emptyEmployee: Employee = {
     id: NaN,
+    employeeCode: NaN,
     lastName: "",
     firstName: "",
     joinedAt: "",
-    total: 20,
-    used: 0,
-    leaveDates: [],
-    grants: [],
-    carryOver: 0,
   };
 
   // employeeIdがnullなら追加モード、従業員データがあれば編集モード

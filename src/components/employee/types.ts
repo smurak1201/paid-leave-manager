@@ -31,15 +31,11 @@ export interface LeaveGrant {
  * - 集計値（total, used, carryOver）は今後は持たず、付与履歴と取得日だけを保持する設計推奨
  */
 export interface Employee {
-  id: number;             // 従業員コード(数値型)
+  id: number;             // DB主キー
+  employeeCode: number;   // 業務用従業員コード
   lastName: string;       // 姓
   firstName: string;      // 名
   joinedAt: string;       // 入社年月日 (YYYY-MM-DD)
-  grants?: LeaveGrant[];  // 年度ごとの有給付与履歴（バックエンド連携時は省略可）
-  leaveDates?: string[];  // 有給取得日(YYYY-MM-DD)（バックエンド連携時は省略可）
-  // total?: number;      // ← 今後は不要（集計値は都度計算）
-  // used?: number;       // ← 今後は不要
-  // carryOver?: number;  // ← 今後は不要
 }
 
 // ====== UI部品・props型 ======
@@ -70,14 +66,13 @@ export interface LeaveDatesModalProps {
   isOpen: boolean;
   onClose: () => void;
   employeeId: number | null;
-  getEmployee: (id: number) => Employee | undefined;
-  editDateIdx: number | null;
-  dateInput: string;
-  onChangeDateInput: (v: string) => void;
+  leaveUsages: import("../../sampleData/dbSampleTables").LeaveUsage[];
   onAddDate: (date: string) => void;
-  onEditDate: (idx: number) => void;
-  onSaveDate: () => void;
   onDeleteDate: (idx: number) => void;
+  editDateIdx: number | null;
+  setEditDateIdx: (idx: number | null) => void;
+  dateInput: string;
+  setDateInput: (v: string) => void;
   currentPage: number;
   onPageChange: (page: number) => void;
 }

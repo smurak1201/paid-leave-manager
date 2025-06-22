@@ -19,9 +19,6 @@ import { useState } from "react";
 // ===== import: 型定義 =====
 import type { Employee } from "../components/employee/types";
 
-// ===== import: ユーティリティ =====
-import { calcLeaveDays } from "../components/employee/utils";
-
 // =============================
 // カスタムフック: useEmployeeForm
 // 従業員フォームの状態・バリデーション共通化カスタムフック
@@ -55,16 +52,7 @@ export function useEmployeeForm(initial: Employee, employees: Employee[], active
       }
       return;
     }
-    setForm((prev) => {
-      let next = {
-        ...prev,
-        [name]: name === "total" || name === "used" ? Number(value) : value,
-      };
-      if (name === "joinedAt") {
-        next.total = calcLeaveDays(value);
-      }
-      return next;
-    });
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   return { form, setForm, idError, setIdError, handleChange };
