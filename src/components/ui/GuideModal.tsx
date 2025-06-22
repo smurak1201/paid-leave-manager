@@ -27,7 +27,6 @@ import { Icons } from "../employee/icons";
 export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
   return (
     <CustomModal isOpen={open} onClose={onClose}>
-      {/* スクロール可能にするためmaxH/overflowYを追加 */}
       <Box
         position="relative"
         bg="white"
@@ -56,38 +55,287 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
           <Icon as={Icons.X} boxSize={4} />
         </Button>
         <Heading size="md" mb={4} color="teal.700">
-          有給休暇管理アプリの使い方
+          有給休暇管理ガイド
         </Heading>
         <Stack direction="column" align="start" gap={3} fontSize="md">
-          <Text>【主な機能】</Text>
-          <HStack>
-            <Icon as={Icons.Plus} color="teal.500" boxSize={5} />
-            <Text as="span">従業員の追加</Text>
-          </HStack>
-          <HStack>
-            <Icon as={Icons.Edit} color="teal.500" boxSize={5} />
-            <Text as="span">従業員情報の編集</Text>
-          </HStack>
-          <HStack>
-            <Icon as={Icons.Trash2} color="teal.500" boxSize={5} />
-            <Text as="span">従業員の削除</Text>
-          </HStack>
-          <HStack>
-            <Icon as={Icons.Eye} color="teal.500" boxSize={5} />
-            <Text as="span">従業員ごとの有給取得日一覧・編集</Text>
-          </HStack>
-          <Text>・従業員コードは半角数字で重複不可です。</Text>
           <Text>
-            ・入社年月日を入力すると自動で有給付与日数が計算されます。
+            このアプリは、従業員ごとの有給休暇の付与日数・取得状況・残日数を一元管理できます。
           </Text>
-          <Text>・有給休暇の残日数や消化状況も自動で集計されます。</Text>
-          <Text>・バリデーションエラーは即時表示されます。</Text>
-          <Text>・各操作はテーブルやボタンから直感的に行えます。</Text>
-          <Text mt={2}>【有給休暇の基礎】</Text>
+          <Text fontWeight="bold" mt={2}>
+            付与日数と繰越日数について：
+          </Text>
+          <Text>・毎年の付与日数は勤続年数に応じて決まります。</Text>
           <Text>
-            ・有給休暇は入社半年後に10日付与され、その後は勤続年数に応じて毎年増加します。
+            ・未消化分は翌年に繰り越されますが、繰越できるのは最大2年分までです。
           </Text>
-          <Text>・付与日数の目安（週5日勤務の場合）:</Text>
+          <Text>
+            ・2年以上前の有給は自動的に消滅し、消滅した分は繰り越されません。
+          </Text>
+          <Text>
+            ・有給を消化する際は、繰越分・今年度分を問わず「古い付与分から順に消化」されます（法令順守）。
+          </Text>
+          <Text>
+            ・残日数の計算は、2年以内の有効な付与分のみを対象に、消化済み日数を差し引いて算出しています。
+          </Text>
+          <Text>
+            ・これらのロジックは日本の労働基準法・厚生労働省ガイドラインに準拠しています。
+          </Text>
+          <Text fontWeight="bold" mt={4}>
+            【例】
+          </Text>
+          <Box
+            as="pre"
+            fontSize="sm"
+            bg="gray.50"
+            p={2}
+            borderRadius="md"
+            w="100%"
+            whiteSpace="pre-wrap"
+          >
+            {`2022年度: 12日付与 → 2日消化 → 10日繰越
+2023年度: 14日付与 → 1日消化 → 13日繰越
+2024年度: 16日付与 → 未消化
+※2022年度分は2024年度末で自動消滅`}
+          </Box>
+          <Text fontWeight="bold" mt={4}>
+            付与日数・繰越日数のサンプル表
+          </Text>
+          <Box overflowX="auto" w="100%" pl={2}>
+            <table
+              style={{
+                borderCollapse: "collapse",
+                width: "100%",
+                minWidth: 400,
+              }}
+            >
+              <thead>
+                <tr style={{ background: "#e6fffa" }}>
+                  <th
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    年度
+                  </th>
+                  <th
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    付与日数
+                  </th>
+                  <th
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    消化日数
+                  </th>
+                  <th
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    繰越日数
+                  </th>
+                  <th
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    有効期限
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    2022年度
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    12
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    2
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    10
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    2024年度末まで
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    2023年度
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    14
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    1
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    13
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    2025年度末まで
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    2024年度
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    16
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    0
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    16
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #b2f5ea",
+                      padding: 4,
+                      textAlign: "center",
+                    }}
+                  >
+                    2026年度末まで
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <Text fontSize="xs" color="gray.500" mt={1}>
+              ※繰越は最大2年分まで。2年以上前の分は自動消滅します。
+            </Text>
+          </Box>
+          <Text fontWeight="bold" mt={4}>
+            主な機能：
+          </Text>
+          <Text>・従業員の追加・管理</Text>
+          <Text>・従業員情報の編集</Text>
+          <Text>・従業員の削除</Text>
+          <Text>・有給取得日の登録・編集・削除</Text>
+          <Text>・残日数の自動計算</Text>
+          <Text fontWeight="bold" mt={4}>
+            使い方：
+          </Text>
+          <Text>「従業員追加」ボタンで新規従業員を登録</Text>
+          <Text>テーブルの編集ボタンで従業員情報を編集</Text>
+          <Text>テーブルの削除ボタンで従業員を削除</Text>
+          <Text>テーブルの確認ボタンで有給取得日を一覧・編集</Text>
+          <Text fontWeight="bold" mt={4}>
+            日本の有給休暇制度（概要）
+          </Text>
+          <Text>
+            ・年次有給休暇は、雇用形態や勤続年数に応じて付与されます。
+          </Text>
+          <Text>・取得日数や残日数の管理が義務化されています。</Text>
+          <Text>・本アプリはその管理をサポートします。</Text>
+          <Text fontWeight="bold" mt={4}>
+            年次有給休暇 付与日数の目安表
+          </Text>
           <Box overflowX="auto" w="100%" pl={2}>
             <table
               style={{
@@ -249,7 +497,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                       textAlign: "center",
                     }}
                   >
-                    6年6か月以降
+                    6年6か月以上
                   </td>
                   <td
                     style={{
@@ -263,15 +511,10 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                 </tr>
               </tbody>
             </table>
+            <Text fontSize="xs" color="gray.500" mt={1}>
+              ※週所定労働日数や労働時間によって異なる場合があります
+            </Text>
           </Box>
-          <Text mt={2}>
-            ・有給休暇は翌年度に最大2年まで繰り越し可能です（2年経過で時効消滅）。
-            <br />
-            ・繰り越し分は古い日数から順に消化されます。
-          </Text>
-          <Text>
-            ・有給の取得・消化・繰越・時効消滅など日本の法令に準拠したロジックです。
-          </Text>
         </Stack>
       </Box>
     </CustomModal>
