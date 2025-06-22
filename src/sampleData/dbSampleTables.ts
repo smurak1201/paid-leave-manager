@@ -139,18 +139,20 @@ export function getGrantMasterByMonths(months: number) {
  */
 export function generateLeaveGrants(employee: { joinedAt: string }, now: string) {
   const grants = [];
-  let grantDate = new Date(employee.joinedAt);
-  // 1回目：入社日＋6か月
-  grantDate.setMonth(grantDate.getMonth() + 6);
-  let masterIdx = 0;
-  while (grantDate <= new Date(now)) {
-    // マスタは1回目のみ6か月、2回目以降は1年ごと
-    const master = leaveGrantMaster[Math.min(masterIdx, leaveGrantMaster.length - 1)];
-    grants.push({ grantDate: grantDate.toISOString().slice(0, 10), days: master.days });
-    masterIdx++;
-    // 2回目以降は1年ごと
-    grantDate = new Date(grantDate);
-    grantDate.setFullYear(grantDate.getFullYear() + 1);
+  const [jy, jm, jd] = employee.joinedAt.split('-').map(Number);
+  for (let i = 0; i < leaveGrantMaster.length; i++) {
+    const master = leaveGrantMaster[i];
+    // 年月を合算して日付を生成（setMonth/setFullYearの副作用回避）
+    let y = jy + master.years;
+    let m = jm + master.months;
+    // 月が12を超えた場合の年繰り上げ処理
+    if (m > 12) {
+      y += Math.floor((m - 1) / 12);
+      m = ((m - 1) % 12) + 1;
+    }
+    const date = new Date(y, m - 1, jd);
+    if (date > new Date(now)) continue;
+    grants.push({ grantDate: date.toISOString().slice(0, 10), days: master.days });
   }
   return grants;
 }
@@ -219,16 +221,53 @@ export function getEmployeeLeaveSummary(
   employeeId: number,
   leaveUsages: LeaveUsage[],
   employees: Array<{ id: number; employeeCode: number; lastName: string; firstName: string; joinedAt: string }>,
-  now: string = new Date().toISOString().slice(0, 10)
+  now: string = APP_LAUNCH_DATE
 ) {
   const emp = employees.find((e) => e.id === employeeId);
   if (!emp) return { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
   const grants = generateLeaveGrants(emp, now);
   const usages = leaveUsages.filter((u) => u.employeeId === employeeId).sort((a, b) => a.usedDate.localeCompare(b.usedDate));
   const nowDate = new Date(now);
-  const nowYear = nowDate.getFullYear();
 
-  // 付与分ごとの残数・有効期限を管理
+  // 直近の付与日・次回付与日を特定
+  let thisGrant = null;
+  let nextGrantDate = null;
+  for (let i = 0; i < grants.length; i++) {
+    const grantDate = new Date(grants[i].grantDate);
+    const next = grants[i + 1] ? new Date(grants[i + 1].grantDate) : null;
+    if (grantDate <= nowDate && (!next || nowDate < next)) {
+      thisGrant = grants[i];
+      nextGrantDate = next;
+      break;
+    }
+  }
+
+  // 今年度付与分
+  const grantThisYear = thisGrant ? thisGrant.days : 0;
+
+  // 今年度付与分の消化数
+  const usedThisYear = thisGrant
+    ? usages.filter(u => u.grantDate === thisGrant.grantDate && new Date(u.usedDate) >= new Date(thisGrant.grantDate) && (!nextGrantDate || new Date(u.usedDate) < nextGrantDate)).length
+    : 0;
+
+  // 今年度付与分の残数
+  const remainThisYear = thisGrant ? thisGrant.days - usedThisYear : 0;
+
+  // 繰越分（前回付与分のうち、今年度も有効な残日数）
+  let carryOver = 0;
+  if (grants.length >= 2 && thisGrant) {
+    const prevGrant = grants[grants.length - 2];
+    // 有効期限内かつ、今年度開始時点で残っている分
+    const prevGrantExpire = new Date(prevGrant.grantDate);
+    prevGrantExpire.setFullYear(prevGrantExpire.getFullYear() + 2);
+    if (nowDate < prevGrantExpire) {
+      // 前回付与分の消化数
+      const usedPrev = usages.filter(u => u.grantDate === prevGrant.grantDate && new Date(u.usedDate) >= new Date(prevGrant.grantDate) && new Date(u.usedDate) < new Date(thisGrant.grantDate)).length;
+      carryOver = prevGrant.days - usedPrev;
+    }
+  }
+
+  // 全有効分の消化日数・残日数
   const grantDetails = grants.map((g) => {
     const grantDateObj = new Date(g.grantDate);
     const expireDate = new Date(g.grantDate);
@@ -236,44 +275,23 @@ export function getEmployeeLeaveSummary(
     const isValid = nowDate < expireDate;
     return {
       grantDate: g.grantDate,
-      grantYear: grantDateObj.getFullYear(),
       days: g.days,
-      used: 0,
-      remain: g.days,
+      used: usages.filter(u => u.grantDate === g.grantDate).length,
+      remain: g.days - usages.filter(u => u.grantDate === g.grantDate).length,
       isValid,
     };
   });
-
-  // 消化日数を付与分ごとに割り当て
-  usages.forEach((u) => {
-    for (const g of grantDetails) {
-      if (g.isValid && g.remain > 0 && u.grantDate === g.grantDate) {
-        g.used += 1;
-        g.remain -= 1;
-        break;
-      }
-    }
-  });
-
-  // 今年度付与分合計
-  const grantThisYear = grantDetails.filter(g => g.isValid && g.grantYear === nowYear).reduce((sum, g) => sum + g.days, 0);
-  // 繰越分（前年付与分のうち、今年度も有効な残日数）
-  const carryOver = grantDetails.filter(g => g.isValid && g.grantYear === nowYear - 1).reduce((sum, g) => sum + g.remain, 0);
-  // 消化日数（有効な付与分から消化された合計）
   const used = grantDetails.filter(g => g.isValid).reduce((sum, g) => sum + g.used, 0);
-  // 残日数（有効な付与分の残数合計）
   const remain = grantDetails.filter(g => g.isValid).reduce((sum, g) => sum + g.remain, 0);
 
   return { grantThisYear, carryOver, used, remain };
 }
 
-/**
- * 集計済み従業員一覧データを返す（UIはこれを表示するだけでOK）
- * @param now 現在日付（YYYY-MM-DD、省略時は今日）
- * @returns Array<{ id, employeeCode, lastName, firstName, joinedAt, years, months, remain, used, grantThisYear, carryOver }>
- */
+// アプリ起動時の基準日を一度だけ決定し、以降はこの値を使う
+export const APP_LAUNCH_DATE = new Date().toISOString().slice(0, 10);
+
 export function getEmployeeSummaryList(
-  now: string = new Date().toISOString().slice(0, 10)
+  now: string = APP_LAUNCH_DATE
 ) {
   return employees.map(emp => {
     // 勤続年数
@@ -298,15 +316,15 @@ export function getEmployeeSummaryList(
 }
 
 /**
- * 現時点での付与日数を返す（勤続年数→マスタ参照）
+ * 現時点での付与日数を返す（最新の付与分のdaysを返す）
  * @param joinedAt 入社年月日（YYYY-MM-DD）
  * @param now 現在日付（YYYY-MM-DD、省略時は今日）
  * @returns 付与日数
  */
 export function getCurrentGrantDays(joinedAt: string, now: string = new Date().toISOString().slice(0, 10)) {
-  const months = calcMonthsOfService(joinedAt, now);
-  const master = getGrantMasterByMonths(months);
-  return master.days;
+  const grants = generateLeaveGrants({ joinedAt }, now);
+  if (grants.length === 0) return 0;
+  return grants[grants.length - 1].days;
 }
 
 // =============================
