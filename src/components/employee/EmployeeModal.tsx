@@ -104,27 +104,13 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     }
   }, [isOpen]);
 
-  // 入力欄のonChangeハンドラ（id重複・数字バリデーション即時反映）
+  // 入力欄のonChangeハンドラ（id重複・数字バリデーションはuseEmployeeFormに集約）
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!form) return;
     if (e.target.name === "id") {
       setIdInputValue(e.target.value); // 入力値はそのまま表示
-      // 数字以外が含まれていればエラー
-      if (e.target.value && !/^[0-9]*$/.test(e.target.value)) {
-        setIdError("数字を入力してください");
-      } else if (
-        e.target.value &&
-        employees.some(
-          (emp) =>
-            emp.id === Number(e.target.value) &&
-            Number(e.target.value) !== editId
-        )
-      ) {
-        setIdError("従業員コードが重複しています");
-      } else {
-        setIdError("");
-        setForm({ ...form, id: e.target.value ? Number(e.target.value) : NaN });
-      }
+      // バリデーションはuseEmployeeForm側で一元管理するため、ここではsetFormのみ
+      setForm({ ...form, id: e.target.value ? Number(e.target.value) : NaN });
     } else {
       setForm({ ...form, [e.target.name]: e.target.value });
     }
