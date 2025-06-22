@@ -87,14 +87,18 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     setIdInputValue(form.id ? String(form.id) : "");
   }, [employeeId, employee]);
 
-  // employeeIdまたは従業員データが変わったらformを再初期化
+  // employeeIdまたはisOpenが変わったらform/idInputValueを初期化
   useEffect(() => {
-    if (employeeId) {
-      setForm(employee ?? emptyEmployee);
-    } else {
-      setForm(emptyEmployee);
+    if (isOpen) {
+      if (employeeId) {
+        setForm(employee ?? emptyEmployee);
+        setIdInputValue(employee && employee.id ? String(employee.id) : "");
+      } else {
+        setForm(emptyEmployee);
+        setIdInputValue("");
+      }
     }
-  }, [employeeId, employee]);
+  }, [isOpen, employeeId, employee]);
 
   // モーダルが閉じられたときにフォーム内容を初期化
   useEffect(() => {
