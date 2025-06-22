@@ -26,7 +26,11 @@ import { inputDateSmallStyle } from "./icons";
 import { LeaveDateList } from "./LeaveDateList";
 
 // ===== import: サンプルデータ・集計ロジック =====
-import { employees, calcLeaveSummary } from "../../sampleData/dbSampleTables";
+import {
+  employees,
+  calcLeaveSummary,
+  generateLeaveGrants,
+} from "../../sampleData/dbSampleTables";
 
 // propsの型定義はtypes.tsに集約
 export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
@@ -48,11 +52,25 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
     ? employees.find((e) => e.id === employeeId)
     : undefined;
   if (!isOpen || !employee) return null;
-  // --- leaveUsagesからこの従業員の消化履歴を抽出 ---
-  const usages = leaveUsages.filter((u) => u.employeeId === employee.id);
+  // --- leaveUsagesからこの従業員の消化履歴を抽出（有効な付与分のみ） ---
+  const now = new Date();
+  const nowStr = now.toISOString().slice(0, 10);
+  type Grant = { grantDate: string; days: number };
+  const validGrantDates = employee
+    ? (generateLeaveGrants(employee, nowStr) as Grant[])
+        .filter((g: Grant) => {
+          const expire = new Date(g.grantDate);
+          expire.setFullYear(expire.getFullYear() + 2);
+          return now < expire;
+        })
+        .map((g: Grant) => g.grantDate)
+    : [];
+  // 有効な付与分に紐づく消化履歴のみ抽出
+  const usages = leaveUsages.filter(
+    (u) => u.employeeId === employee.id && validGrantDates.includes(u.grantDate)
+  );
   const dates = usages.map((u) => u.usedDate).sort();
   // --- 残日数等の集計 ---
-  const now = new Date();
   const summary = calcLeaveSummary(employee.id, now.toISOString().slice(0, 10));
   const remain = summary ? summary.remain : 0;
 

@@ -169,18 +169,35 @@ export function calcLeaveSummary(employeeId: number, now: string) {
   const grants = generateLeaveGrants(emp, now);
   // 付与ごとに消化数を集計
   const usages = leaveUsages.filter(u => u.employeeId === employeeId);
+  const nowDate = new Date(now);
   let totalGranted = 0, totalUsed = 0;
   grants.forEach(g => {
-    totalGranted += g.days;
-    const used = usages.filter(u => u.grantDate === g.grantDate).length;
-    totalUsed += used;
+    // 有効期限（付与日＋2年）未満のみ集計
+    const expire = new Date(g.grantDate);
+    expire.setFullYear(expire.getFullYear() + 2);
+    if (nowDate < expire) {
+      totalGranted += g.days;
+      const used = usages.filter(u => u.grantDate === g.grantDate).length;
+      totalUsed += used;
+    }
   });
   return {
     totalGranted,
     totalUsed,
     remain: totalGranted - totalUsed,
-    grants,
-    usages
+    grants: grants.filter(g => {
+      const expire = new Date(g.grantDate);
+      expire.setFullYear(expire.getFullYear() + 2);
+      return nowDate < expire;
+    }),
+    usages: usages.filter(u => {
+      // 有効な付与分の消化履歴のみ返す
+      const grant = grants.find(g => g.grantDate === u.grantDate);
+      if (!grant) return false;
+      const expire = new Date(grant.grantDate);
+      expire.setFullYear(expire.getFullYear() + 2);
+      return nowDate < expire;
+    })
   };
 }
 
@@ -197,16 +214,24 @@ export function getGrantDetails(employeeId: number, now: string) {
   if (!emp) return [];
   const grants = generateLeaveGrants(emp, now);
   const usages = leaveUsages.filter(u => u.employeeId === employeeId);
-  return grants.map(g => {
-    const usedDates = usages.filter(u => u.grantDate === g.grantDate).map(u => u.usedDate).sort();
-    return {
-      grantDate: g.grantDate,
-      days: g.days,
-      used: usedDates.length,
-      remain: g.days - usedDates.length,
-      usedDates,
-    };
-  });
+  const nowDate = new Date(now);
+  return grants
+    .filter(g => {
+      // 有効期限（付与日＋2年）未満のみ表示
+      const expire = new Date(g.grantDate);
+      expire.setFullYear(expire.getFullYear() + 2);
+      return nowDate < expire;
+    })
+    .map(g => {
+      const usedDates = usages.filter(u => u.grantDate === g.grantDate).map(u => u.usedDate).sort();
+      return {
+        grantDate: g.grantDate,
+        days: g.days,
+        used: usedDates.length,
+        remain: g.days - usedDates.length,
+        usedDates,
+      };
+    });
 }
 
 /**
@@ -231,27 +256,18 @@ export function getEmployeeLeaveSummary(
 
   // 直近の付与日・次回付与日を特定
   let thisGrant = null;
-  let nextGrantDate = null;
+  // nextGrantDateは未使用のため削除
   for (let i = 0; i < grants.length; i++) {
     const grantDate = new Date(grants[i].grantDate);
     const next = grants[i + 1] ? new Date(grants[i + 1].grantDate) : null;
     if (grantDate <= nowDate && (!next || nowDate < next)) {
       thisGrant = grants[i];
-      nextGrantDate = next;
       break;
     }
   }
 
   // 今年度付与分
   const grantThisYear = thisGrant ? thisGrant.days : 0;
-
-  // 今年度付与分の消化数
-  const usedThisYear = thisGrant
-    ? usages.filter(u => u.grantDate === thisGrant.grantDate && new Date(u.usedDate) >= new Date(thisGrant.grantDate) && (!nextGrantDate || new Date(u.usedDate) < nextGrantDate)).length
-    : 0;
-
-  // 今年度付与分の残数
-  const remainThisYear = thisGrant ? thisGrant.days - usedThisYear : 0;
 
   // 繰越分（前回付与分のうち、今年度も有効な残日数）
   let carryOver = 0;
@@ -269,7 +285,6 @@ export function getEmployeeLeaveSummary(
 
   // 全有効分の消化日数・残日数
   const grantDetails = grants.map((g) => {
-    const grantDateObj = new Date(g.grantDate);
     const expireDate = new Date(g.grantDate);
     expireDate.setFullYear(expireDate.getFullYear() + 2);
     const isValid = nowDate < expireDate;
@@ -280,9 +295,9 @@ export function getEmployeeLeaveSummary(
       remain: g.days - usages.filter(u => u.grantDate === g.grantDate).length,
       isValid,
     };
-  });
-  const used = grantDetails.filter(g => g.isValid).reduce((sum, g) => sum + g.used, 0);
-  const remain = grantDetails.filter(g => g.isValid).reduce((sum, g) => sum + g.remain, 0);
+  }).filter(g => g.isValid);
+  const used = grantDetails.reduce((sum, g) => sum + g.used, 0);
+  const remain = grantDetails.reduce((sum, g) => sum + g.remain, 0);
 
   return { grantThisYear, carryOver, used, remain };
 }
