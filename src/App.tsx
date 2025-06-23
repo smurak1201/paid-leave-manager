@@ -345,7 +345,22 @@ function App() {
             const s = summaries.find((s) => s.employeeId === activeEmployeeId);
             return s || { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
           })()}
-          grantDetails={[]}
+          grantDetails={(() => {
+            if (!activeEmployeeId) return [];
+            const dates = leaveUsages
+              .filter((u) => u.employeeId === activeEmployeeId)
+              .map((u) => u.usedDate)
+              .sort();
+            return [
+              {
+                grantDate: "",
+                days: 0,
+                used: dates.length,
+                remain: 0,
+                usedDates: dates,
+              },
+            ];
+          })()}
         />
       </Box>
     </Box>
