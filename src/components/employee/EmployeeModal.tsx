@@ -30,11 +30,11 @@ import { CustomModal } from "../ui/CustomModal";
 export interface EmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  employeeId: number | null; // employeeCode→employeeId
-  getEmployee: (employeeId: number) => Employee | undefined;
+  employeeId: string | null; // employeeIdはstring型
+  getEmployee: (employeeId: string) => Employee | undefined;
   onAdd: (form: Employee) => void;
   onSave: (form: Employee) => void;
-  onDelete?: (id: number) => Promise<void>;
+  onDelete?: (id: string) => Promise<void>;
 }
 
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
@@ -48,7 +48,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   // 空の従業員初期値（追加時用）
   const emptyEmployee: Employee = {
     id: NaN,
-    employeeId: NaN, // employeeCode→employeeId
+    employeeId: "",
     lastName: "",
     firstName: "",
     joinedAt: "",
@@ -78,7 +78,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
       const employee = getEmployee(employeeId);
       setForm({
         id: employee?.id ?? NaN,
-        employeeId: employee?.employeeId ?? NaN,
+        employeeId: employee ? String(employee.employeeId) : "",
         lastName: employee?.lastName ?? "",
         firstName: employee?.firstName ?? "",
         joinedAt: employee?.joinedAt ?? "",
@@ -90,7 +90,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     } else if (isOpen) {
       setForm({
         id: NaN,
-        employeeId: NaN,
+        employeeId: "",
         lastName: "",
         firstName: "",
         joinedAt: "",
@@ -118,8 +118,8 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
         setEmployeeIdError("従業員コードは半角数字のみ入力できます");
       } else if (
         e.target.value &&
-        Number(e.target.value) !== (employeeId ?? NaN) &&
-        getEmployee(Number(e.target.value))
+        e.target.value !== (employeeId ?? "") &&
+        getEmployee(e.target.value)
       ) {
         setEmployeeIdError("従業員コードが重複しています");
       } else if (!e.target.value) {
@@ -129,7 +129,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
       }
       setForm({
         ...form,
-        employeeId: e.target.value ? Number(e.target.value) : NaN,
+        employeeId: e.target.value,
       });
     } else {
       setForm({ ...form, [e.target.name]: e.target.value });
