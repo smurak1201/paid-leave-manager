@@ -65,3 +65,4 @@ export const FadeTableRow: React.FC<
     </MotionTr>
   );
 };
+// FadeTableRowはemployeeId型の影響なし。型安全なまま現状維持。

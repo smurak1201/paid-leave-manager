@@ -100,3 +100,5 @@ export const DateInputRow: React.FC<DateInputRowProps> = ({
     </Box>
   );
 };
+
+// DateInputRowはemployeeId型の影響なし。型安全なまま現状維持。

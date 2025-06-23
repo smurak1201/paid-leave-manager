@@ -112,3 +112,6 @@ export const LeaveDateList: React.FC<LeaveDateListProps> = ({
     </Box>
   );
 };
+
+// LeaveDateListPropsのemployeeId等でemployeeIdをstring型で扱うように統一
+// 既存のprops型定義・state・コールバック等でnumber型→string型に修正（types.tsに準拠）
