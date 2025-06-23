@@ -167,9 +167,14 @@ function App() {
   // 従業員一覧APIから取得
   useEffect(() => {
     fetch("/paid_leave_manager/employees.php")
-      .then((res) => res.json())
-      .then((data) => {
-        setEmployees(data);
+      .then(async (res) => {
+        const text = await res.text();
+        try {
+          const data = JSON.parse(text);
+          setEmployees(data);
+        } catch (err) {
+          setError("APIレスポンスが不正です: " + text.slice(0, 200));
+        }
         setLoading(false);
       })
       .catch((e) => {
