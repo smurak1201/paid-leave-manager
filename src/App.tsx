@@ -79,7 +79,7 @@ function App() {
             `http://localhost/paid_leave_manager/leave_summary.php?employee_id=${emp.id}`
           );
           return {
-            employeeId: emp.id,
+            employeeId: emp.employeeCode, // ← employeeCodeで持つ
             grantThisYear: data.grantThisYear ?? 0,
             carryOver: data.carryOver ?? 0,
             used: data.used ?? 0,
@@ -87,7 +87,7 @@ function App() {
           };
         } catch {
           return {
-            employeeId: emp.id,
+            employeeId: emp.employeeCode, // ← employeeCodeで持つ
             grantThisYear: 0,
             carryOver: 0,
             used: 0,

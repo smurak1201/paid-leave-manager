@@ -77,7 +77,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     [employees, currentPage]
   );
   const summaryMap = useMemo(() => {
-    const map = new Map<number, EmployeeSummary>();
+    const map = new Map<number | string, EmployeeSummary>();
     summaries.forEach((s) => map.set(s.employeeId, s));
     return map;
   }, [summaries]);
@@ -305,7 +305,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         <Tbody>
           <AnimatePresence>
             {pagedEmployees.map((emp, idx) => {
-              const summary = summaryMap.get(emp.id) ?? {
+              const summary = summaryMap.get(emp.employeeCode) ?? {
                 grantThisYear: 0,
                 carryOver: 0,
                 used: 0,
