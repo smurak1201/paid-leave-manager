@@ -23,10 +23,10 @@ const BASE_URL = "http://localhost/paid_leave_manager/leave_summary.php";
 
 /**
  * 有給サマリーを取得
- * @param employeeId - 対象従業員ID
- * employeeIdはemployee_idとしてAPIに送信します
+ * @param employeeId - 対象従業員ID（string型）
+ * employeeIdはAPI送信時にint型へ変換
  * @returns LeaveSummary
  */
 export async function fetchLeaveSummary(employeeId: string): Promise<LeaveSummary> {
-  return apiGet<LeaveSummary>(`${BASE_URL}?employee_id=${employeeId}`);
+  return apiGet<LeaveSummary>(`${BASE_URL}?employee_id=${Number(employeeId)}`);
 }
