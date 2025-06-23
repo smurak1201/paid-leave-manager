@@ -39,11 +39,10 @@ import { useEmployeeForm } from "./hooks/useEmployeeForm";
 //   employees as employeeTable,
 //   leaveUsages as leaveUsagesTable,
 // } from "./sampleData/dbSampleTables";
-// import {
-//   generateLeaveGrants,
-//   getEmployeeLeaveSummary,
-//   getGrantDetails,
-// } from "./sampleData/dbSampleTables";
+import {
+  getEmployeeLeaveSummary,
+  getGrantDetails,
+} from "./sampleData/dbSampleTables";
 
 function App() {
   // --- グローバル状態管理 ---
