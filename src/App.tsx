@@ -99,9 +99,27 @@ function App() {
       if (!result || result.error)
         throw new Error(result?.error || "APIエラー");
       // 追加後に最新の消化履歴を再取得
-      fetch("http://localhost/paid_leave_manager/leave_usages.php")
-        .then((res) => res.json())
-        .then((data) => setLeaveUsages(data));
+      try {
+        const res2 = await fetch(
+          "http://localhost/paid_leave_manager/leave_usages.php"
+        );
+        const text2 = await res2.text();
+        let data = [];
+        try {
+          data = JSON.parse(text2).map((u: any) => ({
+            ...u,
+            employeeId: u.employee_id,
+            usedDate: u.used_date,
+          }));
+        } catch (err) {
+          throw new Error(
+            "消化履歴APIレスポンスが不正です: " + text2.slice(0, 200)
+          );
+        }
+        setLeaveUsages(data);
+      } catch (e: any) {
+        alert(e.message || "消化履歴の再取得に失敗しました");
+      }
       setDateInput("");
     } catch (e: any) {
       alert(e.message || "有給消化日の追加に失敗しました");
@@ -116,7 +134,7 @@ function App() {
     if (!empUsages[idx]) return;
     const target = empUsages[idx];
     try {
-      await fetch(
+      const res = await fetch(
         "http://localhost/paid_leave_manager/leave_usage_delete.php",
         {
           method: "POST",
@@ -124,18 +142,37 @@ function App() {
           body: JSON.stringify({ id: target.id }),
         }
       );
+      const text = await res.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        throw new Error("APIレスポンスが不正です: " + text);
+      }
+      if (!result || result.error)
+        throw new Error(result?.error || "APIエラー");
       // 削除後に最新の消化履歴を再取得
-      fetch("http://localhost/paid_leave_manager/leave_usages.php")
-        .then((res) => res.json())
-        .then((data) =>
-          setLeaveUsages(
-            data.map((u: any) => ({
-              ...u,
-              employeeId: u.employee_id,
-              usedDate: u.used_date,
-            }))
-          )
+      try {
+        const res2 = await fetch(
+          "http://localhost/paid_leave_manager/leave_usages.php"
         );
+        const text2 = await res2.text();
+        let data = [];
+        try {
+          data = JSON.parse(text2).map((u: any) => ({
+            ...u,
+            employeeId: u.employee_id,
+            usedDate: u.used_date,
+          }));
+        } catch (err) {
+          throw new Error(
+            "消化履歴APIレスポンスが不正です: " + text2.slice(0, 200)
+          );
+        }
+        setLeaveUsages(data);
+      } catch (e: any) {
+        alert(e.message || "消化履歴の再取得に失敗しました");
+      }
     } catch (e: any) {
       alert(e.message || "有給消化日の削除に失敗しました");
     }
