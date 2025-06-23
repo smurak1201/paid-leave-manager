@@ -167,7 +167,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 size="sm"
                 variant="ghost"
                 colorScheme="blue"
-                onClick={() => onView(emp.id)}
+                onClick={() => onView(String(emp.id))}
               >
                 <Icon as={Icons.Eye} boxSize={5} />
               </IconButton>
@@ -178,7 +178,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 size="sm"
                 variant="ghost"
                 colorScheme="teal"
-                onClick={() => onEdit(emp.id)}
+                onClick={() => onEdit(String(emp.id))}
               >
                 <Icon as={Icons.Edit} boxSize={5} />
               </IconButton>
@@ -189,7 +189,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 size="sm"
                 variant="ghost"
                 colorScheme="red"
-                onClick={() => handleDeleteClick(emp.id)}
+                onClick={() => handleDeleteClick(String(emp.id))}
               >
                 <Icon as={Icons.Trash2} boxSize={5} />
               </IconButton>
