@@ -17,29 +17,26 @@ export async function fetchEmployees(): Promise<Employee[]> {
 
 /**
  * 従業員を追加
- * @param form - idを除く従業員情報（employeeId必須）
- * employeeIdはstring型で受け取り、API送信時はint型に変換してemployee_idとして渡します
+ * @param form - idを除く従業員情報（employeeId必須, number型）
  */
 export async function addEmployee(form: Omit<Employee, "id">): Promise<void> {
-  await apiPost(BASE_URL, { ...form, employee_id: Number(form.employeeId), mode: "add" });
+  await apiPost(BASE_URL, { ...form, employee_id: form.employeeId, mode: "add" });
 }
 
 /**
  * 従業員情報を編集
- * @param form - 編集後の従業員情報（id, employeeId含む）
- * employeeIdはstring型で受け取り、API送信時はint型に変換してemployee_idとして渡します
+ * @param form - 編集後の従業員情報（id, employeeId含む, number型）
  */
 export async function editEmployee(form: Employee): Promise<void> {
-  await apiPost(BASE_URL, { ...form, employee_id: Number(form.employeeId), mode: "edit" });
+  await apiPost(BASE_URL, { ...form, employee_id: form.employeeId, mode: "edit" });
 }
 
 /**
  * 従業員を削除
- * @param employeeId - 削除対象の従業員ID（string型）
- * API送信時はint型に変換してemployee_idとして渡します
+ * @param employeeId - 削除対象の従業員ID（number型）
  */
-export async function deleteEmployee(employeeId: string): Promise<void> {
-  await apiPost(BASE_URL, { employee_id: Number(employeeId), mode: "delete" });
+export async function deleteEmployee(employeeId: number): Promise<void> {
+  await apiPost(BASE_URL, { employee_id: employeeId, mode: "delete" });
 }
 
 // エラーハンドリング例（必要に応じて各関数でtry-catchを追加してください）

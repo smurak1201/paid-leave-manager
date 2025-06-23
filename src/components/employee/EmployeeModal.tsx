@@ -34,7 +34,7 @@ export interface EmployeeModalProps {
   employees: Employee[];
   onAdd: (form: Omit<Employee, "id">) => void;
   onSave: (form: Employee) => void;
-  onDelete?: (employeeId: string) => Promise<void>;
+  onDelete?: (employeeId: number) => Promise<void>;
 }
 
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
@@ -48,7 +48,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   // 空の従業員初期値（追加時用）
   const emptyEmployee: Employee = {
     id: NaN,
-    employeeId: "",
+    employeeId: NaN,
     lastName: "",
     firstName: "",
     joinedAt: "",
@@ -81,20 +81,22 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     if (!form) return;
     if (e.target.name === "employeeId") {
       const value = e.target.value;
-      if (value && !/^[0-9]*$/.test(value)) {
+      // 入力値が空欄の場合はNaNで管理
+      const numValue = value === "" ? NaN : Number(value);
+      setForm((prev) => ({ ...prev, employeeId: numValue }));
+      // バリデーション
+      if (value === "") {
+        setEmployeeIdError("従業員コードは必須です");
+      } else if (!/^[0-9]+$/.test(value)) {
         setEmployeeIdError("従業員コードは半角数字のみ入力できます");
       } else if (
         !employee &&
-        value &&
-        employees.some((emp) => emp.employeeId === value)
+        employees.some((emp) => emp.employeeId === numValue)
       ) {
         setEmployeeIdError("従業員コードが重複しています");
-      } else if (!value) {
-        setEmployeeIdError("従業員コードは必須です");
       } else {
         setEmployeeIdError("");
       }
-      setForm({ ...form, employeeId: value });
     } else {
       setForm({ ...form, [e.target.name]: e.target.value });
     }

@@ -43,7 +43,7 @@ function App() {
   const [activeModal, setActiveModal] = useState<
     null | "add" | "edit" | "leaveDates"
   >(null);
-  const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null);
+  const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null);
   const guideDisclosure = useDisclosure();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -55,7 +55,7 @@ function App() {
     );
     return data.map((emp: any) => ({
       ...emp,
-      employeeId: emp.employee_id, // ← employee_idに変更
+      employeeId: Number(emp.employee_id), // number型で持つ
       joinedAt: emp.joined_at,
       lastName: emp.last_name,
       firstName: emp.first_name,
@@ -67,7 +67,7 @@ function App() {
     );
     return data.map((u: any) => ({
       ...u,
-      employeeId: u.employee_id,
+      employeeId: Number(u.employee_id), // number型で持つ
       usedDate: u.used_date,
     }));
   };
@@ -118,12 +118,12 @@ function App() {
 
   // --- サマリー再取得 ---
   type EmployeeSummary = {
-    employeeId: string;
+    employeeId: number;
     grantThisYear: number;
     carryOver: number;
     used: number;
     remain: number;
-    usedDates: string[]; // 追加
+    usedDates: string[];
   };
   const [summaries, setSummaries] = useState<EmployeeSummary[]>([]);
   useEffect(() => {
@@ -133,14 +133,11 @@ function App() {
 
   // --- UIイベントハンドラ ---
   // テーブル「確認」ボタン
-  const handleView = (employeeId: string) => {
+  const handleView = (employeeId: number) => {
     setActiveEmployeeId(employeeId);
-    setActiveModal("leaveDates");
-    setEditDateIdx(null);
-    setDateInput("");
   };
   // テーブル「編集」ボタン
-  const handleEdit = (employeeId: string) => {
+  const handleEdit = (employeeId: number) => {
     setActiveEmployeeId(employeeId);
     setActiveModal("edit");
   };
@@ -266,11 +263,11 @@ function App() {
         )}
         <EmployeeModal
           isOpen={activeModal === "add" || activeModal === "edit"}
-          onClose={handleCloseModal}
+          onClose={() => setActiveModal(null)}
           employee={
-            activeModal === "add"
-              ? null
-              : employees.find((e) => e.employeeId === activeEmployeeId) ?? null
+            activeModal === "edit"
+              ? employees.find((e) => e.employeeId === activeEmployeeId) ?? null
+              : null
           }
           employees={employees}
           onAdd={async (form) => {
@@ -317,20 +314,49 @@ function App() {
               alert(e.message || "従業員編集に失敗しました");
             }
           }}
+          onDelete={async (employeeId) => {
+            try {
+              // 先に有給取得日を全て削除
+              const emp = employees.find((e) => e.employeeId === employeeId);
+              if (emp) {
+                const usages = leaveUsages.filter(
+                  (u) => u.employeeId === emp.employeeId
+                );
+                for (const usage of usages) {
+                  await apiPost(
+                    "http://localhost/paid_leave_manager/leave_usage_delete.php",
+                    { id: usage.id }
+                  );
+                }
+              }
+              // 従業員本体を削除
+              await apiPost(
+                "http://localhost/paid_leave_manager/employees.php",
+                {
+                  employee_id: employeeId,
+                  mode: "delete",
+                }
+              );
+              const data = await fetchEmployees();
+              setEmployees(data);
+              setLeaveUsages(await fetchLeaveUsages()); // 取得日も再取得
+              setSummaries(await fetchSummaries(data)); // サマリーも再取得
+              setActiveEmployeeId(null);
+              setActiveModal(null);
+            } catch (e: any) {
+              alert(e.message || "従業員削除に失敗しました");
+            }
+          }}
         />
         <LeaveDatesModal
           isOpen={activeModal === "leaveDates"}
-          onClose={handleCloseModal}
-          employeeId={
-            activeEmployeeId !== null ? String(activeEmployeeId) : null
-          }
+          onClose={() => setActiveModal(null)}
+          employeeId={activeEmployeeId}
           leaveUsages={leaveUsages}
           onAddDate={async (date) => {
             const emp =
               activeEmployeeId !== null
-                ? employees.find(
-                    (e) => e.employeeId === String(activeEmployeeId)
-                  )
+                ? employees.find((e) => e.employeeId === activeEmployeeId)
                 : null;
             if (!emp) return;
             try {
@@ -351,9 +377,7 @@ function App() {
           onDeleteDate={async (idx) => {
             const emp =
               activeEmployeeId !== null
-                ? employees.find(
-                    (e) => e.employeeId === String(activeEmployeeId)
-                  )
+                ? employees.find((e) => e.employeeId === activeEmployeeId)
                 : null;
             if (!emp) return false;
             // 画面に表示しているusedDatesから削除対象日付を特定
@@ -389,14 +413,12 @@ function App() {
           currentPage={leaveDatesPage}
           onPageChange={setLeaveDatesPage}
           summary={(() => {
-            const id =
-              activeEmployeeId !== null ? String(activeEmployeeId) : null;
+            const id = activeEmployeeId !== null ? activeEmployeeId : null;
             const s = summaries.find((s) => s.employeeId === id);
             return s || { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
           })()}
           usedDates={(() => {
-            const id =
-              activeEmployeeId !== null ? String(activeEmployeeId) : null;
+            const id = activeEmployeeId !== null ? activeEmployeeId : null;
             const summary = summaries.find((s) => s.employeeId === id);
             return summary && summary.usedDates ? summary.usedDates : [];
           })()}

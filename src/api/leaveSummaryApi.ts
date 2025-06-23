@@ -4,7 +4,7 @@
 import { apiGet } from "../api";
 
 export interface LeaveSummary {
-  employeeId: string; // string型に統一
+  employeeId: number; // number型に統一
   grantThisYear: number;
   carryOver: number;
   used: number;
@@ -23,10 +23,9 @@ const BASE_URL = "http://localhost/paid_leave_manager/leave_summary.php";
 
 /**
  * 有給サマリーを取得
- * @param employeeId - 対象従業員ID（string型）
- * employeeIdはAPI送信時にint型へ変換
+ * @param employeeId - 対象従業員ID（number型）
  * @returns LeaveSummary
  */
-export async function fetchLeaveSummary(employeeId: string): Promise<LeaveSummary> {
-  return apiGet<LeaveSummary>(`${BASE_URL}?employee_id=${Number(employeeId)}`);
+export async function fetchLeaveSummary(employeeId: number): Promise<LeaveSummary> {
+  return apiGet<LeaveSummary>(`${BASE_URL}?employee_id=${employeeId}`);
 }

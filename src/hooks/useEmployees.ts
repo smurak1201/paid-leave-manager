@@ -38,8 +38,8 @@ export function useEmployees() {
     await editEmployee(form);
     await load();
   };
-  const remove = async (id: number) => {
-    await deleteEmployee(String(id)); // string型に変換して渡す
+  const remove = async (employeeId: number) => {
+    await deleteEmployee(employeeId); // number型で渡す
     await load();
   };
 

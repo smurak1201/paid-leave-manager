@@ -32,7 +32,7 @@ export interface LeaveGrant {
  */
 export interface Employee {
   id: number;             // DB主キー
-  employeeId: string;     // 業務用従業員ID（string型で管理）
+  employeeId: number;     // 業務用従業員ID（number型で管理）
   lastName: string;       // 姓
   firstName: string;      // 名
   joinedAt: string;       // 入社年月日 (YYYY-MM-DD)
@@ -52,9 +52,9 @@ export interface RowContentProps {
   used: number;
   remain: number;
   servicePeriod: string;
-  onView: (id: string) => void;
-  onEdit: (id: string) => void;
-  handleDeleteClick: (id: string) => void;
+  onView: (id: number) => void;
+  onEdit: (id: number) => void;
+  handleDeleteClick: (id: number) => void;
 }
 
 /**
@@ -67,14 +67,14 @@ export interface RowContentProps {
  */
 export interface LeaveUsage {
   id: number;
-  employeeId: string;
+  employeeId: number;
   usedDate: string;
 }
 
 export interface LeaveDatesModalProps {
   isOpen: boolean;
   onClose: () => void;
-  employeeId: string | null;
+  employeeId: number | null;
   leaveUsages: LeaveUsage[];
   onAddDate: (date: string) => void;
   onDeleteDate: (idx: number) => Promise<boolean>;

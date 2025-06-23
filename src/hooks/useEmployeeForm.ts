@@ -30,7 +30,11 @@ export function useEmployeeForm(initial: Employee) {
   // 入力値変更時の状態更新
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === "employeeId") {
+      setForm((prev) => ({ ...prev, employeeId: value === "" ? NaN : Number(value) }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
   return { form, setForm, handleChange };
 }

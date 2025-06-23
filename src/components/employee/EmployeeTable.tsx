@@ -38,7 +38,7 @@ import { FadeTableRow } from "./FadeTableRow";
 
 // propsの型定義。データと操作関数を親(App)から受け取る
 interface EmployeeSummary {
-  employeeId: string;
+  employeeId: number;
   grantThisYear: number;
   carryOver: number;
   used: number;
@@ -48,9 +48,9 @@ interface EmployeeSummary {
 interface EmployeeTableProps {
   employees: Employee[];
   summaries: EmployeeSummary[];
-  onEdit: (employeeId: string) => void;
-  onDelete: (employeeId: string) => void;
-  onView: (employeeId: string) => void;
+  onEdit: (employeeId: number) => void;
+  onDelete: (employeeId: number) => void;
+  onView: (employeeId: number) => void;
   currentPage: number; // 現在のページ番号
   onPageChange: (page: number) => void; // ページ切替ハンドラ
 }
@@ -77,7 +77,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     [employees, currentPage]
   );
   const summaryMap = useMemo(() => {
-    const map = new Map<string, EmployeeSummary>();
+    const map = new Map<number, EmployeeSummary>();
     summaries.forEach((s) => map.set(s.employeeId, s));
     return map;
   }, [summaries]);
@@ -92,7 +92,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   }, [employees.length, totalPages]);
 
   // 削除対象の従業員ID（number型に修正）
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const prevEmployeesRef = useRef<Employee[]>(employees);
 
@@ -103,7 +103,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   }, [employees]);
 
   // 削除ボタンクリック時のハンドラ（number型に修正）
-  const handleDeleteClick = useCallback((id: string) => {
+  const handleDeleteClick = useCallback((id: number) => {
     setDeleteTarget(id);
     setDeleteOpen(true);
   }, []);
@@ -350,9 +350,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         targetName={
           deleteTarget !== null
             ? (() => {
-                const emp = employees.find(
-                  (e) => String(e.id) === deleteTarget
-                );
+                const emp = employees.find((e) => e.id === deleteTarget);
                 return emp ? `${emp.lastName} ${emp.firstName}` : undefined;
               })()
             : undefined
