@@ -48,10 +48,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // --- 有給取得日編集用の状態・ロジック ---
-  const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
-  const [dateInput, setDateInput] = useState("");
-
   // --- データ取得・更新用関数 ---
   const fetchEmployees = async () => {
     const data = await apiGet<any[]>(
@@ -131,39 +127,6 @@ function App() {
     fetchSummaries(employees).then(setSummaries);
   }, [employees]);
 
-  // --- 有給消化日追加 ---
-  const handleAddDate = async (date: string) => {
-    if (!activeEmployeeId) return;
-    try {
-      await apiPost("http://localhost/paid_leave_manager/leave_usage_add.php", {
-        employee_id: activeEmployeeId,
-        used_date: date,
-      });
-      setLeaveUsages(await fetchLeaveUsages());
-      setDateInput("");
-    } catch (e: any) {
-      alert(e.message || "有給消化日の追加に失敗しました");
-    }
-  };
-  // --- 有給消化日削除 ---
-  const handleDeleteDate = async (idx: number) => {
-    if (!activeEmployeeId) return;
-    const empUsages = leaveUsages.filter(
-      (u) => u.employeeId === activeEmployeeId
-    );
-    if (!empUsages[idx]) return;
-    const target = empUsages[idx];
-    try {
-      await apiPost(
-        "http://localhost/paid_leave_manager/leave_usage_delete.php",
-        { id: target.id }
-      );
-      setLeaveUsages(await fetchLeaveUsages());
-    } catch (e: any) {
-      alert(e.message || "有給消化日の削除に失敗しました");
-    }
-  };
-
   // --- UIイベントハンドラ ---
   // テーブル「確認」ボタン
   const handleView = (id: number) => {
@@ -195,6 +158,10 @@ function App() {
     if (employees.length === 0) return;
     fetchSummaries(employees).then(setSummaries);
   }, [employees]);
+
+  // --- 有給取得日編集用の状態・ロジック ---
+  const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
+  const [dateInput, setDateInput] = useState("");
 
   // --- 画面描画 ---
   return (
@@ -280,8 +247,15 @@ function App() {
         <EmployeeModal
           isOpen={activeModal === "add" || activeModal === "edit"}
           onClose={handleCloseModal}
-          employeeId={activeModal === "add" ? null : activeEmployeeId}
-          getEmployee={(id) => employees.find((e) => e.id === id)}
+          employeeId={
+            activeModal === "add"
+              ? null
+              : activeEmployeeId !== null
+              ? employees.find((e) => e.id === activeEmployeeId)
+                  ?.employeeCode ?? null
+              : null
+          }
+          getEmployee={(code) => employees.find((e) => e.employeeCode === code)}
           onAdd={async (form) => {
             try {
               await apiPost(
@@ -331,10 +305,52 @@ function App() {
         <LeaveDatesModal
           isOpen={activeModal === "leaveDates"}
           onClose={handleCloseModal}
-          employeeId={activeEmployeeId}
+          employeeId={
+            activeEmployeeId !== null
+              ? employees.find((e) => e.id === activeEmployeeId)
+                  ?.employeeCode ?? null
+              : null
+          }
           leaveUsages={leaveUsages}
-          onAddDate={handleAddDate}
-          onDeleteDate={handleDeleteDate}
+          onAddDate={async (date) => {
+            const code =
+              activeEmployeeId !== null
+                ? employees.find((e) => e.id === activeEmployeeId)?.employeeCode
+                : null;
+            if (!code) return;
+            try {
+              await apiPost(
+                "http://localhost/paid_leave_manager/leave_usage_add.php",
+                {
+                  employee_code: code,
+                  used_date: date,
+                }
+              );
+              setLeaveUsages(await fetchLeaveUsages());
+              setDateInput("");
+            } catch (e: any) {
+              alert(e.message || "有給消化日の追加に失敗しました");
+            }
+          }}
+          onDeleteDate={async (idx) => {
+            const code =
+              activeEmployeeId !== null
+                ? employees.find((e) => e.id === activeEmployeeId)?.employeeCode
+                : null;
+            if (!code) return;
+            const empUsages = leaveUsages.filter((u) => u.employeeId === code);
+            if (!empUsages[idx]) return;
+            const target = empUsages[idx];
+            try {
+              await apiPost(
+                "http://localhost/paid_leave_manager/leave_usage_delete.php",
+                { id: target.id }
+              );
+              setLeaveUsages(await fetchLeaveUsages());
+            } catch (e: any) {
+              alert(e.message || "有給消化日の削除に失敗しました");
+            }
+          }}
           editDateIdx={editDateIdx}
           setEditDateIdx={setEditDateIdx}
           dateInput={dateInput}
@@ -342,13 +358,21 @@ function App() {
           currentPage={leaveDatesPage}
           onPageChange={setLeaveDatesPage}
           summary={(() => {
-            const s = summaries.find((s) => s.employeeId === activeEmployeeId);
+            const code =
+              activeEmployeeId !== null
+                ? employees.find((e) => e.id === activeEmployeeId)?.employeeCode
+                : null;
+            const s = summaries.find((s) => s.employeeId === code);
             return s || { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
           })()}
           grantDetails={(() => {
-            if (!activeEmployeeId) return [];
+            const code =
+              activeEmployeeId !== null
+                ? employees.find((e) => e.id === activeEmployeeId)?.employeeCode
+                : null;
+            if (!code) return [];
             const dates = leaveUsages
-              .filter((u) => u.employeeId === activeEmployeeId)
+              .filter((u) => u.employeeId === code)
               .map((u) => u.usedDate)
               .sort();
             return [

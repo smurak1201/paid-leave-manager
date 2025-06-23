@@ -64,39 +64,25 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   const [idInputValue, setIdInputValue] = useState(
     form.id ? String(form.id) : ""
   );
-  // employeeCode入力欄の値
-  const [employeeCodeInputValue, setEmployeeCodeInputValue] = useState(
-    form.employeeCode ? String(form.employeeCode) : ""
-  );
-  // id/employeeCodeエラー（内部stateで管理）
+  // idエラー（内部stateで管理）
   const [idError, setIdError] = useState("");
-  const [employeeCodeError, setEmployeeCodeError] = useState("");
 
-  // 編集モードや初期化時にid/employeeCodeInputValueも同期
+  // 編集モードや初期化時にidInputValueも同期
   useEffect(() => {
     setIdInputValue(form.id ? String(form.id) : "");
-    setEmployeeCodeInputValue(
-      form.employeeCode ? String(form.employeeCode) : ""
-    );
   }, [employeeId, employee]);
 
-  // employeeIdまたはisOpenが変わったらform/idInputValue/employeeCodeInputValue/idError/employeeCodeErrorを初期化
+  // employeeIdまたはisOpenが変わったらform/idInputValue/idErrorを初期化
   useEffect(() => {
     if (isOpen) {
       if (employeeId) {
         setForm(employee ?? emptyEmployee);
         setIdInputValue(employee && employee.id ? String(employee.id) : "");
-        setEmployeeCodeInputValue(
-          employee && employee.employeeCode ? String(employee.employeeCode) : ""
-        );
         setIdError("");
-        setEmployeeCodeError("");
       } else {
         setForm(emptyEmployee);
         setIdInputValue("");
-        setEmployeeCodeInputValue("");
         setIdError("");
-        setEmployeeCodeError("");
       }
     }
   }, [isOpen, employeeId, employee]);
@@ -106,80 +92,42 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     if (!isOpen) {
       setForm(emptyEmployee);
       setIdInputValue("");
-      setEmployeeCodeInputValue("");
       setIdError("");
-      setEmployeeCodeError("");
     }
   }, [isOpen]);
 
-  // 入力欄のonChangeハンドラ（id/employeeCode重複・数字バリデーションを内部で完結）
+  // 入力欄のonChangeハンドラ（id重複・数字バリデーションを内部で完結）
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!form) return;
     if (e.target.name === "id") {
-      setIdInputValue(e.target.value);
+      setIdInputValue(e.target.value); // 入力値はそのまま表示
       if (e.target.value && !/^[0-9]*$/.test(e.target.value)) {
-        setIdError("従業員IDは半角数字のみ入力できます");
+        setIdError("従業員コードは半角数字のみ入力できます");
       } else if (
         e.target.value &&
         Number(e.target.value) !== (employeeId ?? NaN) &&
         getEmployee(Number(e.target.value))
       ) {
-        setIdError("従業員IDが重複しています");
+        setIdError("従業員コードが重複しています");
       } else if (!e.target.value) {
-        setIdError("従業員IDは必須です");
+        setIdError("従業員コードは必須です");
       } else {
         setIdError("");
       }
       setForm({ ...form, id: e.target.value ? Number(e.target.value) : NaN });
-    } else if (e.target.name === "employeeCode") {
-      setEmployeeCodeInputValue(e.target.value);
-      if (e.target.value && !/^[0-9]*$/.test(e.target.value)) {
-        setEmployeeCodeError("従業員コードは半角数字のみ入力できます");
-      } else if (
-        e.target.value &&
-        Number(e.target.value) !==
-          (employee && employee.employeeCode ? employee.employeeCode : NaN) &&
-        // 全従業員のemployeeCode重複チェック
-        typeof getEmployee === "function" &&
-        getEmployeeByCode(Number(e.target.value))
-      ) {
-        setEmployeeCodeError("従業員コードが重複しています");
-      } else if (!e.target.value) {
-        setEmployeeCodeError("従業員コードは必須です");
-      } else {
-        setEmployeeCodeError("");
-      }
-      setForm({
-        ...form,
-        employeeCode: e.target.value ? Number(e.target.value) : NaN,
-      });
     } else {
       setForm({ ...form, [e.target.name]: e.target.value });
     }
   };
 
-  // employeeCode重複チェック用
-  const getEmployeeByCode = (code: number) => {
-    // getEmployeeはid検索なので、全従業員リストを参照する必要がある
-    // ここではid以外の従業員を全て走査してemployeeCode重複を判定
-    if (!getEmployee) return undefined;
-    for (let i = 0; i < 10000; ++i) {
-      const emp = getEmployee(i);
-      if (emp && emp.employeeCode === code && emp.id !== form.id) return emp;
-    }
-    return undefined;
-  };
-
   const isSaveDisabled = useMemo(
     () =>
       !!idError ||
-      !!employeeCodeError ||
       !form.id ||
-      !form.employeeCode ||
       !form.lastName ||
       !form.firstName ||
       !form.joinedAt,
-    [idError, employeeCodeError, form]
+    [idError, form]
   );
 
   const handleSave = useCallback(() => {
@@ -234,7 +182,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
           <FormControl isRequired>
             <FormLabel>
               <Icon as={BadgeInfo} mr={2} />
-              従業員ID
+              従業員コード
             </FormLabel>
             <Input
               name="id"
@@ -253,38 +201,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             {idInputValue && idError && (
               <Text color="red.500" fontSize="sm" mt={1}>
                 {idError}
-              </Text>
-            )}
-            {employeeId && (
-              <Text color="gray.400" fontSize="xs" mt={1}>
-                ※従業員IDは編集できません
-              </Text>
-            )}
-          </FormControl>
-          <FormControl isRequired>
-            <FormLabel>
-              <Icon as={BadgeInfo} mr={2} />
-              従業員コード
-            </FormLabel>
-            <Input
-              name="employeeCode"
-              value={
-                employeeId ? String(form.employeeCode) : employeeCodeInputValue
-              }
-              onChange={handleChange}
-              borderColor="teal.300"
-              bg={employeeId ? "gray.100" : "whiteAlpha.900"}
-              color={employeeId ? "gray.500" : undefined}
-              _placeholder={{ color: "teal.200" }}
-              type="text"
-              inputMode="numeric"
-              pattern="^[0-9]*$"
-              autoComplete="off"
-              disabled={!!employeeId}
-            />
-            {employeeCodeInputValue && employeeCodeError && (
-              <Text color="red.500" fontSize="sm" mt={1}>
-                {employeeCodeError}
               </Text>
             )}
             {employeeId && (
