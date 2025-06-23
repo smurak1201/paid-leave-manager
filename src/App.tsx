@@ -146,13 +146,6 @@ function App() {
     setActiveEmployeeId(null);
     setActiveModal("add");
   };
-  // モーダルを閉じる
-  const handleCloseModal = () => {
-    setActiveModal(null);
-    setActiveEmployeeId(null);
-    setEditDateIdx(null);
-    setDateInput("");
-  };
 
   // --- 有給サマリー・詳細のAPI連携 ---
   useEffect(() => {
