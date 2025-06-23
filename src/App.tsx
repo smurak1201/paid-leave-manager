@@ -84,6 +84,7 @@ function App() {
             carryOver: data.carryOver ?? 0,
             used: data.used ?? 0,
             remain: data.remain ?? 0,
+            usedDates: data.usedDates ?? [], // ← 追加
           };
         } catch {
           return {
@@ -92,6 +93,7 @@ function App() {
             carryOver: 0,
             used: 0,
             remain: 0,
+            usedDates: [],
           };
         }
       })
@@ -121,6 +123,7 @@ function App() {
     carryOver: number;
     used: number;
     remain: number;
+    usedDates: string[]; // 追加
   };
   const [summaries, setSummaries] = useState<EmployeeSummary[]>([]);
   useEffect(() => {
@@ -328,6 +331,7 @@ function App() {
                 }
               );
               setLeaveUsages(await fetchLeaveUsages());
+              setSummaries(await fetchSummaries(employees)); // 追加
               setDateInput("");
             } catch (e: any) {
               alert(e.message || "有給消化日の追加に失敗しました");
@@ -350,6 +354,7 @@ function App() {
                 { id: target.id }
               );
               setLeaveUsages(await fetchLeaveUsages());
+              setSummaries(await fetchSummaries(employees)); // 追加
               return true;
             } catch (e: any) {
               alert(e.message || "有給消化日の削除に失敗しました");
@@ -376,9 +381,7 @@ function App() {
                 ? employees.find((e) => e.id === activeEmployeeId)?.employeeCode
                 : null;
             const summary = summaries.find((s) => s.employeeId === code);
-            return summary && (summary as any).usedDates
-              ? (summary as any).usedDates
-              : [];
+            return summary && summary.usedDates ? summary.usedDates : [];
           })()}
         />
       </Box>
