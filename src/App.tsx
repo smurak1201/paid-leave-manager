@@ -78,18 +78,28 @@ function App() {
   const handleAddDate = async (date: string) => {
     if (!activeEmployeeId) return;
     try {
-      const res = await fetch("/paid_leave_manager/leave_usage_add.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          employee_id: activeEmployeeId,
-          used_date: date,
-        }),
-      });
-      const result = await res.json();
-      if (result.error) throw new Error(result.error);
+      const res = await fetch(
+        "http://localhost/paid_leave_manager/leave_usage_add.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            employee_id: activeEmployeeId,
+            used_date: date,
+          }),
+        }
+      );
+      const text = await res.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        throw new Error("APIレスポンスが不正です: " + text);
+      }
+      if (!result || result.error)
+        throw new Error(result?.error || "APIエラー");
       // 追加後に最新の消化履歴を再取得
-      fetch("/paid_leave_manager/leave_usages.php")
+      fetch("http://localhost/paid_leave_manager/leave_usages.php")
         .then((res) => res.json())
         .then((data) => setLeaveUsages(data));
       setDateInput("");
