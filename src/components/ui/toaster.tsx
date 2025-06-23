@@ -36,8 +36,6 @@ export const toaster = createToaster({
 
 export const Toaster = () => {
   const toastRootWidth = useMemo(() => ({ md: "sm" }), []);
-  const spinnerSize = useMemo(() => "sm", []);
-  const spinnerColor = useMemo(() => "blue.solid", []);
 
   return (
     <Portal>
@@ -45,7 +43,7 @@ export const Toaster = () => {
         {(toast) => (
           <Toast.Root width={toastRootWidth}>
             {toast.type === "loading" ? (
-              <Spinner size={spinnerSize} color={spinnerColor} />
+              <Spinner size="sm" color="blue.solid" />
             ) : (
               <Toast.Indicator />
             )}
