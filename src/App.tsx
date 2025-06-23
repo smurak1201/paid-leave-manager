@@ -108,15 +108,37 @@ function App() {
     }
   };
   // 日付削除
-  const handleDeleteDate = (idx: number) => {
+  const handleDeleteDate = async (idx: number) => {
     if (!activeEmployeeId) return;
-    // 該当従業員のusedDateリストを取得
     const empUsages = leaveUsages.filter(
       (u) => u.employeeId === activeEmployeeId
     );
     if (!empUsages[idx]) return;
     const target = empUsages[idx];
-    setLeaveUsages((prev) => prev.filter((u) => u.id !== target.id));
+    try {
+      await fetch(
+        "http://localhost/paid_leave_manager/leave_usage_delete.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: target.id }),
+        }
+      );
+      // 削除後に最新の消化履歴を再取得
+      fetch("http://localhost/paid_leave_manager/leave_usages.php")
+        .then((res) => res.json())
+        .then((data) =>
+          setLeaveUsages(
+            data.map((u: any) => ({
+              ...u,
+              employeeId: u.employee_id,
+              usedDate: u.used_date,
+            }))
+          )
+        );
+    } catch (e: any) {
+      alert(e.message || "有給消化日の削除に失敗しました");
+    }
   };
 
   // --- UIイベントハンドラ ---
@@ -164,31 +186,84 @@ function App() {
     });
   };
 
-  // 従業員一覧APIから取得
+  // 従業員一覧・有給消化履歴APIから取得
   useEffect(() => {
-    fetch("http://localhost/paid_leave_manager/employees.php")
-      .then(async (res) => {
-        const text = await res.text();
-        try {
-          let data = JSON.parse(text);
-          // joined_at → joinedAt へ変換
-          data = data.map((emp: any) => ({
-            ...emp,
-            joinedAt: emp.joined_at,
-            lastName: emp.last_name,
-            firstName: emp.first_name,
-          }));
-          setEmployees(data);
-        } catch (err) {
-          setError("APIレスポンスが不正です: " + text.slice(0, 200));
+    setLoading(true);
+    Promise.all([
+      fetch("http://localhost/paid_leave_manager/employees.php").then(
+        async (res) => {
+          const text = await res.text();
+          let data = [];
+          try {
+            data = JSON.parse(text).map((emp: any) => ({
+              ...emp,
+              joinedAt: emp.joined_at,
+              lastName: emp.last_name,
+              firstName: emp.first_name,
+            }));
+          } catch (err) {
+            setError("従業員APIレスポンスが不正です: " + text.slice(0, 200));
+          }
+          return data;
         }
+      ),
+      fetch("http://localhost/paid_leave_manager/leave_usages.php").then(
+        async (res) => {
+          const text = await res.text();
+          let data = [];
+          try {
+            data = JSON.parse(text).map((u: any) => ({
+              ...u,
+              employeeId: u.employee_id,
+              usedDate: u.used_date,
+            }));
+          } catch (err) {
+            setError("消化履歴APIレスポンスが不正です: " + text.slice(0, 200));
+          }
+          return data;
+        }
+      ),
+    ])
+      .then(([employeesData, leaveUsagesData]) => {
+        setEmployees(employeesData);
+        setLeaveUsages(leaveUsagesData);
         setLoading(false);
       })
       .catch((e) => {
-        setError("従業員データの取得に失敗しました: " + (e.message || e));
+        setError("データの取得に失敗しました: " + (e.message || e));
         setLoading(false);
       });
   }, []);
+
+  // --- 有給サマリー・詳細のAPI連携 ---
+  const [summary, setSummary] = useState({
+    grantThisYear: 0,
+    carryOver: 0,
+    used: 0,
+    remain: 0,
+  });
+  const [grantDetails, setGrantDetails] = useState([]);
+  useEffect(() => {
+    if (!activeEmployeeId || activeModal !== "leaveDates") return;
+    fetch(
+      `http://localhost/paid_leave_manager/leave_summary.php?employee_id=${activeEmployeeId}`
+    ).then(async (res) => {
+      const text = await res.text();
+      try {
+        const data = JSON.parse(text);
+        setSummary({
+          grantThisYear: data.grantThisYear,
+          carryOver: data.carryOver,
+          used: data.used,
+          remain: data.remain,
+        });
+        setGrantDetails(data.grantDetails || []);
+      } catch (err) {
+        setSummary({ grantThisYear: 0, carryOver: 0, used: 0, remain: 0 });
+        setGrantDetails([]);
+      }
+    });
+  }, [activeEmployeeId, activeModal]);
 
   // --- 画面描画 ---
   return (
@@ -268,7 +343,7 @@ function App() {
           onClose={handleCloseModal}
           employeeId={activeModal === "add" ? null : activeEmployeeId}
           getEmployee={(id) => employees.find((e) => e.id === id)}
-          onAdd={(form) => {
+          onAdd={async (form) => {
             // 入力バリデーション
             if (
               !form.id ||
@@ -284,22 +359,52 @@ function App() {
               );
               return;
             }
-            setEmployees([...employees, { ...form }]);
-            // 追加後に最終ページへ移動
-            const ITEMS_PER_PAGE = 15;
-            const newTotal = employees.length + 1;
-            setCurrentPage(Math.ceil(newTotal / ITEMS_PER_PAGE));
-            setForm({
-              id: NaN,
-              employeeCode: NaN,
-              lastName: "",
-              firstName: "",
-              joinedAt: "",
-            });
-            setActiveEmployeeId(null);
-            setActiveModal(null);
+            try {
+              await fetch("http://localhost/paid_leave_manager/employees.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  id: form.id,
+                  employee_code: form.employeeCode,
+                  last_name: form.lastName,
+                  first_name: form.firstName,
+                  joined_at: form.joinedAt,
+                  mode: "add",
+                }),
+              });
+              // 追加後に再取得
+              const res = await fetch(
+                "http://localhost/paid_leave_manager/employees.php"
+              );
+              const text = await res.text();
+              let data = [];
+              try {
+                data = JSON.parse(text).map((emp: any) => ({
+                  ...emp,
+                  joinedAt: emp.joined_at,
+                  lastName: emp.last_name,
+                  firstName: emp.first_name,
+                }));
+              } catch (err) {}
+              setEmployees(data);
+              // 追加後に最終ページへ移動
+              const ITEMS_PER_PAGE = 15;
+              const newTotal = data.length;
+              setCurrentPage(Math.ceil(newTotal / ITEMS_PER_PAGE));
+              setForm({
+                id: NaN,
+                employeeCode: NaN,
+                lastName: "",
+                firstName: "",
+                joinedAt: "",
+              });
+              setActiveEmployeeId(null);
+              setActiveModal(null);
+            } catch (e: any) {
+              setIdError(e.message || "従業員追加に失敗しました");
+            }
           }}
-          onSave={(form) => {
+          onSave={async (form) => {
             // 入力バリデーション
             if (
               !form.id ||
@@ -312,20 +417,72 @@ function App() {
               setIdError("全ての項目を正しく入力してください");
               return;
             }
-            setEmployees((prev) =>
-              prev.map((emp) =>
-                emp.id === activeEmployeeId ? { ...form } : emp
-              )
-            );
-            setForm({
-              id: NaN,
-              employeeCode: NaN,
-              lastName: "",
-              firstName: "",
-              joinedAt: "",
-            });
-            setActiveEmployeeId(null);
-            setActiveModal(null);
+            try {
+              await fetch("http://localhost/paid_leave_manager/employees.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  id: form.id,
+                  employee_code: form.employeeCode,
+                  last_name: form.lastName,
+                  first_name: form.firstName,
+                  joined_at: form.joinedAt,
+                  mode: "edit",
+                }),
+              });
+              // 編集後に再取得
+              const res = await fetch(
+                "http://localhost/paid_leave_manager/employees.php"
+              );
+              const text = await res.text();
+              let data = [];
+              try {
+                data = JSON.parse(text).map((emp: any) => ({
+                  ...emp,
+                  joinedAt: emp.joined_at,
+                  lastName: emp.last_name,
+                  firstName: emp.first_name,
+                }));
+              } catch (err) {}
+              setEmployees(data);
+              setForm({
+                id: NaN,
+                employeeCode: NaN,
+                lastName: "",
+                firstName: "",
+                joinedAt: "",
+              });
+              setActiveEmployeeId(null);
+              setActiveModal(null);
+            } catch (e: any) {
+              setIdError(e.message || "従業員編集に失敗しました");
+            }
+          }}
+          onDelete={async (id) => {
+            try {
+              await fetch("http://localhost/paid_leave_manager/employees.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id, mode: "delete" }),
+              });
+              // 削除後に再取得
+              const res = await fetch(
+                "http://localhost/paid_leave_manager/employees.php"
+              );
+              const text = await res.text();
+              let data = [];
+              try {
+                data = JSON.parse(text).map((emp: any) => ({
+                  ...emp,
+                  joinedAt: emp.joined_at,
+                  lastName: emp.last_name,
+                  firstName: emp.first_name,
+                }));
+              } catch (err) {}
+              setEmployees(data);
+            } catch (e: any) {
+              setIdError(e.message || "従業員削除に失敗しました");
+            }
           }}
           idError={idError}
           editId={activeModal === "edit" ? activeEmployeeId : null}
@@ -346,24 +503,8 @@ function App() {
           setDateInput={setDateInput}
           currentPage={leaveDatesPage}
           onPageChange={setLeaveDatesPage}
-          summary={
-            activeEmployeeId
-              ? getEmployeeLeaveSummary(
-                  activeEmployeeId,
-                  leaveUsages,
-                  employees,
-                  new Date().toISOString().slice(0, 10)
-                )
-              : { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 }
-          }
-          grantDetails={
-            activeEmployeeId
-              ? getGrantDetails(
-                  activeEmployeeId,
-                  new Date().toISOString().slice(0, 10)
-                )
-              : []
-          }
+          summary={summary}
+          grantDetails={grantDetails}
         />
       </Box>
     </Box>
