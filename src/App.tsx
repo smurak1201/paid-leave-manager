@@ -55,7 +55,7 @@ function App() {
     );
     return data.map((emp: any) => ({
       ...emp,
-      employeeCode: emp.employee_code, // ← 追加
+      employeeId: emp.employee_id, // ← employee_idに変更
       joinedAt: emp.joined_at,
       lastName: emp.last_name,
       firstName: emp.first_name,
@@ -76,19 +76,19 @@ function App() {
       emps.map(async (emp) => {
         try {
           const data = await apiGet<any>(
-            `http://localhost/paid_leave_manager/leave_summary.php?employee_code=${emp.employeeCode}`
+            `http://localhost/paid_leave_manager/leave_summary.php?employee_id=${emp.employeeId}` // ← employee_idに変更
           );
           return {
-            employeeId: emp.employeeCode, // ← employeeCodeで持つ
+            employeeId: emp.employeeId, // ← employeeIdで持つ
             grantThisYear: data.grantThisYear ?? 0,
             carryOver: data.carryOver ?? 0,
             used: data.used ?? 0,
             remain: data.remain ?? 0,
-            usedDates: data.usedDates ?? [], // ← 追加
+            usedDates: data.usedDates ?? [],
           };
         } catch {
           return {
-            employeeId: emp.employeeCode, // ← employeeCodeで持つ
+            employeeId: emp.employeeId,
             grantThisYear: 0,
             carryOver: 0,
             used: 0,
@@ -271,18 +271,18 @@ function App() {
             activeModal === "add"
               ? null
               : activeEmployeeId !== null
-              ? employees.find((e) => e.id === activeEmployeeId)
-                  ?.employeeCode ?? null
+              ? employees.find((e) => e.id === activeEmployeeId)?.employeeId ??
+                null // employeeCode→employeeId
               : null
           }
-          getEmployee={(code) => employees.find((e) => e.employeeCode === code)}
+          getEmployee={(id) => employees.find((e) => e.employeeId === id)} // employeeCode→employeeId
           onAdd={async (form) => {
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/employees.php",
                 {
                   id: form.id,
-                  employee_code: form.employeeCode,
+                  employee_id: form.employeeId, // employee_code→employee_id
                   last_name: form.lastName,
                   first_name: form.firstName,
                   joined_at: form.joinedAt,
@@ -306,7 +306,7 @@ function App() {
                 "http://localhost/paid_leave_manager/employees.php",
                 {
                   id: form.id,
-                  employee_code: form.employeeCode,
+                  employee_id: form.employeeId, // employee_code→employee_id
                   last_name: form.lastName,
                   first_name: form.firstName,
                   joined_at: form.joinedAt,
@@ -327,8 +327,8 @@ function App() {
           onClose={handleCloseModal}
           employeeId={
             activeEmployeeId !== null
-              ? employees.find((e) => e.id === activeEmployeeId)
-                  ?.employeeCode ?? null
+              ? employees.find((e) => e.id === activeEmployeeId)?.employeeId ??
+                null // employeeCode→employeeId
               : null
           }
           leaveUsages={leaveUsages}
@@ -342,12 +342,12 @@ function App() {
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_add.php",
                 {
-                  employee_id: emp.id, // ← employee_idで送信
+                  employee_id: emp.employeeId, // emp.id→emp.employeeId
                   used_date: date,
                 }
               );
               setLeaveUsages(await fetchLeaveUsages());
-              setSummaries(await fetchSummaries(employees)); // 追加
+              setSummaries(await fetchSummaries(employees));
               setDateInput("");
             } catch (e: any) {
               alert(e.message || "有給消化日の追加に失敗しました");
@@ -360,15 +360,16 @@ function App() {
                 : null;
             if (!emp) return false;
             // 画面に表示しているusedDatesから削除対象日付を特定
-            const code = emp.employeeCode;
-            const summary = summaries.find((s) => s.employeeId === code);
+            const id = emp.employeeId; // employeeCode→employeeId
+            const summary = summaries.find((s) => s.employeeId === id);
             const usedDates =
               summary && summary.usedDates ? summary.usedDates : [];
             const targetDate = usedDates[idx];
             if (!targetDate) return false;
             // leaveUsagesから該当日付・従業員IDのレコードを探す
             const target = leaveUsages.find(
-              (u) => u.employeeId === emp.id && u.usedDate === targetDate
+              (u) =>
+                u.employeeId === emp.employeeId && u.usedDate === targetDate
             );
             if (!target) return false;
             try {
@@ -391,19 +392,19 @@ function App() {
           currentPage={leaveDatesPage}
           onPageChange={setLeaveDatesPage}
           summary={(() => {
-            const code =
+            const id =
               activeEmployeeId !== null
-                ? employees.find((e) => e.id === activeEmployeeId)?.employeeCode
+                ? employees.find((e) => e.id === activeEmployeeId)?.employeeId
                 : null;
-            const s = summaries.find((s) => s.employeeId === code);
+            const s = summaries.find((s) => s.employeeId === id);
             return s || { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
           })()}
           usedDates={(() => {
-            const code =
+            const id =
               activeEmployeeId !== null
-                ? employees.find((e) => e.id === activeEmployeeId)?.employeeCode
+                ? employees.find((e) => e.id === activeEmployeeId)?.employeeId
                 : null;
-            const summary = summaries.find((s) => s.employeeId === code);
+            const summary = summaries.find((s) => s.employeeId === id);
             return summary && summary.usedDates ? summary.usedDates : [];
           })()}
         />

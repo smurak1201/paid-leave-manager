@@ -32,7 +32,7 @@ export interface LeaveGrant {
  */
 export interface Employee {
   id: number;             // DB主キー
-  employeeCode: number;   // 業務用従業員コード
+  employeeId: number;     // 業務用従業員ID（employee_code→employee_idにリネーム）
   lastName: string;       // 姓
   firstName: string;      // 名
   joinedAt: string;       // 入社年月日 (YYYY-MM-DD)

@@ -132,7 +132,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   }) => {
     return (
       <>
-        <Td>{emp.employeeCode}</Td> {/* 従業員コードを表示 */}
+        <Td>{emp.employeeId}</Td> {/* 従業員IDを表示 */}
         <Td>{emp.lastName}</Td>
         <Td>{emp.firstName}</Td>
         <Td>
@@ -305,7 +305,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         <Tbody>
           <AnimatePresence>
             {pagedEmployees.map((emp, idx) => {
-              const summary = summaryMap.get(emp.employeeCode) ?? {
+              const summary = summaryMap.get(emp.employeeId) ?? {
                 grantThisYear: 0,
                 carryOver: 0,
                 used: 0,
