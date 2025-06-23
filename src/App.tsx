@@ -314,16 +314,16 @@ function App() {
           }
           leaveUsages={leaveUsages}
           onAddDate={async (date) => {
-            const code =
+            const emp =
               activeEmployeeId !== null
-                ? employees.find((e) => e.id === activeEmployeeId)?.employeeCode
+                ? employees.find((e) => e.id === activeEmployeeId)
                 : null;
-            if (!code) return;
+            if (!emp) return;
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_add.php",
                 {
-                  employee_code: code,
+                  employee_id: emp.id, // ← employee_idで送信
                   used_date: date,
                 }
               );
@@ -334,12 +334,14 @@ function App() {
             }
           }}
           onDeleteDate={async (idx) => {
-            const code =
+            const emp =
               activeEmployeeId !== null
-                ? employees.find((e) => e.id === activeEmployeeId)?.employeeCode
+                ? employees.find((e) => e.id === activeEmployeeId)
                 : null;
-            if (!code) return;
-            const empUsages = leaveUsages.filter((u) => u.employeeId === code);
+            if (!emp) return;
+            const empUsages = leaveUsages.filter(
+              (u) => u.employeeId === emp.id
+            );
             if (!empUsages[idx]) return;
             const target = empUsages[idx];
             try {
