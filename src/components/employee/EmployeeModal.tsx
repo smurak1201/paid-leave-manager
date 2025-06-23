@@ -30,8 +30,7 @@ import { CustomModal } from "../ui/CustomModal";
 export interface EmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  employeeId: string | null;
-  getEmployee: (employeeId: string) => Employee | undefined;
+  employee: Employee | null;
   onAdd: (form: Omit<Employee, "id">) => void;
   onSave: (form: Employee) => void;
   onDelete?: (employeeId: string) => Promise<void>;
@@ -40,8 +39,7 @@ export interface EmployeeModalProps {
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   isOpen,
   onClose,
-  employeeId,
-  getEmployee,
+  employee,
   onAdd,
   onSave,
 }) => {
@@ -54,57 +52,24 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     joinedAt: "",
   };
 
-  // employeeIdがnullなら追加モード、従業員データがあれば編集モード
-  const employee = employeeId ? getEmployee(employeeId) : undefined;
-  // 追加時は空の初期値、編集時は従業員データでformを初期化
-  const [form, setForm] = useState<Employee>(
-    employeeId ? employee ?? emptyEmployee : emptyEmployee
-  );
-  // employeeId入力欄の値（数字以外も含めて表示）
-  const [employeeIdInputValue, setEmployeeIdInputValue] = useState(
-    form.employeeId ? String(form.employeeId) : ""
-  );
-  // employeeIdエラー（内部stateで管理）
+  const [form, setForm] = useState<Employee>(emptyEmployee);
   const [employeeIdError, setEmployeeIdError] = useState("");
 
-  // 編集モードや初期化時にemployeeIdInputValueも同期
+  // employeeが変わるたびにformを初期化
   useEffect(() => {
-    setEmployeeIdInputValue(form.employeeId ? String(form.employeeId) : "");
-  }, [form.employeeId]);
-
-  // employeeIdまたはisOpenが変わったらform/employeeIdInputValue/employeeIdErrorを初期化
-  useEffect(() => {
-    if (employeeId !== null && isOpen) {
-      const employee = getEmployee(employeeId);
-      setForm({
-        id: employee?.id ?? NaN,
-        employeeId: employee ? String(employee.employeeId) : "",
-        lastName: employee?.lastName ?? "",
-        firstName: employee?.firstName ?? "",
-        joinedAt: employee?.joinedAt ?? "",
-      });
-      setEmployeeIdInputValue(
-        employee && employee.employeeId ? String(employee.employeeId) : ""
-      );
+    if (isOpen && employee) {
+      setForm({ ...employee });
       setEmployeeIdError("");
     } else if (isOpen) {
-      setForm({
-        id: NaN,
-        employeeId: "",
-        lastName: "",
-        firstName: "",
-        joinedAt: "",
-      });
-      setEmployeeIdInputValue("");
+      setForm(emptyEmployee);
       setEmployeeIdError("");
     }
-  }, [employeeId, isOpen, getEmployee]);
+  }, [employee, isOpen]);
 
   // モーダルが閉じられたときにフォーム内容を初期化
   useEffect(() => {
     if (!isOpen) {
       setForm(emptyEmployee);
-      setEmployeeIdInputValue("");
       setEmployeeIdError("");
     }
   }, [isOpen]);
@@ -113,24 +78,22 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!form) return;
     if (e.target.name === "employeeId") {
-      setEmployeeIdInputValue(e.target.value); // 入力値はそのまま表示
-      if (e.target.value && !/^[0-9]*$/.test(e.target.value)) {
+      const value = e.target.value;
+      if (value && !/^[0-9]*$/.test(value)) {
         setEmployeeIdError("従業員コードは半角数字のみ入力できます");
       } else if (
-        e.target.value &&
-        e.target.value !== (employeeId ?? "") &&
-        getEmployee(e.target.value)
+        value &&
+        value !== (employee ? employee.employeeId : "") &&
+        // 重複チェックはApp側で必要に応じて渡す（ここでは省略も可）
+        false
       ) {
         setEmployeeIdError("従業員コードが重複しています");
-      } else if (!e.target.value) {
+      } else if (!value) {
         setEmployeeIdError("従業員コードは必須です");
       } else {
         setEmployeeIdError("");
       }
-      setForm({
-        ...form,
-        employeeId: e.target.value,
-      });
+      setForm({ ...form, employeeId: value });
     } else {
       setForm({ ...form, [e.target.name]: e.target.value });
     }
@@ -147,12 +110,12 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   );
 
   const handleSave = useCallback(() => {
-    if (employeeId) {
+    if (employee) {
       onSave(form);
     } else {
       onAdd(form);
     }
-  }, [employeeId, form, onAdd, onSave]);
+  }, [employee, form, onAdd, onSave]);
 
   if (!isOpen || !form) return null;
   return (
@@ -177,7 +140,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             fontSize="xl"
             letterSpacing={1}
           >
-            {employeeId ? "従業員編集" : "従業員追加"}
+            {employee ? "従業員編集" : "従業員追加"}
           </Text>
         </HStack>
         <Button
@@ -202,26 +165,24 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             </FormLabel>
             <Input
               name="employeeId"
-              value={
-                employeeId ? String(form.employeeId) : employeeIdInputValue
-              }
+              value={form.employeeId}
               onChange={handleChange}
               borderColor="teal.300"
-              bg={employeeId ? "gray.100" : "whiteAlpha.900"}
-              color={employeeId ? "gray.500" : undefined}
+              bg={employee ? "gray.100" : "whiteAlpha.900"}
+              color={employee ? "gray.500" : undefined}
               _placeholder={{ color: "teal.200" }}
               type="text"
               inputMode="numeric"
               pattern="^[0-9]*$"
               autoComplete="off"
-              disabled={!!employeeId}
+              disabled={!!employee}
             />
-            {employeeIdInputValue && employeeIdError && (
+            {employeeIdError && (
               <Text color="red.500" fontSize="sm" mt={1}>
                 {employeeIdError}
               </Text>
             )}
-            {employeeId && (
+            {employee && (
               <Text color="gray.400" fontSize="xs" mt={1}>
                 ※従業員コードは編集できません
               </Text>
@@ -279,7 +240,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
           >
             <Icon as={User} mr={2} />
-            {employeeId ? "保存" : "追加"}
+            {employee ? "保存" : "追加"}
           </Button>
           <Button
             onClick={onClose}

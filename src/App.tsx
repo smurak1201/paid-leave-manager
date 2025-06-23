@@ -267,14 +267,11 @@ function App() {
         <EmployeeModal
           isOpen={activeModal === "add" || activeModal === "edit"}
           onClose={handleCloseModal}
-          employeeId={
+          employee={
             activeModal === "add"
               ? null
-              : activeEmployeeId !== null
-              ? String(activeEmployeeId)
-              : null
+              : employees.find((e) => e.employeeId === activeEmployeeId) ?? null
           }
-          getEmployee={(id) => employees.find((e) => e.employeeId === id)}
           onAdd={async (form) => {
             try {
               await apiPost(
