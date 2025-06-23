@@ -173,7 +173,7 @@ function App() {
         setLoading(false);
       })
       .catch((e) => {
-        setError("従業員データの取得に失敗しました");
+        setError("従業員データの取得に失敗しました: " + (e.message || e));
         setLoading(false);
       });
   }, []);
