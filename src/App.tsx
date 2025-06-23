@@ -170,7 +170,14 @@ function App() {
       .then(async (res) => {
         const text = await res.text();
         try {
-          const data = JSON.parse(text);
+          let data = JSON.parse(text);
+          // joined_at → joinedAt へ変換
+          data = data.map((emp: any) => ({
+            ...emp,
+            joinedAt: emp.joined_at,
+            lastName: emp.last_name,
+            firstName: emp.first_name,
+          }));
           setEmployees(data);
         } catch (err) {
           setError("APIレスポンスが不正です: " + text.slice(0, 200));
