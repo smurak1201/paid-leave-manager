@@ -89,15 +89,31 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   }, []);
   const handleDeleteConfirm = useCallback(async () => {
     if (deleteIdx !== null) {
-      await onDeleteDate(deleteIdx);
-      setDeleteOpen(false);
-      setDeleteIdx(null);
+      const result = await onDeleteDate(deleteIdx);
+      if (result) {
+        setDeleteOpen(false);
+        setDeleteIdx(null);
+      }
+      // 削除失敗時は何もしない（親モーダルも閉じない）
     }
   }, [deleteIdx, onDeleteDate]);
   const handleDeleteClose = useCallback(() => {
     setDeleteOpen(false);
     setDeleteIdx(null);
   }, []);
+
+  // 日付追加時の重複チェック付きラッパー
+  const handleAddDate = useCallback(
+    async (date: string) => {
+      if (!date) return;
+      if (dates.includes(date)) {
+        alert("同じ有給取得日がすでに登録されています。");
+        return;
+      }
+      await onAddDate(date);
+    },
+    [dates, onAddDate]
+  );
 
   return (
     <Box
@@ -111,7 +127,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
       display="flex"
       alignItems="center"
       justifyContent="center"
-      onClick={onClose}
+      onClick={isDeleteOpen ? undefined : onClose}
     >
       <Box
         bg="white"
@@ -149,8 +165,8 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
         <DateInputRow
           dateInput={dateInput}
           onChangeDateInput={setDateInput}
-          onAddDate={onAddDate}
-          onSaveDate={() => onAddDate(dateInput)}
+          onAddDate={handleAddDate}
+          onSaveDate={() => handleAddDate(dateInput)}
           editDateIdx={editDateIdx}
           remainSimple={remain}
         />
