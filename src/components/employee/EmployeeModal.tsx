@@ -31,6 +31,7 @@ export interface EmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
   employee: Employee | null;
+  employees: Employee[];
   onAdd: (form: Omit<Employee, "id">) => void;
   onSave: (form: Employee) => void;
   onDelete?: (employeeId: string) => Promise<void>;
@@ -40,6 +41,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   isOpen,
   onClose,
   employee,
+  employees,
   onAdd,
   onSave,
 }) => {
@@ -82,10 +84,9 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
       if (value && !/^[0-9]*$/.test(value)) {
         setEmployeeIdError("従業員コードは半角数字のみ入力できます");
       } else if (
+        !employee &&
         value &&
-        value !== (employee ? employee.employeeId : "") &&
-        // 重複チェックはApp側で必要に応じて渡す（ここでは省略も可）
-        false
+        employees.some((emp) => emp.employeeId === value)
       ) {
         setEmployeeIdError("従業員コードが重複しています");
       } else if (!value) {

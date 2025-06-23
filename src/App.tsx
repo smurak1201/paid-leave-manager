@@ -272,6 +272,7 @@ function App() {
               ? null
               : employees.find((e) => e.employeeId === activeEmployeeId) ?? null
           }
+          employees={employees}
           onAdd={async (form) => {
             try {
               await apiPost(
