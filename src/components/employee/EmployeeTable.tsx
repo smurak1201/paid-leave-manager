@@ -355,6 +355,11 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               })()
             : undefined
         }
+        extraMessage={
+          deleteTarget !== null
+            ? "この従業員の有給取得日も全て削除されます。"
+            : undefined
+        }
       />
     </Box>
   );

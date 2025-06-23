@@ -26,6 +26,7 @@ interface ConfirmDeleteModalProps {
   onClose: () => void;
   onConfirm: () => void;
   targetName?: string;
+  extraMessage?: string; // 追加: 補足説明文
 }
 
 export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
@@ -33,6 +34,7 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   onClose,
   onConfirm,
   targetName,
+  extraMessage,
 }) => {
   const modalTitle = useMemo(
     () =>
@@ -59,9 +61,14 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
         <Text fontWeight="bold" fontSize="lg" mb={3} color="red.600">
           {modalTitle}
         </Text>
-        <Text fontSize="sm" color="gray.600" mb={5}>
+        <Text fontSize="sm" color="gray.600" mb={2}>
           {modalContent}
         </Text>
+        {extraMessage && (
+          <Text fontSize="sm" color="red.500" mb={4}>
+            {extraMessage}
+          </Text>
+        )}
         <HStack justify="flex-end" gap={2}>
           <Button onClick={onClose} variant="ghost" colorScheme="teal">
             キャンセル

@@ -230,6 +230,20 @@ function App() {
             onEdit={handleEdit}
             onDelete={async (id) => {
               try {
+                // 先に有給取得日を全て削除
+                const emp = employees.find((e) => e.id === id);
+                if (emp) {
+                  const usages = leaveUsages.filter(
+                    (u) => u.employeeId === emp.id
+                  );
+                  for (const usage of usages) {
+                    await apiPost(
+                      "http://localhost/paid_leave_manager/leave_usage_delete.php",
+                      { id: usage.id }
+                    );
+                  }
+                }
+                // 従業員本体を削除
                 await apiPost(
                   "http://localhost/paid_leave_manager/employees.php",
                   {
@@ -239,6 +253,8 @@ function App() {
                 );
                 const data = await fetchEmployees();
                 setEmployees(data);
+                setLeaveUsages(await fetchLeaveUsages()); // 取得日も再取得
+                setSummaries(await fetchSummaries(data)); // サマリーも再取得
               } catch (e: any) {
                 alert(e.message || "従業員削除に失敗しました");
               }
@@ -343,18 +359,25 @@ function App() {
                 ? employees.find((e) => e.id === activeEmployeeId)
                 : null;
             if (!emp) return false;
-            const empUsages = leaveUsages.filter(
-              (u) => u.employeeId === emp.id
+            // 画面に表示しているusedDatesから削除対象日付を特定
+            const code = emp.employeeCode;
+            const summary = summaries.find((s) => s.employeeId === code);
+            const usedDates =
+              summary && summary.usedDates ? summary.usedDates : [];
+            const targetDate = usedDates[idx];
+            if (!targetDate) return false;
+            // leaveUsagesから該当日付・従業員IDのレコードを探す
+            const target = leaveUsages.find(
+              (u) => u.employeeId === emp.id && u.usedDate === targetDate
             );
-            if (!empUsages[idx]) return false;
-            const target = empUsages[idx];
+            if (!target) return false;
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_delete.php",
                 { id: target.id }
               );
               setLeaveUsages(await fetchLeaveUsages());
-              setSummaries(await fetchSummaries(employees)); // 追加
+              setSummaries(await fetchSummaries(employees));
               return true;
             } catch (e: any) {
               alert(e.message || "有給消化日の削除に失敗しました");
