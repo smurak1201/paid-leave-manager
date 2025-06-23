@@ -1,8 +1,10 @@
 // leaveSummaryApi.ts: 有給サマリー取得API通信ロジック
+// すべてのAPI通信はこのファイルで一元管理します。
+// idではなくemployeeIdをビジネスキーとして利用します。
 import { apiGet } from "../api";
 
 export interface LeaveSummary {
-  employeeId: number;
+  employeeId: string; // string型に統一
   grantThisYear: number;
   carryOver: number;
   used: number;
@@ -19,6 +21,12 @@ export interface LeaveSummary {
 
 const BASE_URL = "http://localhost/paid_leave_manager/leave_summary.php";
 
-export async function fetchLeaveSummary(employeeId: number): Promise<LeaveSummary> {
+/**
+ * 有給サマリーを取得
+ * @param employeeId - 対象従業員ID
+ * employeeIdはemployee_idとしてAPIに送信します
+ * @returns LeaveSummary
+ */
+export async function fetchLeaveSummary(employeeId: string): Promise<LeaveSummary> {
   return apiGet<LeaveSummary>(`${BASE_URL}?employee_id=${employeeId}`);
 }
