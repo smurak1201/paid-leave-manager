@@ -48,9 +48,9 @@ interface EmployeeSummary {
 interface EmployeeTableProps {
   employees: Employee[];
   summaries: EmployeeSummary[];
-  onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
-  onView: (id: string) => void;
+  onEdit: (employeeId: string) => void;
+  onDelete: (employeeId: string) => void;
+  onView: (employeeId: string) => void;
   currentPage: number; // 現在のページ番号
   onPageChange: (page: number) => void; // ページ切替ハンドラ
 }
@@ -167,7 +167,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 size="sm"
                 variant="ghost"
                 colorScheme="blue"
-                onClick={() => onView(String(emp.id))}
+                onClick={() => onView(emp.employeeId)}
               >
                 <Icon as={Icons.Eye} boxSize={5} />
               </IconButton>
@@ -178,7 +178,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 size="sm"
                 variant="ghost"
                 colorScheme="teal"
-                onClick={() => onEdit(String(emp.id))}
+                onClick={() => onEdit(emp.employeeId)}
               >
                 <Icon as={Icons.Edit} boxSize={5} />
               </IconButton>
@@ -189,7 +189,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 size="sm"
                 variant="ghost"
                 colorScheme="red"
-                onClick={() => handleDeleteClick(String(emp.id))}
+                onClick={() => handleDeleteClick(emp.employeeId)}
               >
                 <Icon as={Icons.Trash2} boxSize={5} />
               </IconButton>

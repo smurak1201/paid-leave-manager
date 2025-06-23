@@ -17,43 +17,20 @@
 import { useState } from "react";
 
 // ===== import: 型定義 =====
-import type { Employee } from "../components/employee/types";
+import type { Employee } from "../types/employee";
 
 // =============================
 // カスタムフック: useEmployeeForm
 // 従業員フォームの状態・バリデーション共通化カスタムフック
 // Appから渡された初期値・従業員一覧・編集中IDを元に、入力値やエラー状態を一元管理します。
 // =============================
-export function useEmployeeForm(initial: Employee, employees: Employee[], activeEmployeeId: number | null) {
+export function useEmployeeForm(initial: Employee) {
   const [form, setForm] = useState<Employee>(initial);
-  const [idError, setIdError] = useState("");
 
-  // 入力値変更時のバリデーション・状態更新
+  // 入力値変更時の状態更新
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    if (name === "id") {
-      // 入力値が空ならNaN、そうでなければ数値化
-      const numValue = value === "" ? NaN : Number(value);
-      setForm((prev) => ({ ...prev, id: numValue } as Employee));
-      // コードは半角数字のみ・重複禁止
-      if (value && !/^[0-9]*$/.test(value)) {
-        setIdError("従業員コードは半角数字のみ入力できます");
-      } else if (
-        value &&
-        employees.some(
-          (emp) => emp.id === numValue && (activeEmployeeId === null || emp.id !== activeEmployeeId)
-        )
-      ) {
-        setIdError("従業員コードが重複しています");
-      } else if (!value) {
-        setIdError("従業員コードは必須です");
-      } else {
-        setIdError("");
-      }
-      return;
-    }
     setForm((prev) => ({ ...prev, [name]: value }));
   };
-
-  return { form, setForm, idError, setIdError, handleChange };
+  return { form, setForm, handleChange };
 }

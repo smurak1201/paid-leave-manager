@@ -19,8 +19,7 @@ import { useEffect, useState } from "react";
 import { Box, Heading, Button, Flex, useDisclosure } from "@chakra-ui/react";
 
 // ===== import: 型定義 =====
-import type { Employee } from "./components/employee/types";
-import type { LeaveUsage } from "./components/employee/types";
+import type { Employee } from "./types/employee";
 
 // ===== import: 従業員関連コンポーネント・ユーティリティ =====
 import { EmployeeTable } from "./components/employee/EmployeeTable";

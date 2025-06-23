@@ -11,7 +11,7 @@
 // ・型安全・責務分離・UI/UX・可読性重視
 // ・props/stateの流れ・UI部品の責務を日本語コメントで明記
 
-import type { Employee } from "./types";
+import type { Employee } from "../../types/employee";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Box,
@@ -30,11 +30,11 @@ import { CustomModal } from "../ui/CustomModal";
 export interface EmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  employeeId: string | null; // employeeIdはstring型
+  employeeId: string | null;
   getEmployee: (employeeId: string) => Employee | undefined;
-  onAdd: (form: Employee) => void;
+  onAdd: (form: Omit<Employee, "id">) => void;
   onSave: (form: Employee) => void;
-  onDelete?: (id: string) => Promise<void>;
+  onDelete?: (employeeId: string) => Promise<void>;
 }
 
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
