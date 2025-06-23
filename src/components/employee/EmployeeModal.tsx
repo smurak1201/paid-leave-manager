@@ -30,8 +30,8 @@ import { CustomModal } from "../ui/CustomModal";
 interface EmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  employeeId: number | null;
-  getEmployee: (id: number) => Employee | undefined;
+  employeeId: number | null; // ここはemployeeCodeを受け取る
+  getEmployee: (employeeCode: number) => Employee | undefined;
   onAdd: (form: Employee) => void;
   onSave: (form: Employee) => void;
   onDelete?: (id: number) => Promise<void>;
@@ -60,29 +60,33 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   const [form, setForm] = useState<Employee>(
     employeeId ? employee ?? emptyEmployee : emptyEmployee
   );
-  // id入力欄の値（数字以外も含めて表示）
-  const [idInputValue, setIdInputValue] = useState(
-    form.id ? String(form.id) : ""
+  // employeeCode入力欄の値（数字以外も含めて表示）
+  const [employeeCodeInputValue, setEmployeeCodeInputValue] = useState(
+    form.employeeCode ? String(form.employeeCode) : ""
   );
-  // idエラー（内部stateで管理）
-  const [idError, setIdError] = useState("");
+  // employeeCodeエラー（内部stateで管理）
+  const [employeeCodeError, setEmployeeCodeError] = useState("");
 
-  // 編集モードや初期化時にidInputValueも同期
+  // 編集モードや初期化時にemployeeCodeInputValueも同期
   useEffect(() => {
-    setIdInputValue(form.id ? String(form.id) : "");
+    setEmployeeCodeInputValue(
+      form.employeeCode ? String(form.employeeCode) : ""
+    );
   }, [employeeId, employee]);
 
-  // employeeIdまたはisOpenが変わったらform/idInputValue/idErrorを初期化
+  // employeeIdまたはisOpenが変わったらform/employeeCodeInputValue/employeeCodeErrorを初期化
   useEffect(() => {
     if (isOpen) {
       if (employeeId) {
         setForm(employee ?? emptyEmployee);
-        setIdInputValue(employee && employee.id ? String(employee.id) : "");
-        setIdError("");
+        setEmployeeCodeInputValue(
+          employee && employee.employeeCode ? String(employee.employeeCode) : ""
+        );
+        setEmployeeCodeError("");
       } else {
         setForm(emptyEmployee);
-        setIdInputValue("");
-        setIdError("");
+        setEmployeeCodeInputValue("");
+        setEmployeeCodeError("");
       }
     }
   }, [isOpen, employeeId, employee]);
@@ -91,30 +95,33 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   useEffect(() => {
     if (!isOpen) {
       setForm(emptyEmployee);
-      setIdInputValue("");
-      setIdError("");
+      setEmployeeCodeInputValue("");
+      setEmployeeCodeError("");
     }
   }, [isOpen]);
 
-  // 入力欄のonChangeハンドラ（id重複・数字バリデーションを内部で完結）
+  // 入力欄のonChangeハンドラ（employeeCode重複・数字バリデーションを内部で完結）
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!form) return;
-    if (e.target.name === "id") {
-      setIdInputValue(e.target.value); // 入力値はそのまま表示
+    if (e.target.name === "employeeCode") {
+      setEmployeeCodeInputValue(e.target.value); // 入力値はそのまま表示
       if (e.target.value && !/^[0-9]*$/.test(e.target.value)) {
-        setIdError("従業員コードは半角数字のみ入力できます");
+        setEmployeeCodeError("従業員コードは半角数字のみ入力できます");
       } else if (
         e.target.value &&
         Number(e.target.value) !== (employeeId ?? NaN) &&
         getEmployee(Number(e.target.value))
       ) {
-        setIdError("従業員コードが重複しています");
+        setEmployeeCodeError("従業員コードが重複しています");
       } else if (!e.target.value) {
-        setIdError("従業員コードは必須です");
+        setEmployeeCodeError("従業員コードは必須です");
       } else {
-        setIdError("");
+        setEmployeeCodeError("");
       }
-      setForm({ ...form, id: e.target.value ? Number(e.target.value) : NaN });
+      setForm({
+        ...form,
+        employeeCode: e.target.value ? Number(e.target.value) : NaN,
+      });
     } else {
       setForm({ ...form, [e.target.name]: e.target.value });
     }
@@ -122,12 +129,12 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
 
   const isSaveDisabled = useMemo(
     () =>
-      !!idError ||
-      !form.id ||
+      !!employeeCodeError ||
+      !form.employeeCode ||
       !form.lastName ||
       !form.firstName ||
       !form.joinedAt,
-    [idError, form]
+    [employeeCodeError, form]
   );
 
   const handleSave = useCallback(() => {
@@ -185,8 +192,10 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
               従業員コード
             </FormLabel>
             <Input
-              name="id"
-              value={employeeId ? String(form.id) : idInputValue}
+              name="employeeCode"
+              value={
+                employeeId ? String(form.employeeCode) : employeeCodeInputValue
+              }
               onChange={handleChange}
               borderColor="teal.300"
               bg={employeeId ? "gray.100" : "whiteAlpha.900"}
@@ -198,9 +207,9 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
               autoComplete="off"
               disabled={!!employeeId}
             />
-            {idInputValue && idError && (
+            {employeeCodeInputValue && employeeCodeError && (
               <Text color="red.500" fontSize="sm" mt={1}>
-                {idError}
+                {employeeCodeError}
               </Text>
             )}
             {employeeId && (

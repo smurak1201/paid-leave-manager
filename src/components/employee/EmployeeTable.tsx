@@ -132,7 +132,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   }) => {
     return (
       <>
-        <Td>{emp.id}</Td>
+        <Td>{emp.employeeCode}</Td> {/* 従業員コードを表示 */}
         <Td>{emp.lastName}</Td>
         <Td>{emp.firstName}</Td>
         <Td>

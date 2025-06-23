@@ -55,6 +55,7 @@ function App() {
     );
     return data.map((emp: any) => ({
       ...emp,
+      employeeCode: emp.employee_code, // ← 追加
       joinedAt: emp.joined_at,
       lastName: emp.last_name,
       firstName: emp.first_name,
