@@ -10,7 +10,7 @@
 // ・UI部品の可読性・保守性向上
 
 // ===== import: 外部ライブラリ =====
-import { X, Edit, Trash2, Plus, Info, Eye } from "lucide-react";
+import { X, Edit, Trash2, Plus, Info, Eye, Loader } from "lucide-react";
 
 // =============================
 // アイコン・スタイル定義
@@ -23,6 +23,7 @@ export const Icons = {
   Plus,
   Info,
   Eye,
+  Loader,
 };
 
 // 日付入力用のスタイル

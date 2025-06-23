@@ -48,8 +48,7 @@ import { useEmployeeForm } from "./hooks/useEmployeeForm";
 function App() {
   // --- グローバル状態管理 ---
   const [employees, setEmployees] = useState<Employee[]>([]); // ←API取得に変更
-  const [leaveUsages, setLeaveUsages] =
-    useState<LeaveUsage[]>(leaveUsagesTable); // 有給消化履歴
+  const [leaveUsages, setLeaveUsages] = useState<LeaveUsage[]>([]); // API連携用に初期値を空配列に修正
   const [currentPage, setCurrentPage] = useState(1); // 従業員一覧テーブルのページ番号
   const [leaveDatesPage, setLeaveDatesPage] = useState(1); // 有給取得日モーダルのページ番号
   const [activeModal, setActiveModal] = useState<
@@ -87,30 +86,27 @@ function App() {
   const [dateInput, setDateInput] = useState("");
 
   // 日付追加
-  const handleAddDate = (date: string) => {
+  const handleAddDate = async (date: string) => {
     if (!activeEmployeeId) return;
-    // grantDateは最新付与日を仮でセット（本来はロジックで割り当て）
-    const now = new Date();
-    const emp = employees.find((e) => e.id === activeEmployeeId);
-    if (!emp) return;
-    // 付与履歴を生成し、最新のgrantDateを取得
-    const grants = emp
-      ? typeof emp.joinedAt === "string"
-        ? generateLeaveGrants(emp, now.toISOString().slice(0, 10))
-        : []
-      : [];
-    const latestGrant =
-      grants.length > 0 ? grants[grants.length - 1].grantDate : emp.joinedAt;
-    setLeaveUsages((prev) => [
-      ...prev,
-      {
-        id: prev.length ? Math.max(...prev.map((u) => u.id)) + 1 : 1,
-        employeeId: activeEmployeeId,
-        usedDate: date,
-        grantDate: latestGrant,
-      },
-    ]);
-    setDateInput("");
+    try {
+      const res = await fetch("/paid_leave_manager/leave_usage_add.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          employee_id: activeEmployeeId,
+          used_date: date,
+        }),
+      });
+      const result = await res.json();
+      if (result.error) throw new Error(result.error);
+      // 追加後に最新の消化履歴を再取得
+      fetch("/paid_leave_manager/leave_usages.php")
+        .then((res) => res.json())
+        .then((data) => setLeaveUsages(data));
+      setDateInput("");
+    } catch (e: any) {
+      alert(e.message || "有給消化日の追加に失敗しました");
+    }
   };
   // 日付削除
   const handleDeleteDate = (idx: number) => {
@@ -237,7 +233,7 @@ function App() {
         {/* 従業員一覧テーブル */}
         {loading ? (
           <Box textAlign="center" py={10}>
-            <Icons.Loader2 className="animate-spin" size={24} />
+            <Icons.Loader className="animate-spin" size={24} />
           </Box>
         ) : error ? (
           <Box color="red.500" textAlign="center" py={10}>
