@@ -19,22 +19,22 @@ export async function fetchLeaveUsages(): Promise<LeaveUsage[]> {
 
 /**
  * 有給消化履歴を追加
- * @param employeeId - 対象従業員ID
+ * @param employeeId - 対象従業員ID（string型）
  * @param usedDate - 消化日
- * employeeIdはemployee_idとしてAPIに送信します
+ * employeeIdはAPI送信時にint型へ変換
  */
 export async function addLeaveUsage(employeeId: string, usedDate: string): Promise<void> {
-  await apiPost(ADD_URL, { employee_id: employeeId, used_date: usedDate });
+  await apiPost(ADD_URL, { employee_id: Number(employeeId), used_date: usedDate });
 }
 
 /**
  * 有給消化履歴を削除
- * @param employeeId - 対象従業員ID
+ * @param employeeId - 対象従業員ID（string型）
  * @param usedDate - 消化日
- * employeeIdはemployee_idとしてAPIに送信します
+ * employeeIdはAPI送信時にint型へ変換
  *
  * ※PK(id)でなくビジネスキーで削除する設計
  */
 export async function deleteLeaveUsage(employeeId: string, usedDate: string): Promise<void> {
-  await apiPost(DELETE_URL, { employee_id: employeeId, used_date: usedDate });
+  await apiPost(DELETE_URL, { employee_id: Number(employeeId), used_date: usedDate });
 }
