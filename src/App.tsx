@@ -166,7 +166,7 @@ function App() {
 
   // 従業員一覧APIから取得
   useEffect(() => {
-    fetch("/paid_leave_manager/employees.php")
+    fetch("http://localhost/paid_leave_manager/employees.php")
       .then(async (res) => {
         const text = await res.text();
         try {
