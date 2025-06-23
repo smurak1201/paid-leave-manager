@@ -20,6 +20,7 @@ import { Box, Heading, Button, Flex, useDisclosure } from "@chakra-ui/react";
 
 // ===== import: 型定義 =====
 import type { Employee } from "./types/employee";
+import type { LeaveUsage } from "./types/leaveUsage";
 
 // ===== import: 従業員関連コンポーネント・ユーティリティ =====
 import { EmployeeTable } from "./components/employee/EmployeeTable";
@@ -42,7 +43,7 @@ function App() {
   const [activeModal, setActiveModal] = useState<
     null | "add" | "edit" | "leaveDates"
   >(null);
-  const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null);
+  const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null);
   const guideDisclosure = useDisclosure();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -117,7 +118,7 @@ function App() {
 
   // --- サマリー再取得 ---
   type EmployeeSummary = {
-    employeeId: number;
+    employeeId: string;
     grantThisYear: number;
     carryOver: number;
     used: number;
@@ -132,15 +133,15 @@ function App() {
 
   // --- UIイベントハンドラ ---
   // テーブル「確認」ボタン
-  const handleView = (id: number) => {
-    setActiveEmployeeId(id);
+  const handleView = (employeeId: string) => {
+    setActiveEmployeeId(employeeId);
     setActiveModal("leaveDates");
     setEditDateIdx(null);
     setDateInput("");
   };
   // テーブル「編集」ボタン
-  const handleEdit = (id: number) => {
-    setActiveEmployeeId(id);
+  const handleEdit = (employeeId: string) => {
+    setActiveEmployeeId(employeeId);
     setActiveModal("edit");
   };
   // 「従業員追加」ボタン
@@ -227,13 +228,13 @@ function App() {
             employees={employees}
             summaries={summaries}
             onEdit={handleEdit}
-            onDelete={async (id) => {
+            onDelete={async (employeeId) => {
               try {
                 // 先に有給取得日を全て削除
-                const emp = employees.find((e) => e.id === id);
+                const emp = employees.find((e) => e.employeeId === employeeId);
                 if (emp) {
                   const usages = leaveUsages.filter(
-                    (u) => u.employeeId === emp.id
+                    (u) => u.employeeId === emp.employeeId
                   );
                   for (const usage of usages) {
                     await apiPost(
@@ -246,7 +247,7 @@ function App() {
                 await apiPost(
                   "http://localhost/paid_leave_manager/employees.php",
                   {
-                    id,
+                    employee_id: employeeId,
                     mode: "delete",
                   }
                 );
@@ -270,18 +271,16 @@ function App() {
             activeModal === "add"
               ? null
               : activeEmployeeId !== null
-              ? employees.find((e) => e.id === activeEmployeeId)?.employeeId ??
-                null // employeeCode→employeeId
+              ? String(activeEmployeeId)
               : null
           }
-          getEmployee={(id) => employees.find((e) => e.employeeId === id)} // employeeCode→employeeId
+          getEmployee={(id) => employees.find((e) => e.employeeId === id)}
           onAdd={async (form) => {
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/employees.php",
                 {
-                  id: form.id,
-                  employee_id: form.employeeId, // employee_code→employee_id
+                  employee_id: form.employeeId,
                   last_name: form.lastName,
                   first_name: form.firstName,
                   joined_at: form.joinedAt,
@@ -305,7 +304,7 @@ function App() {
                 "http://localhost/paid_leave_manager/employees.php",
                 {
                   id: form.id,
-                  employee_id: form.employeeId, // employee_code→employee_id
+                  employee_id: form.employeeId,
                   last_name: form.lastName,
                   first_name: form.firstName,
                   joined_at: form.joinedAt,
@@ -325,23 +324,22 @@ function App() {
           isOpen={activeModal === "leaveDates"}
           onClose={handleCloseModal}
           employeeId={
-            activeEmployeeId !== null
-              ? employees.find((e) => e.id === activeEmployeeId)?.employeeId ??
-                null // employeeCode→employeeId
-              : null
+            activeEmployeeId !== null ? String(activeEmployeeId) : null
           }
           leaveUsages={leaveUsages}
           onAddDate={async (date) => {
             const emp =
               activeEmployeeId !== null
-                ? employees.find((e) => e.id === activeEmployeeId)
+                ? employees.find(
+                    (e) => e.employeeId === String(activeEmployeeId)
+                  )
                 : null;
             if (!emp) return;
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_add.php",
                 {
-                  employee_id: emp.employeeId, // emp.id→emp.employeeId
+                  employee_id: emp.employeeId,
                   used_date: date,
                 }
               );
@@ -355,11 +353,13 @@ function App() {
           onDeleteDate={async (idx) => {
             const emp =
               activeEmployeeId !== null
-                ? employees.find((e) => e.id === activeEmployeeId)
+                ? employees.find(
+                    (e) => e.employeeId === String(activeEmployeeId)
+                  )
                 : null;
             if (!emp) return false;
             // 画面に表示しているusedDatesから削除対象日付を特定
-            const id = emp.employeeId; // employeeCode→employeeId
+            const id = emp.employeeId;
             const summary = summaries.find((s) => s.employeeId === id);
             const usedDates =
               summary && summary.usedDates ? summary.usedDates : [];
@@ -392,17 +392,13 @@ function App() {
           onPageChange={setLeaveDatesPage}
           summary={(() => {
             const id =
-              activeEmployeeId !== null
-                ? employees.find((e) => e.id === activeEmployeeId)?.employeeId
-                : null;
+              activeEmployeeId !== null ? String(activeEmployeeId) : null;
             const s = summaries.find((s) => s.employeeId === id);
             return s || { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
           })()}
           usedDates={(() => {
             const id =
-              activeEmployeeId !== null
-                ? employees.find((e) => e.id === activeEmployeeId)?.employeeId
-                : null;
+              activeEmployeeId !== null ? String(activeEmployeeId) : null;
             const summary = summaries.find((s) => s.employeeId === id);
             return summary && summary.usedDates ? summary.usedDates : [];
           })()}
