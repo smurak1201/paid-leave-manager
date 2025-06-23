@@ -20,7 +20,7 @@ import { Box, Heading, Button, Flex, useDisclosure } from "@chakra-ui/react";
 
 // ===== import: 型定義 =====
 import type { Employee } from "./components/employee/types";
-import type { LeaveUsage } from "./sampleData/dbSampleTables";
+import type { LeaveUsage } from "./components/employee/types";
 
 // ===== import: 従業員関連コンポーネント・ユーティリティ =====
 import { EmployeeTable } from "./components/employee/EmployeeTable";
@@ -226,34 +226,39 @@ function App() {
   }, []);
 
   // --- 有給サマリー・詳細のAPI連携 ---
-  const [summary, setSummary] = useState({
-    grantThisYear: 0,
-    carryOver: 0,
-    used: 0,
-    remain: 0,
-  });
-  const [grantDetails, setGrantDetails] = useState([]);
+  type EmployeeSummary = {
+    employeeId: number;
+    grantThisYear: number;
+    carryOver: number;
+    used: number;
+    remain: number;
+  };
+  const [summaries, setSummaries] = useState<EmployeeSummary[]>([]);
   useEffect(() => {
-    if (!activeEmployeeId || activeModal !== "leaveDates") return;
-    fetch(
-      `http://localhost/paid_leave_manager/leave_summary.php?employee_id=${activeEmployeeId}`
-    ).then(async (res) => {
-      const text = await res.text();
-      try {
-        const data = JSON.parse(text);
-        setSummary({
-          grantThisYear: data.grantThisYear,
-          carryOver: data.carryOver,
-          used: data.used,
-          remain: data.remain,
-        });
-        setGrantDetails(data.grantDetails || []);
-      } catch (err) {
-        setSummary({ grantThisYear: 0, carryOver: 0, used: 0, remain: 0 });
-        setGrantDetails([]);
-      }
-    });
-  }, [activeEmployeeId, activeModal]);
+    if (employees.length === 0) return;
+    Promise.all(
+      employees.map((emp) =>
+        fetch(
+          `http://localhost/paid_leave_manager/leave_summary.php?employee_id=${emp.id}`
+        )
+          .then((res) => res.json())
+          .then((data) => ({
+            employeeId: emp.id,
+            grantThisYear: data.grantThisYear ?? 0,
+            carryOver: data.carryOver ?? 0,
+            used: data.used ?? 0,
+            remain: data.remain ?? 0,
+          }))
+          .catch(() => ({
+            employeeId: emp.id,
+            grantThisYear: 0,
+            carryOver: 0,
+            used: 0,
+            remain: 0,
+          }))
+      )
+    ).then(setSummaries);
+  }, [employees]);
 
   // --- 画面描画 ---
   return (
@@ -318,6 +323,7 @@ function App() {
         ) : (
           <EmployeeTable
             employees={employees}
+            summaries={summaries}
             onEdit={handleEdit}
             onDelete={(id) =>
               setEmployees((prev) => prev.filter((e) => e.id !== id))
@@ -493,8 +499,11 @@ function App() {
           setDateInput={setDateInput}
           currentPage={leaveDatesPage}
           onPageChange={setLeaveDatesPage}
-          summary={summary}
-          grantDetails={grantDetails}
+          summary={(() => {
+            const s = summaries.find((s) => s.employeeId === activeEmployeeId);
+            return s || { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
+          })()}
+          grantDetails={[]}
         />
       </Box>
     </Box>

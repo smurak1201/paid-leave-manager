@@ -31,8 +31,17 @@ import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { FadeTableRow } from "./FadeTableRow";
 
 // propsの型定義。データと操作関数を親(App)から受け取る
+interface EmployeeSummary {
+  employeeId: number;
+  grantThisYear: number;
+  carryOver: number;
+  used: number;
+  remain: number;
+}
+
 interface EmployeeTableProps {
   employees: Employee[];
+  summaries: EmployeeSummary[];
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
   onView: (id: number) => void;
@@ -43,6 +52,7 @@ interface EmployeeTableProps {
 // 従業員一覧テーブル本体
 export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   employees,
+  summaries,
   onEdit,
   onDelete,
   onView,
@@ -280,11 +290,11 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         <Tbody>
           <AnimatePresence>
             {pagedEmployees.map((emp, idx) => {
-              // summary情報はEmployee型には含まれないため、0で初期化
-              const grantThisYear = 0;
-              const carryOver = 0;
-              const used = 0;
-              const remain = 0;
+              const summary = summaries.find((s) => s.employeeId === emp.id);
+              const grantThisYear = summary?.grantThisYear ?? 0;
+              const carryOver = summary?.carryOver ?? 0;
+              const used = summary?.used ?? 0;
+              const remain = summary?.remain ?? 0;
               const rowProps = {
                 emp,
                 grantThisYear,
