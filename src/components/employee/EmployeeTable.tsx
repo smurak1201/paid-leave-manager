@@ -24,7 +24,6 @@ import type { Employee, RowContentProps } from "./types";
 
 // ===== import: アイコン・ユーティリティ =====
 import { Icons, getServicePeriod } from "./icons";
-import { getEmployeeSummaryList } from "../../sampleData/dbSampleTables";
 
 // ===== import: UI部品 =====
 import { Tooltip } from "../ui/tooltip";
@@ -281,14 +280,11 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         <Tbody>
           <AnimatePresence>
             {pagedEmployees.map((emp, idx) => {
-              // getEmployeeSummaryListで集計済みデータを取得する前提
-              const summary = getEmployeeSummaryList().find(
-                (e) => e.id === emp.id
-              );
-              const grantThisYear = summary?.grantThisYear ?? 0;
-              const carryOver = summary?.carryOver ?? 0;
-              const used = summary?.used ?? 0;
-              const remain = summary?.remain ?? 0;
+              // summary情報はEmployee型には含まれないため、0で初期化
+              const grantThisYear = 0;
+              const carryOver = 0;
+              const used = 0;
+              const remain = 0;
               const rowProps = {
                 emp,
                 grantThisYear,

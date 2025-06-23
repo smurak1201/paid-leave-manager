@@ -25,9 +25,6 @@ import { DateInputRow } from "./DateInputRow";
 import { inputDateSmallStyle } from "./icons";
 import { LeaveDateList } from "./LeaveDateList";
 
-// ===== import: サンプルデータ・集計ロジック =====
-import { employees } from "../../sampleData/dbSampleTables";
-
 // propsの型定義はtypes.tsに集約
 export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   isOpen,
@@ -45,10 +42,11 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   grantDetails,
 }) => {
   // 対象従業員データ取得
-  const employee = employeeId
-    ? employees.find((e) => e.id === employeeId)
-    : undefined;
-  if (!isOpen || !employee) return null;
+  // const employee = employeeId
+  //   ? employees.find((e) => e.id === employeeId)
+  //   : undefined;
+  // propsでemployeeIdのみ受け取り、従業員データは親で取得・渡す設計に統一済み
+  if (!isOpen) return null;
   // --- propsで受け取った集計済みデータを利用 ---
   const dates = grantDetails.flatMap((g) => g.usedDates).sort();
   const remain = summary.remain;
@@ -125,7 +123,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
           <X size={18} />
         </Button>
         <Heading as="h3" size="md" mb={4} color="teal.700" textAlign="center">
-          {employee.lastName} {employee.firstName} さんの有給取得日
+          有給取得日
         </Heading>
         <Text color="teal.700" fontWeight="bold" mb={1} textAlign="center">
           消化日数：{dates.length}日

@@ -13,7 +13,6 @@
 
 // ===== import: 型定義 =====
 import type { LeaveGrant, Employee } from "./types";
-import { generateLeaveGrants } from "../../sampleData/dbSampleTables";
 
 /**
  * 勤続年数（月単位）から付与日数を返す関数
@@ -146,10 +145,10 @@ export function getEmployeeLeaveSummary(
   const emp = employees.find((e) => e.id === employeeId);
   if (!emp) return { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
   // 付与履歴を生成
-  const grants: { grantDate: string; days: number }[] = generateLeaveGrants(
-    emp,
-    now.toISOString().slice(0, 10)
-  );
+  const grants: { grantDate: string; days: number }[] = []; //generateLeaveGrants(
+    //emp,
+    //now.toISOString().slice(0, 10)
+  //);
   let grantThisYear = 0;
   let carryOver = 0;
   // 今年度・前年度の付与分を集計

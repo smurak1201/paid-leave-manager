@@ -65,11 +65,17 @@ export interface RowContentProps {
  * summary: getEmployeeLeaveSummaryの返却型
  * grantDetails: getGrantDetailsの返却型
  */
+export interface LeaveUsage {
+  id: number;
+  employeeId: number;
+  usedDate: string;
+}
+
 export interface LeaveDatesModalProps {
   isOpen: boolean;
   onClose: () => void;
   employeeId: number | null;
-  leaveUsages: import("../../sampleData/dbSampleTables").LeaveUsage[];
+  leaveUsages: LeaveUsage[];
   onAddDate: (date: string) => void;
   onDeleteDate: (idx: number) => void;
   editDateIdx: number | null;
@@ -148,7 +154,7 @@ export interface UseLeaveDatesReturn {
  * サンプル従業員データ型
  * - sampleData.ts等で利用
  */
-export type SampleEmployee = Omit<Employee, 'id'> & { id: number | string };
+// export type SampleEmployee = Omit<Employee, 'id'> & { id: number | string }; // ← サンプルデータ用のため削除
 
 // ====== 共通ユーティリティ型 ======
 
