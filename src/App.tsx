@@ -76,7 +76,7 @@ function App() {
       emps.map(async (emp) => {
         try {
           const data = await apiGet<any>(
-            `http://localhost/paid_leave_manager/leave_summary.php?employee_id=${emp.id}`
+            `http://localhost/paid_leave_manager/leave_summary.php?employee_code=${emp.employeeCode}`
           );
           return {
             employeeId: emp.employeeCode, // ← employeeCodeで持つ
