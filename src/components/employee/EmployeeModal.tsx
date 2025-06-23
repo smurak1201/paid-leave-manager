@@ -28,6 +28,8 @@ import { inputDateStyle } from "./icons";
 import { CustomModal } from "../ui/CustomModal";
 
 export interface EmployeeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
   employeeId: number | null; // employeeCode→employeeId
   getEmployee: (employeeId: number) => Employee | undefined;
   onAdd: (form: Employee) => void;
@@ -75,7 +77,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     if (employeeId !== null && isOpen) {
       const employee = getEmployee(employeeId);
       setForm({
-        id: employee?.id ?? undefined,
+        id: employee?.id ?? NaN,
         employeeId: employee?.employeeId ?? NaN,
         lastName: employee?.lastName ?? "",
         firstName: employee?.firstName ?? "",
@@ -87,7 +89,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
       setEmployeeIdError("");
     } else if (isOpen) {
       setForm({
-        id: undefined,
+        id: NaN,
         employeeId: NaN,
         lastName: "",
         firstName: "",
