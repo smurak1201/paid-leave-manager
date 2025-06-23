@@ -350,7 +350,9 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         targetName={
           deleteTarget !== null
             ? (() => {
-                const emp = employees.find((e) => e.id === deleteTarget);
+                const emp = employees.find(
+                  (e) => String(e.id) === deleteTarget
+                );
                 return emp ? `${emp.lastName} ${emp.firstName}` : undefined;
               })()
             : undefined
