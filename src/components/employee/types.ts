@@ -77,7 +77,7 @@ export interface LeaveDatesModalProps {
   employeeId: number | null;
   leaveUsages: LeaveUsage[];
   onAddDate: (date: string) => void;
-  onDeleteDate: (idx: number) => void;
+  onDeleteDate: (idx: number) => Promise<boolean>;
   editDateIdx: number | null;
   setEditDateIdx: (idx: number | null) => void;
   dateInput: string;

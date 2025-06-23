@@ -338,11 +338,11 @@ function App() {
               activeEmployeeId !== null
                 ? employees.find((e) => e.id === activeEmployeeId)
                 : null;
-            if (!emp) return;
+            if (!emp) return false;
             const empUsages = leaveUsages.filter(
               (u) => u.employeeId === emp.id
             );
-            if (!empUsages[idx]) return;
+            if (!empUsages[idx]) return false;
             const target = empUsages[idx];
             try {
               await apiPost(
@@ -350,8 +350,10 @@ function App() {
                 { id: target.id }
               );
               setLeaveUsages(await fetchLeaveUsages());
+              return true;
             } catch (e: any) {
               alert(e.message || "有給消化日の削除に失敗しました");
+              return false;
             }
           }}
           editDateIdx={editDateIdx}

@@ -87,10 +87,12 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
     setDeleteIdx(idx);
     setDeleteOpen(true);
   }, []);
-  const handleDeleteConfirm = useCallback(() => {
-    if (deleteIdx !== null) onDeleteDate(deleteIdx);
-    setDeleteOpen(false);
-    setDeleteIdx(null);
+  const handleDeleteConfirm = useCallback(async () => {
+    if (deleteIdx !== null) {
+      await onDeleteDate(deleteIdx);
+      setDeleteOpen(false);
+      setDeleteIdx(null);
+    }
   }, [deleteIdx, onDeleteDate]);
   const handleDeleteClose = useCallback(() => {
     setDeleteOpen(false);
