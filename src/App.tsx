@@ -34,16 +34,6 @@ import { GuideModal } from "./components/ui/GuideModal";
 // ===== import: カスタムフック =====
 import { useEmployeeForm } from "./hooks/useEmployeeForm";
 
-// ===== import: サンプルデータ（DBテーブル想定） =====
-// import {
-//   employees as employeeTable,
-//   leaveUsages as leaveUsagesTable,
-// } from "./sampleData/dbSampleTables";
-import {
-  getEmployeeLeaveSummary,
-  getGrantDetails,
-} from "./sampleData/dbSampleTables";
-
 function App() {
   // --- グローバル状態管理 ---
   const [employees, setEmployees] = useState<Employee[]>([]); // ←API取得に変更

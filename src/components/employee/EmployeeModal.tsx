@@ -44,6 +44,7 @@ interface EmployeeModalProps {
   editId: number | null;
   employees: Employee[];
   setIdError: (msg: string) => void;
+  onDelete?: (id: number) => Promise<void>; // 追加: 削除用コールバック
 }
 
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
