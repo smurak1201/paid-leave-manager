@@ -376,19 +376,21 @@ function App() {
                 ? employees.find((e) => e.id === activeEmployeeId)?.employeeCode
                 : null;
             if (!code) return [];
-            const dates = leaveUsages
-              .filter((u) => u.employeeId === code)
-              .map((u) => u.usedDate)
-              .sort();
-            return [
-              {
-                grantDate: "",
-                days: 0,
-                used: dates.length,
-                remain: 0,
-                usedDates: dates,
-              },
-            ];
+            // summariesからusedDatesを取得
+            const summary = summaries.find((s) => s.employeeId === code);
+            // usedDatesがあればそれを使う
+            if (summary && (summary as any).usedDates) {
+              return [
+                {
+                  grantDate: "",
+                  days: 0,
+                  used: (summary as any).usedDates.length,
+                  remain: 0,
+                  usedDates: (summary as any).usedDates,
+                },
+              ];
+            }
+            return [];
           })()}
         />
       </Box>
