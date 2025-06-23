@@ -39,7 +39,7 @@ export function useEmployees() {
     await load();
   };
   const remove = async (id: number) => {
-    await deleteEmployee(id);
+    await deleteEmployee(String(id)); // string型に変換して渡す
     await load();
   };
 
