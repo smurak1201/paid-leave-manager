@@ -15,7 +15,7 @@
 // ・全てのprops/stateの流れ・UI部品の責務・業務ロジック・型定義・バリデーション・設計意図を日本語コメントで明記
 
 // ===== import: 外部ライブラリ =====
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Heading, Button, Flex, useDisclosure } from "@chakra-ui/react";
 
 // ===== import: 型定義 =====
@@ -35,19 +35,19 @@ import { GuideModal } from "./components/ui/GuideModal";
 import { useEmployeeForm } from "./hooks/useEmployeeForm";
 
 // ===== import: サンプルデータ（DBテーブル想定） =====
-import {
-  employees as employeeTable,
-  leaveUsages as leaveUsagesTable,
-} from "./sampleData/dbSampleTables";
-import {
-  generateLeaveGrants,
-  getEmployeeLeaveSummary,
-  getGrantDetails,
-} from "./sampleData/dbSampleTables";
+// import {
+//   employees as employeeTable,
+//   leaveUsages as leaveUsagesTable,
+// } from "./sampleData/dbSampleTables";
+// import {
+//   generateLeaveGrants,
+//   getEmployeeLeaveSummary,
+//   getGrantDetails,
+// } from "./sampleData/dbSampleTables";
 
 function App() {
   // --- グローバル状態管理 ---
-  const [employees, setEmployees] = useState<Employee[]>(employeeTable); // 従業員リスト
+  const [employees, setEmployees] = useState<Employee[]>([]); // ←API取得に変更
   const [leaveUsages, setLeaveUsages] =
     useState<LeaveUsage[]>(leaveUsagesTable); // 有給消化履歴
   const [currentPage, setCurrentPage] = useState(1); // 従業員一覧テーブルのページ番号
@@ -57,6 +57,8 @@ function App() {
   >(null); // 開いているモーダル種別
   const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null); // 操作対象従業員ID
   const guideDisclosure = useDisclosure(); // ガイドモーダル開閉
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   // --- 選択中従業員データ取得 ---
   const currentEmployee =
@@ -167,6 +169,20 @@ function App() {
     });
   };
 
+  // 従業員一覧APIから取得
+  useEffect(() => {
+    fetch("/paid_leave_manager/employees.php")
+      .then((res) => res.json())
+      .then((data) => {
+        setEmployees(data);
+        setLoading(false);
+      })
+      .catch((e) => {
+        setError("従業員データの取得に失敗しました");
+        setLoading(false);
+      });
+  }, []);
+
   // --- 画面描画 ---
   return (
     <Box minH="100vh" bgGradient="linear(to-br, teal.50, white)" py={10}>
@@ -219,16 +235,26 @@ function App() {
           onClose={guideDisclosure.onClose}
         />
         {/* 従業員一覧テーブル */}
-        <EmployeeTable
-          employees={employees}
-          onEdit={handleEdit}
-          onDelete={(id) =>
-            setEmployees((prev) => prev.filter((e) => e.id !== id))
-          }
-          onView={handleView}
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-        />
+        {loading ? (
+          <Box textAlign="center" py={10}>
+            <Icons.Loader2 className="animate-spin" size={24} />
+          </Box>
+        ) : error ? (
+          <Box color="red.500" textAlign="center" py={10}>
+            {error}
+          </Box>
+        ) : (
+          <EmployeeTable
+            employees={employees}
+            onEdit={handleEdit}
+            onDelete={(id) =>
+              setEmployees((prev) => prev.filter((e) => e.id !== id))
+            }
+            onView={handleView}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+          />
+        )}
         {/* 従業員追加・編集モーダル */}
         <EmployeeModal
           isOpen={activeModal === "add" || activeModal === "edit"}
