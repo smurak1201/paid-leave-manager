@@ -29,7 +29,6 @@ import { LeaveDateList } from "./LeaveDateList";
 export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   isOpen,
   onClose,
-  employeeId,
   onAddDate,
   onDeleteDate,
   editDateIdx,
