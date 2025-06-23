@@ -27,6 +27,7 @@ import {
   Toast,
   createToaster,
 } from "@chakra-ui/react";
+import { useMemo } from "react";
 
 export const toaster = createToaster({
   placement: "bottom-end",
@@ -34,13 +35,17 @@ export const toaster = createToaster({
 });
 
 export const Toaster = () => {
+  const toastRootWidth = useMemo(() => ({ md: "sm" }), []);
+  const spinnerSize = useMemo(() => "sm", []);
+  const spinnerColor = useMemo(() => "blue.solid", []);
+
   return (
     <Portal>
       <ChakraToaster toaster={toaster} insetInline={{ mdDown: "4" }}>
         {(toast) => (
-          <Toast.Root width={{ md: "sm" }}>
+          <Toast.Root width={toastRootWidth}>
             {toast.type === "loading" ? (
-              <Spinner size="sm" color="blue.solid" />
+              <Spinner size={spinnerSize} color={spinnerColor} />
             ) : (
               <Toast.Indicator />
             )}

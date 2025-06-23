@@ -14,7 +14,13 @@
 // ・props/stateの流れ・UI部品の責務を日本語コメントで明記
 
 // ===== import: 外部ライブラリ =====
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
 import { Box, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
@@ -62,10 +68,19 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   // ページネーション用
   const ITEMS_PER_PAGE = 15;
   const totalPages = Math.max(1, Math.ceil(employees.length / ITEMS_PER_PAGE));
-  const pagedEmployees = employees.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+  const pagedEmployees = useMemo(
+    () =>
+      employees.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+      ),
+    [employees, currentPage]
   );
+  const summaryMap = useMemo(() => {
+    const map = new Map<number, EmployeeSummary>();
+    summaries.forEach((s) => map.set(s.employeeId, s));
+    return map;
+  }, [summaries]);
   // ページ切替時にリスト先頭へスクロール
   const listRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -88,10 +103,10 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   }, [employees]);
 
   // 削除ボタンクリック時のハンドラ（number型に修正）
-  const handleDeleteClick = (id: number) => {
+  const handleDeleteClick = useCallback((id: number) => {
     setDeleteTarget(id);
     setDeleteOpen(true);
-  };
+  }, []);
   // 削除確定時のハンドラ（number型に修正）
   const handleDeleteConfirm = () => {
     if (deleteTarget !== null) onDelete(deleteTarget);
@@ -290,11 +305,16 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         <Tbody>
           <AnimatePresence>
             {pagedEmployees.map((emp, idx) => {
-              const summary = summaries.find((s) => s.employeeId === emp.id);
-              const grantThisYear = summary?.grantThisYear ?? 0;
-              const carryOver = summary?.carryOver ?? 0;
-              const used = summary?.used ?? 0;
-              const remain = summary?.remain ?? 0;
+              const summary = summaryMap.get(emp.id) ?? {
+                grantThisYear: 0,
+                carryOver: 0,
+                used: 0,
+                remain: 0,
+              };
+              const grantThisYear = summary.grantThisYear;
+              const carryOver = summary.carryOver;
+              const used = summary.used;
+              const remain = summary.remain;
               const rowProps = {
                 emp,
                 grantThisYear,

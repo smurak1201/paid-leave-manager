@@ -15,8 +15,51 @@ import type { GuideModalProps } from "../employee/types";
 import { Box, Heading, Text, Button, Stack, Icon } from "@chakra-ui/react";
 import { CustomModal } from "./CustomModal";
 import { Icons } from "../employee/icons";
+import { useMemo } from "react";
 
 export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
+  // テーブルデータ
+  const tableData = useMemo(
+    () => [
+      {
+        year: "2022年度",
+        grant: 12,
+        used: 2,
+        carryOver: 10,
+        validUntil: "2024年度末まで",
+      },
+      {
+        year: "2023年度",
+        grant: 14,
+        used: 1,
+        carryOver: 13,
+        validUntil: "2025年度末まで",
+      },
+      {
+        year: "2024年度",
+        grant: 16,
+        used: 0,
+        carryOver: 16,
+        validUntil: "2026年度末まで",
+      },
+    ],
+    []
+  );
+
+  // 年次有給休暇付与日数の目安表データ
+  const guidelineData = useMemo(
+    () => [
+      { tenure: "6か月", grant: 10 },
+      { tenure: "1年6か月", grant: 11 },
+      { tenure: "2年6か月", grant: 12 },
+      { tenure: "3年6か月", grant: 14 },
+      { tenure: "4年6か月", grant: 16 },
+      { tenure: "5年6か月", grant: 18 },
+      { tenure: "6年6か月以上", grant: 20 },
+    ],
+    []
+  );
+
   return (
     <CustomModal isOpen={open} onClose={onClose}>
       <Box
@@ -155,147 +198,55 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    2022年度
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    12
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    2
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    10
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    2024年度末まで
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    2023年度
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    14
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    1
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    13
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    2025年度末まで
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    2024年度
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    16
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    0
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    16
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    2026年度末まで
-                  </td>
-                </tr>
+                {tableData.map((row) => (
+                  <tr key={row.year}>
+                    <td
+                      style={{
+                        border: "1px solid #b2f5ea",
+                        padding: 4,
+                        textAlign: "center",
+                      }}
+                    >
+                      {row.year}
+                    </td>
+                    <td
+                      style={{
+                        border: "1px solid #b2f5ea",
+                        padding: 4,
+                        textAlign: "center",
+                      }}
+                    >
+                      {row.grant}
+                    </td>
+                    <td
+                      style={{
+                        border: "1px solid #b2f5ea",
+                        padding: 4,
+                        textAlign: "center",
+                      }}
+                    >
+                      {row.used}
+                    </td>
+                    <td
+                      style={{
+                        border: "1px solid #b2f5ea",
+                        padding: 4,
+                        textAlign: "center",
+                      }}
+                    >
+                      {row.carryOver}
+                    </td>
+                    <td
+                      style={{
+                        border: "1px solid #b2f5ea",
+                        padding: 4,
+                        textAlign: "center",
+                      }}
+                    >
+                      {row.validUntil}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
             <Text fontSize="xs" color="gray.500" mt={1}>
@@ -361,146 +312,28 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    6か月
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    10日
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    1年6か月
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    11日
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    2年6か月
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    12日
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    3年6か月
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    14日
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    4年6か月
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    16日
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    5年6か月
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    18日
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    6年6か月以上
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #b2f5ea",
-                      padding: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    20日
-                  </td>
-                </tr>
+                {guidelineData.map((row) => (
+                  <tr key={row.tenure}>
+                    <td
+                      style={{
+                        border: "1px solid #b2f5ea",
+                        padding: 4,
+                        textAlign: "center",
+                      }}
+                    >
+                      {row.tenure}
+                    </td>
+                    <td
+                      style={{
+                        border: "1px solid #b2f5ea",
+                        padding: 4,
+                        textAlign: "center",
+                      }}
+                    >
+                      {row.grant}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
             <Text fontSize="xs" color="gray.500" mt={1}>

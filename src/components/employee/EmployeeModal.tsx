@@ -12,7 +12,7 @@
 // ・props/stateの流れ・UI部品の責務を日本語コメントで明記
 
 import type { Employee } from "./types";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Box,
   HStack,
@@ -126,6 +126,24 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
       setForm({ ...form, [e.target.name]: e.target.value });
     }
   };
+
+  const isSaveDisabled = useMemo(
+    () =>
+      !!idError ||
+      !form.id ||
+      !form.lastName ||
+      !form.firstName ||
+      !form.joinedAt,
+    [idError, form]
+  );
+
+  const handleSave = useCallback(() => {
+    if (editId) {
+      onSave(form);
+    } else {
+      onAdd(form);
+    }
+  }, [editId, form, onAdd, onSave]);
 
   if (!isOpen || !form) return null;
   return (
@@ -242,27 +260,13 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
         <HStack justify="flex-end" gap={3}>
           <Button
             colorScheme="teal"
-            onClick={() => (editId ? onSave(form) : onAdd(form))}
+            onClick={handleSave}
             borderRadius="full"
             px={6}
             fontWeight="bold"
             boxShadow="md"
-            disabled={
-              !!idError ||
-              !form.id ||
-              !form.lastName ||
-              !form.firstName ||
-              !form.joinedAt
-            }
-            cursor={
-              !!idError ||
-              !form.id ||
-              !form.lastName ||
-              !form.firstName ||
-              !form.joinedAt
-                ? "not-allowed"
-                : "pointer"
-            }
+            disabled={isSaveDisabled}
+            cursor={isSaveDisabled ? "not-allowed" : "pointer"}
             _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
           >
             <Icon as={User} mr={2} />

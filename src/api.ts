@@ -3,15 +3,15 @@
 
 export async function apiGet<T>(url: string): Promise<T> {
   const res = await fetch(url);
+  if (!res.ok) throw new Error(`APIリクエスト失敗: ${res.status}`);
   const text = await res.text();
-  let data;
   try {
-    data = JSON.parse(text);
+    const data = JSON.parse(text);
+    if (data && data.error) throw new Error(data.error);
+    return data;
   } catch {
     throw new Error("APIレスポンスが不正です: " + text);
   }
-  if (data && data.error) throw new Error(data.error);
-  return data;
 }
 
 export async function apiPost<T>(url: string, body: any): Promise<T> {
@@ -20,13 +20,13 @@ export async function apiPost<T>(url: string, body: any): Promise<T> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+  if (!res.ok) throw new Error(`APIリクエスト失敗: ${res.status}`);
   const text = await res.text();
-  let data;
   try {
-    data = JSON.parse(text);
+    const data = JSON.parse(text);
+    if (data && data.error) throw new Error(data.error);
+    return data;
   } catch {
     throw new Error("APIレスポンスが不正です: " + text);
   }
-  if (data && data.error) throw new Error(data.error);
-  return data;
 }

@@ -11,7 +11,7 @@
 
 // ===== import: 外部ライブラリ =====
 import { Box, Button, Text } from "@chakra-ui/react";
-import React from "react";
+import React, { useMemo } from "react";
 
 // ===== import: 型定義 =====
 import type { LeaveDateListProps } from "./types";
@@ -35,13 +35,23 @@ export const LeaveDateList: React.FC<LeaveDateListProps> = ({
   pagedDates,
   currentPage,
   ITEMS_PER_PAGE,
-}) => (
-  <Box as="ul" pl={0} m={0}>
-    {pagedDates.map((date, i) => {
+}) => {
+  const memoizedPagedDates = useMemo(() => {
+    return pagedDates.map((date, i) => {
       const idx = (currentPage - 1) * ITEMS_PER_PAGE + i;
       const [y, m, d] = date.split("-");
       const jpDate = `${y}年${m}月${d}日`;
-      return (
+      return {
+        idx,
+        date,
+        jpDate,
+      };
+    });
+  }, [pagedDates, currentPage, ITEMS_PER_PAGE]);
+
+  return (
+    <Box as="ul" pl={0} m={0}>
+      {memoizedPagedDates.map(({ idx, date, jpDate }) => (
         <Box
           as="li"
           key={date + idx}
@@ -98,7 +108,7 @@ export const LeaveDateList: React.FC<LeaveDateListProps> = ({
             <Icons.Trash2 size={15} />
           </Button>
         </Box>
-      );
-    })}
-  </Box>
-);
+      ))}
+    </Box>
+  );
+};

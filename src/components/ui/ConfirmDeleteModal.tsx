@@ -18,7 +18,7 @@
 // - targetName: 削除対象名（任意）
 
 import { Button, Text, HStack, Box } from "@chakra-ui/react";
-import React from "react";
+import React, { useMemo } from "react";
 import { CustomModal } from "./CustomModal";
 
 interface ConfirmDeleteModalProps {
@@ -33,34 +33,44 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   onClose,
   onConfirm,
   targetName,
-}) => (
-  <CustomModal isOpen={isOpen} onClose={onClose}>
-    <Box
-      bg="white"
-      p={6}
-      borderRadius="md"
-      boxShadow="lg"
-      minW={{ base: "90vw", sm: "360px" }}
-      maxW="96vw"
-      maxH="90vh"
-      overflowY="auto"
-    >
-      <Text fontWeight="bold" fontSize="lg" mb={3} color="red.600">
-        {targetName
-          ? `「${targetName}」を本当に削除しますか？`
-          : "本当に削除しますか？"}
-      </Text>
-      <Text fontSize="sm" color="gray.600" mb={5}>
-        この操作は元に戻せません。
-      </Text>
-      <HStack justify="flex-end" gap={2}>
-        <Button onClick={onClose} variant="ghost" colorScheme="teal">
-          キャンセル
-        </Button>
-        <Button colorScheme="red" onClick={onConfirm}>
-          削除する
-        </Button>
-      </HStack>
-    </Box>
-  </CustomModal>
-);
+}) => {
+  const modalTitle = useMemo(
+    () =>
+      targetName
+        ? `「${targetName}」を本当に削除しますか？`
+        : "本当に削除しますか？",
+    [targetName]
+  );
+
+  const modalContent = useMemo(() => "この操作は元に戻せません。", []);
+
+  return (
+    <CustomModal isOpen={isOpen} onClose={onClose}>
+      <Box
+        bg="white"
+        p={6}
+        borderRadius="md"
+        boxShadow="lg"
+        minW={{ base: "90vw", sm: "360px" }}
+        maxW="96vw"
+        maxH="90vh"
+        overflowY="auto"
+      >
+        <Text fontWeight="bold" fontSize="lg" mb={3} color="red.600">
+          {modalTitle}
+        </Text>
+        <Text fontSize="sm" color="gray.600" mb={5}>
+          {modalContent}
+        </Text>
+        <HStack justify="flex-end" gap={2}>
+          <Button onClick={onClose} variant="ghost" colorScheme="teal">
+            キャンセル
+          </Button>
+          <Button colorScheme="red" onClick={onConfirm}>
+            削除する
+          </Button>
+        </HStack>
+      </Box>
+    </CustomModal>
+  );
+};

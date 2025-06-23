@@ -33,7 +33,7 @@
 // 入力値・バリデーション・ボタンの有効/無効などをpropsで制御します。
 import { Box, Button } from "@chakra-ui/react";
 import { Icons, inputDateStyle } from "./icons";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 
 interface DateInputRowProps {
   dateInput: string;
@@ -54,43 +54,49 @@ export const DateInputRow: React.FC<DateInputRowProps> = ({
   onSaveDate,
   editDateIdx,
   remainSimple,
-}) => (
-  <Box display="flex" gap={2} mb={4}>
-    <input
-      type="date"
-      value={dateInput}
-      onChange={(e) => {
-        onChangeDateInput(e.target.value);
-        if (
-          editDateIdx === null &&
-          e.target.value.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/) &&
-          remainSimple > 0
-        ) {
-          onAddDate(e.target.value);
-        }
-      }}
-      style={inputDateStyle}
-      maxLength={10}
-    />
-    {editDateIdx !== null && (
-      <Button
-        colorScheme="teal"
-        onClick={onSaveDate}
-        px={4}
-        minW={"auto"}
-        disabled={
-          remainSimple === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
-        }
-        cursor={
-          remainSimple === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/)
-            ? "not-allowed"
-            : "pointer"
-        }
-        _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
-      >
-        <Icons.Edit size={16} style={{ marginRight: 6 }} />
-        保存
-      </Button>
-    )}
-  </Box>
-);
+}) => {
+  const handleDateChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChangeDateInput(e.target.value);
+      if (
+        editDateIdx === null &&
+        e.target.value.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/) &&
+        remainSimple > 0
+      ) {
+        onAddDate(e.target.value);
+      }
+    },
+    [onChangeDateInput, onAddDate, editDateIdx, remainSimple]
+  );
+
+  const isSaveDisabled = useMemo(
+    () => remainSimple === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/),
+    [remainSimple, dateInput]
+  );
+
+  return (
+    <Box display="flex" gap={2} mb={4}>
+      <input
+        type="date"
+        value={dateInput}
+        onChange={handleDateChange}
+        style={inputDateStyle}
+        maxLength={10}
+      />
+      {editDateIdx !== null && (
+        <Button
+          colorScheme="teal"
+          onClick={onSaveDate}
+          px={4}
+          minW={"auto"}
+          disabled={isSaveDisabled}
+          cursor={isSaveDisabled ? "not-allowed" : "pointer"}
+          _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
+        >
+          <Icons.Edit size={16} style={{ marginRight: 6 }} />
+          保存
+        </Button>
+      )}
+    </Box>
+  );
+};

@@ -13,7 +13,13 @@
 
 // ===== import: 外部ライブラリ =====
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
-import React, { useRef, useEffect } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback,
+  useState,
+} from "react";
 import { X } from "lucide-react";
 
 // ===== import: 型定義 =====
@@ -47,15 +53,22 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   // propsでemployeeIdのみ受け取り、従業員データは親で取得・渡す設計に統一済み
   if (!isOpen) return null;
   // --- propsで受け取った集計済みデータを利用 ---
-  const dates = grantDetails.flatMap((g) => g.usedDates).sort();
+  const dates = useMemo(
+    () => grantDetails.flatMap((g) => g.usedDates).sort(),
+    [grantDetails]
+  );
   const remain = summary.remain;
 
   // ページネーション用
   const ITEMS_PER_PAGE = 10;
   const totalPages = Math.max(1, Math.ceil(dates.length / ITEMS_PER_PAGE));
-  const pagedDates = dates.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+  const pagedDates = useMemo(
+    () =>
+      dates.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+      ),
+    [dates, currentPage]
   );
   // ページ切替時にリスト先頭へスクロール
   const listRef = useRef<HTMLDivElement>(null);
@@ -68,21 +81,21 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   }, [dates.length, totalPages]);
 
   // 削除モーダル用状態
-  const [deleteIdx, setDeleteIdx] = React.useState<number | null>(null);
-  const [isDeleteOpen, setDeleteOpen] = React.useState(false);
-  const handleDeleteClick = (idx: number) => {
+  const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
+  const [isDeleteOpen, setDeleteOpen] = useState(false);
+  const handleDeleteClick = useCallback((idx: number) => {
     setDeleteIdx(idx);
     setDeleteOpen(true);
-  };
-  const handleDeleteConfirm = () => {
+  }, []);
+  const handleDeleteConfirm = useCallback(() => {
     if (deleteIdx !== null) onDeleteDate(deleteIdx);
     setDeleteOpen(false);
     setDeleteIdx(null);
-  };
-  const handleDeleteClose = () => {
+  }, [deleteIdx, onDeleteDate]);
+  const handleDeleteClose = useCallback(() => {
     setDeleteOpen(false);
     setDeleteIdx(null);
-  };
+  }, []);
 
   return (
     <Box
