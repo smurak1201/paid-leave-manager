@@ -11,10 +11,7 @@
 // ・型安全・責務分離・UI/UX・可読性重視
 // ・props/stateの流れ・UI部品の責務を日本語コメントで明記
 
-// ===== import: 型定義 =====
 import type { Employee } from "./types";
-
-// ===== import: 外部ライブラリ =====
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -27,12 +24,9 @@ import {
 } from "@chakra-ui/react";
 import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import { User, X, BadgeInfo } from "lucide-react";
-
-// ===== import: アイコン・UI部品 =====
 import { inputDateStyle } from "./icons";
 import { CustomModal } from "../ui/CustomModal";
 
-// propsの型定義。親(App)から必要な情報・関数を受け取る
 interface EmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -44,7 +38,7 @@ interface EmployeeModalProps {
   editId: number | null;
   employees: Employee[];
   setIdError: (msg: string) => void;
-  onDelete?: (id: number) => Promise<void>; // 追加: 削除用コールバック
+  onDelete?: (id: number) => Promise<void>;
 }
 
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
@@ -56,7 +50,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   onSave,
   idError,
   editId,
-  employees, // ← ここでpropsとして受け取っているので、handleChange内もemployeesでOK
+  employees,
   setIdError,
 }) => {
   // 空の従業員初期値（追加時用）

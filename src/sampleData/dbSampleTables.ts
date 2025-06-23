@@ -359,3 +359,5 @@ export function getCurrentGrantDays(joinedAt: string, now: string = new Date().t
 // → { totalGranted: 21, totalUsed: 11, remain: 10, grants: [...], usages: [...] }
 //
 // これらのロジックをUIやhooksで活用し、DBテーブル参照型の有給管理を実現します。
+//
+// API連携化により不要。削除予定ファイル。
