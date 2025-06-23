@@ -34,17 +34,20 @@ import { GuideModal } from "./components/ui/GuideModal";
 // ===== import: カスタムフック =====
 import { useEmployeeForm } from "./hooks/useEmployeeForm";
 
+// ===== import: API =====
+import { apiGet, apiPost } from "./api";
+
 function App() {
   // --- グローバル状態管理 ---
-  const [employees, setEmployees] = useState<Employee[]>([]); // ←API取得に変更
-  const [leaveUsages, setLeaveUsages] = useState<LeaveUsage[]>([]); // API連携用に初期値を空配列に修正
-  const [currentPage, setCurrentPage] = useState(1); // 従業員一覧テーブルのページ番号
-  const [leaveDatesPage, setLeaveDatesPage] = useState(1); // 有給取得日モーダルのページ番号
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [leaveUsages, setLeaveUsages] = useState<LeaveUsage[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [leaveDatesPage, setLeaveDatesPage] = useState(1);
   const [activeModal, setActiveModal] = useState<
     null | "add" | "edit" | "leaveDates"
-  >(null); // 開いているモーダル種別
-  const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null); // 操作対象従業員ID
-  const guideDisclosure = useDisclosure(); // ガイドモーダル開閉
+  >(null);
+  const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null);
+  const guideDisclosure = useDisclosure();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -55,7 +58,6 @@ function App() {
       : null;
 
   // --- 従業員フォームの状態・バリデーション管理（カスタムフック） ---
-  // form, handleChangeはこのファイル内では直接使わず、分割代入から除外
   const { setForm, idError, setIdError } = useEmployeeForm(
     activeModal === "edit" && currentEmployee
       ? currentEmployee
@@ -70,62 +72,104 @@ function App() {
     activeEmployeeId
   );
 
-  // --- 有給取得日編集用の状態・ロジック（leaveUsages操作型に変更） ---
+  // --- 有給取得日編集用の状態・ロジック ---
   const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
   const [dateInput, setDateInput] = useState("");
 
-  // 日付追加
+  // --- データ取得・更新用関数 ---
+  const fetchEmployees = async () => {
+    const data = await apiGet<any[]>(
+      "http://localhost/paid_leave_manager/employees.php"
+    );
+    return data.map((emp: any) => ({
+      ...emp,
+      joinedAt: emp.joined_at,
+      lastName: emp.last_name,
+      firstName: emp.first_name,
+    }));
+  };
+  const fetchLeaveUsages = async () => {
+    const data = await apiGet<any[]>(
+      "http://localhost/paid_leave_manager/leave_usages.php"
+    );
+    return data.map((u: any) => ({
+      ...u,
+      employeeId: u.employee_id,
+      usedDate: u.used_date,
+    }));
+  };
+  const fetchSummaries = async (emps: Employee[]) => {
+    return Promise.all(
+      emps.map(async (emp) => {
+        try {
+          const data = await apiGet<any>(
+            `http://localhost/paid_leave_manager/leave_summary.php?employee_id=${emp.id}`
+          );
+          return {
+            employeeId: emp.id,
+            grantThisYear: data.grantThisYear ?? 0,
+            carryOver: data.carryOver ?? 0,
+            used: data.used ?? 0,
+            remain: data.remain ?? 0,
+          };
+        } catch {
+          return {
+            employeeId: emp.id,
+            grantThisYear: 0,
+            carryOver: 0,
+            used: 0,
+            remain: 0,
+          };
+        }
+      })
+    );
+  };
+
+  // --- 初回データ取得 ---
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([fetchEmployees(), fetchLeaveUsages()])
+      .then(([emps, usages]) => {
+        setEmployees(emps);
+        setLeaveUsages(usages);
+        setLoading(false);
+        setError("");
+      })
+      .catch((e) => {
+        setError("データの取得に失敗しました: " + (e.message || e));
+        setLoading(false);
+      });
+  }, []);
+
+  // --- サマリー再取得 ---
+  type EmployeeSummary = {
+    employeeId: number;
+    grantThisYear: number;
+    carryOver: number;
+    used: number;
+    remain: number;
+  };
+  const [summaries, setSummaries] = useState<EmployeeSummary[]>([]);
+  useEffect(() => {
+    if (employees.length === 0) return;
+    fetchSummaries(employees).then(setSummaries);
+  }, [employees]);
+
+  // --- 有給消化日追加 ---
   const handleAddDate = async (date: string) => {
     if (!activeEmployeeId) return;
     try {
-      const res = await fetch(
-        "http://localhost/paid_leave_manager/leave_usage_add.php",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            employee_id: activeEmployeeId,
-            used_date: date,
-          }),
-        }
-      );
-      const text = await res.text();
-      let result;
-      try {
-        result = JSON.parse(text);
-      } catch {
-        throw new Error("APIレスポンスが不正です: " + text);
-      }
-      if (!result || result.error)
-        throw new Error(result?.error || "APIエラー");
-      // 追加後に最新の消化履歴を再取得
-      try {
-        const res2 = await fetch(
-          "http://localhost/paid_leave_manager/leave_usages.php"
-        );
-        const text2 = await res2.text();
-        let data = [];
-        try {
-          data = JSON.parse(text2).map((u: any) => ({
-            ...u,
-            employeeId: u.employee_id,
-            usedDate: u.used_date,
-          }));
-        } catch (err) {
-          throw new Error(
-            "消化履歴APIレスポンスが不正です: " + text2.slice(0, 200)
-          );
-        }
-        setLeaveUsages(data);
-      } catch (e: any) {
-        alert(e.message || "消化履歴の再取得に失敗しました");
-      }
+      await apiPost("http://localhost/paid_leave_manager/leave_usage_add.php", {
+        employee_id: activeEmployeeId,
+        used_date: date,
+      });
+      setLeaveUsages(await fetchLeaveUsages());
       setDateInput("");
     } catch (e: any) {
       alert(e.message || "有給消化日の追加に失敗しました");
     }
   };
-  // 日付削除
+  // --- 有給消化日削除 ---
   const handleDeleteDate = async (idx: number) => {
     if (!activeEmployeeId) return;
     const empUsages = leaveUsages.filter(
@@ -134,45 +178,11 @@ function App() {
     if (!empUsages[idx]) return;
     const target = empUsages[idx];
     try {
-      const res = await fetch(
+      await apiPost(
         "http://localhost/paid_leave_manager/leave_usage_delete.php",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: target.id }),
-        }
+        { id: target.id }
       );
-      const text = await res.text();
-      let result;
-      try {
-        result = JSON.parse(text);
-      } catch {
-        throw new Error("APIレスポンスが不正です: " + text);
-      }
-      if (!result || result.error)
-        throw new Error(result?.error || "APIエラー");
-      // 削除後に最新の消化履歴を再取得
-      try {
-        const res2 = await fetch(
-          "http://localhost/paid_leave_manager/leave_usages.php"
-        );
-        const text2 = await res2.text();
-        let data = [];
-        try {
-          data = JSON.parse(text2).map((u: any) => ({
-            ...u,
-            employeeId: u.employee_id,
-            usedDate: u.used_date,
-          }));
-        } catch (err) {
-          throw new Error(
-            "消化履歴APIレスポンスが不正です: " + text2.slice(0, 200)
-          );
-        }
-        setLeaveUsages(data);
-      } catch (e: any) {
-        alert(e.message || "消化履歴の再取得に失敗しました");
-      }
+      setLeaveUsages(await fetchLeaveUsages());
     } catch (e: any) {
       alert(e.message || "有給消化日の削除に失敗しました");
     }
@@ -223,88 +233,10 @@ function App() {
     });
   };
 
-  // 従業員一覧・有給消化履歴APIから取得
-  useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      fetch("http://localhost/paid_leave_manager/employees.php").then(
-        async (res) => {
-          const text = await res.text();
-          let data = [];
-          try {
-            data = JSON.parse(text).map((emp: any) => ({
-              ...emp,
-              joinedAt: emp.joined_at,
-              lastName: emp.last_name,
-              firstName: emp.first_name,
-            }));
-          } catch (err) {
-            setError("従業員APIレスポンスが不正です: " + text.slice(0, 200));
-          }
-          return data;
-        }
-      ),
-      fetch("http://localhost/paid_leave_manager/leave_usages.php").then(
-        async (res) => {
-          const text = await res.text();
-          let data = [];
-          try {
-            data = JSON.parse(text).map((u: any) => ({
-              ...u,
-              employeeId: u.employee_id,
-              usedDate: u.used_date,
-            }));
-          } catch (err) {
-            setError("消化履歴APIレスポンスが不正です: " + text.slice(0, 200));
-          }
-          return data;
-        }
-      ),
-    ])
-      .then(([employeesData, leaveUsagesData]) => {
-        setEmployees(employeesData);
-        setLeaveUsages(leaveUsagesData);
-        setLoading(false);
-      })
-      .catch((e) => {
-        setError("データの取得に失敗しました: " + (e.message || e));
-        setLoading(false);
-      });
-  }, []);
-
   // --- 有給サマリー・詳細のAPI連携 ---
-  type EmployeeSummary = {
-    employeeId: number;
-    grantThisYear: number;
-    carryOver: number;
-    used: number;
-    remain: number;
-  };
-  const [summaries, setSummaries] = useState<EmployeeSummary[]>([]);
   useEffect(() => {
     if (employees.length === 0) return;
-    Promise.all(
-      employees.map((emp) =>
-        fetch(
-          `http://localhost/paid_leave_manager/leave_summary.php?employee_id=${emp.id}`
-        )
-          .then((res) => res.json())
-          .then((data) => ({
-            employeeId: emp.id,
-            grantThisYear: data.grantThisYear ?? 0,
-            carryOver: data.carryOver ?? 0,
-            used: data.used ?? 0,
-            remain: data.remain ?? 0,
-          }))
-          .catch(() => ({
-            employeeId: emp.id,
-            grantThisYear: 0,
-            carryOver: 0,
-            used: 0,
-            remain: 0,
-          }))
-      )
-    ).then(setSummaries);
+    fetchSummaries(employees).then(setSummaries);
   }, [employees]);
 
   // --- 画面描画 ---
@@ -403,32 +335,19 @@ function App() {
               return;
             }
             try {
-              await fetch("http://localhost/paid_leave_manager/employees.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
+              await apiPost(
+                "http://localhost/paid_leave_manager/employees.php",
+                {
                   id: form.id,
                   employee_code: form.employeeCode,
                   last_name: form.lastName,
                   first_name: form.firstName,
                   joined_at: form.joinedAt,
                   mode: "add",
-                }),
-              });
-              // 追加後に再取得
-              const res = await fetch(
-                "http://localhost/paid_leave_manager/employees.php"
+                }
               );
-              const text = await res.text();
-              let data = [];
-              try {
-                data = JSON.parse(text).map((emp: any) => ({
-                  ...emp,
-                  joinedAt: emp.joined_at,
-                  lastName: emp.last_name,
-                  firstName: emp.first_name,
-                }));
-              } catch (err) {}
+              // 追加後に再取得
+              const data = await fetchEmployees();
               setEmployees(data);
               // 追加後に最終ページへ移動
               const ITEMS_PER_PAGE = 15;
@@ -461,32 +380,19 @@ function App() {
               return;
             }
             try {
-              await fetch("http://localhost/paid_leave_manager/employees.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
+              await apiPost(
+                "http://localhost/paid_leave_manager/employees.php",
+                {
                   id: form.id,
                   employee_code: form.employeeCode,
                   last_name: form.lastName,
                   first_name: form.firstName,
                   joined_at: form.joinedAt,
                   mode: "edit",
-                }),
-              });
-              // 編集後に再取得
-              const res = await fetch(
-                "http://localhost/paid_leave_manager/employees.php"
+                }
               );
-              const text = await res.text();
-              let data = [];
-              try {
-                data = JSON.parse(text).map((emp: any) => ({
-                  ...emp,
-                  joinedAt: emp.joined_at,
-                  lastName: emp.last_name,
-                  firstName: emp.first_name,
-                }));
-              } catch (err) {}
+              // 編集後に再取得
+              const data = await fetchEmployees();
               setEmployees(data);
               setForm({
                 id: NaN,
@@ -503,25 +409,15 @@ function App() {
           }}
           onDelete={async (id) => {
             try {
-              await fetch("http://localhost/paid_leave_manager/employees.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id, mode: "delete" }),
-              });
-              // 削除後に再取得
-              const res = await fetch(
-                "http://localhost/paid_leave_manager/employees.php"
+              await apiPost(
+                "http://localhost/paid_leave_manager/employees.php",
+                {
+                  id,
+                  mode: "delete",
+                }
               );
-              const text = await res.text();
-              let data = [];
-              try {
-                data = JSON.parse(text).map((emp: any) => ({
-                  ...emp,
-                  joinedAt: emp.joined_at,
-                  lastName: emp.last_name,
-                  firstName: emp.first_name,
-                }));
-              } catch (err) {}
+              // 削除後に再取得
+              const data = await fetchEmployees();
               setEmployees(data);
             } catch (e: any) {
               setIdError(e.message || "従業員削除に失敗しました");
