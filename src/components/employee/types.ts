@@ -90,7 +90,8 @@ export interface LeaveDatesModalProps {
     used: number;
     remain: number;
   };
-  grantDetails: Array<{
+  usedDates: string[]; // 追加: APIから直接渡す有効期限内の消化日一覧
+  grantDetails?: Array<{
     grantDate: string;
     days: number;
     used: number;

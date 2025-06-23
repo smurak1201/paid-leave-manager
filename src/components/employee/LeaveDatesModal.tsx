@@ -44,18 +44,19 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   currentPage,
   onPageChange,
   summary,
+  usedDates,
   grantDetails,
 }) => {
-  // 対象従業員データ取得
-  // const employee = employeeId
-  //   ? employees.find((e) => e.id === employeeId)
-  //   : undefined;
-  // propsでemployeeIdのみ受け取り、従業員データは親で取得・渡す設計に統一済み
   if (!isOpen) return null;
-  // --- propsで受け取った集計済みデータを利用 ---
+  // usedDatesがあればそれを使う。なければgrantDetailsから生成
   const dates = useMemo(
-    () => grantDetails.flatMap((g) => g.usedDates).sort(),
-    [grantDetails]
+    () =>
+      usedDates && usedDates.length > 0
+        ? [...usedDates].sort()
+        : grantDetails
+        ? grantDetails.flatMap((g) => g.usedDates).sort()
+        : [],
+    [usedDates, grantDetails]
   );
   const remain = summary.remain;
 

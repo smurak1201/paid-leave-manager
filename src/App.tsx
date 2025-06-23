@@ -370,27 +370,15 @@ function App() {
             const s = summaries.find((s) => s.employeeId === code);
             return s || { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
           })()}
-          grantDetails={(() => {
+          usedDates={(() => {
             const code =
               activeEmployeeId !== null
                 ? employees.find((e) => e.id === activeEmployeeId)?.employeeCode
                 : null;
-            if (!code) return [];
-            // summariesからusedDatesを取得
             const summary = summaries.find((s) => s.employeeId === code);
-            // usedDatesがあればそれを使う
-            if (summary && (summary as any).usedDates) {
-              return [
-                {
-                  grantDate: "",
-                  days: 0,
-                  used: (summary as any).usedDates.length,
-                  remain: 0,
-                  usedDates: (summary as any).usedDates,
-                },
-              ];
-            }
-            return [];
+            return summary && (summary as any).usedDates
+              ? (summary as any).usedDates
+              : [];
           })()}
         />
       </Box>
