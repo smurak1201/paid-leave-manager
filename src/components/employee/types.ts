@@ -148,14 +148,6 @@ export interface UseLeaveDatesReturn {
   validateLeaveDate: (date: string) => string | null;
 }
 
-// ====== サンプルデータ型（sampleData等で利用） ======
-
-/**
- * サンプル従業員データ型
- * - sampleData.ts等で利用
- */
-// export type SampleEmployee = Omit<Employee, 'id'> & { id: number | string }; // ← サンプルデータ用のため削除
-
 // ====== 共通ユーティリティ型 ======
 
 /**
@@ -166,3 +158,5 @@ export interface Pagination {
   totalPages: number;
   onPageChange: (page: number) => void;
 }
+
+// 不要なローカルロジックや未使用型、サンプルデータ型のコメントアウト等は現状で最適化済み。API設計・props/stateの流れに完全準拠。

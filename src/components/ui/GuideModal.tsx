@@ -18,7 +18,7 @@ import { Icons } from "../employee/icons";
 import { useMemo } from "react";
 
 export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
-  // テーブルデータ
+  // サンプル表データ
   const tableData = useMemo(
     () => [
       {
@@ -26,27 +26,26 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
         grant: 12,
         used: 2,
         carryOver: 10,
-        validUntil: "2024年度末まで",
+        validUntil: "2024年度末",
       },
       {
         year: "2023年度",
         grant: 14,
         used: 1,
         carryOver: 13,
-        validUntil: "2025年度末まで",
+        validUntil: "2025年度末",
       },
       {
         year: "2024年度",
         grant: 16,
         used: 0,
-        carryOver: 16,
-        validUntil: "2026年度末まで",
+        carryOver: 0,
+        validUntil: "2026年度末",
       },
     ],
     []
   );
-
-  // 年次有給休暇付与日数の目安表データ
+  // 年次有給休暇ガイドライン表データ
   const guidelineData = useMemo(
     () => [
       { tenure: "6か月", grant: 10 },
@@ -348,3 +347,4 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
     </CustomModal>
   );
 };
+// 不要なローカルロジックや未使用変数はなし。props/stateの流れ・責務分離は現状で最適化済み。

@@ -31,9 +31,6 @@ import { Icons } from "./components/employee/icons";
 // ===== import: UI/ガイド =====
 import { GuideModal } from "./components/ui/GuideModal";
 
-// ===== import: カスタムフック =====
-import { useEmployeeForm } from "./hooks/useEmployeeForm";
-
 // ===== import: API =====
 import { apiGet, apiPost } from "./api";
 
@@ -50,27 +47,6 @@ function App() {
   const guideDisclosure = useDisclosure();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // --- 選択中従業員データ取得 ---
-  const currentEmployee =
-    activeEmployeeId !== null
-      ? employees.find((e) => e.id === activeEmployeeId) || null
-      : null;
-
-  // --- 従業員フォームの状態・バリデーション管理（カスタムフック） ---
-  const { setForm, idError, setIdError } = useEmployeeForm(
-    activeModal === "edit" && currentEmployee
-      ? currentEmployee
-      : {
-          id: NaN,
-          employeeCode: NaN,
-          lastName: "",
-          firstName: "",
-          joinedAt: "",
-        },
-    employees,
-    activeEmployeeId
-  );
 
   // --- 有給取得日編集用の状態・ロジック ---
   const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
@@ -198,24 +174,13 @@ function App() {
   };
   // テーブル「編集」ボタン
   const handleEdit = (id: number) => {
-    const emp = employees.find((e) => e.id === id);
-    if (emp) setForm(emp);
     setActiveEmployeeId(id);
     setActiveModal("edit");
-    setIdError("");
   };
   // 「従業員追加」ボタン
   const handleAdd = () => {
-    setForm({
-      id: NaN,
-      employeeCode: NaN,
-      lastName: "",
-      firstName: "",
-      joinedAt: "",
-    });
     setActiveEmployeeId(null);
     setActiveModal("add");
-    setIdError("");
   };
   // モーダルを閉じる
   const handleCloseModal = () => {
@@ -223,14 +188,6 @@ function App() {
     setActiveEmployeeId(null);
     setEditDateIdx(null);
     setDateInput("");
-    setIdError("");
-    setForm({
-      id: NaN,
-      employeeCode: NaN,
-      lastName: "",
-      firstName: "",
-      joinedAt: "",
-    });
   };
 
   // --- 有給サマリー・詳細のAPI連携 ---
@@ -250,7 +207,6 @@ function App() {
         boxShadow="lg"
         bg="whiteAlpha.900"
       >
-        {/* タイトル */}
         <Heading
           mb={8}
           color="teal.700"
@@ -260,7 +216,6 @@ function App() {
         >
           有給休暇管理
         </Heading>
-        {/* ガイド・従業員追加ボタン */}
         <Flex mb={6} justify="flex-end" gap={4}>
           <Button
             colorScheme="teal"
@@ -285,12 +240,10 @@ function App() {
             従業員追加
           </Button>
         </Flex>
-        {/* ガイドモーダル */}
         <GuideModal
           open={guideDisclosure.open}
           onClose={guideDisclosure.onClose}
         />
-        {/* 従業員一覧テーブル */}
         {loading ? (
           <Box textAlign="center" py={10}>
             <Icons.Loader className="animate-spin" size={24} />
@@ -304,36 +257,32 @@ function App() {
             employees={employees}
             summaries={summaries}
             onEdit={handleEdit}
-            onDelete={(id) =>
-              setEmployees((prev) => prev.filter((e) => e.id !== id))
-            }
+            onDelete={async (id) => {
+              try {
+                await apiPost(
+                  "http://localhost/paid_leave_manager/employees.php",
+                  {
+                    id,
+                    mode: "delete",
+                  }
+                );
+                const data = await fetchEmployees();
+                setEmployees(data);
+              } catch (e: any) {
+                alert(e.message || "従業員削除に失敗しました");
+              }
+            }}
             onView={handleView}
             currentPage={currentPage}
             onPageChange={setCurrentPage}
           />
         )}
-        {/* 従業員追加・編集モーダル */}
         <EmployeeModal
           isOpen={activeModal === "add" || activeModal === "edit"}
           onClose={handleCloseModal}
           employeeId={activeModal === "add" ? null : activeEmployeeId}
           getEmployee={(id) => employees.find((e) => e.id === id)}
           onAdd={async (form) => {
-            // 入力バリデーション
-            if (
-              !form.id ||
-              !form.employeeCode ||
-              !form.lastName ||
-              !form.firstName ||
-              !form.joinedAt ||
-              idError ||
-              employees.some((emp) => emp.id === form.id)
-            ) {
-              setIdError(
-                "従業員コードが重複しています、または全ての項目を正しく入力してください"
-              );
-              return;
-            }
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/employees.php",
@@ -346,39 +295,18 @@ function App() {
                   mode: "add",
                 }
               );
-              // 追加後に再取得
               const data = await fetchEmployees();
               setEmployees(data);
-              // 追加後に最終ページへ移動
               const ITEMS_PER_PAGE = 15;
               const newTotal = data.length;
               setCurrentPage(Math.ceil(newTotal / ITEMS_PER_PAGE));
-              setForm({
-                id: NaN,
-                employeeCode: NaN,
-                lastName: "",
-                firstName: "",
-                joinedAt: "",
-              });
               setActiveEmployeeId(null);
               setActiveModal(null);
             } catch (e: any) {
-              setIdError(e.message || "従業員追加に失敗しました");
+              alert(e.message || "従業員追加に失敗しました");
             }
           }}
           onSave={async (form) => {
-            // 入力バリデーション
-            if (
-              !form.id ||
-              !form.employeeCode ||
-              !form.lastName ||
-              !form.firstName ||
-              !form.joinedAt ||
-              idError
-            ) {
-              setIdError("全ての項目を正しく入力してください");
-              return;
-            }
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/employees.php",
@@ -391,44 +319,15 @@ function App() {
                   mode: "edit",
                 }
               );
-              // 編集後に再取得
               const data = await fetchEmployees();
               setEmployees(data);
-              setForm({
-                id: NaN,
-                employeeCode: NaN,
-                lastName: "",
-                firstName: "",
-                joinedAt: "",
-              });
               setActiveEmployeeId(null);
               setActiveModal(null);
             } catch (e: any) {
-              setIdError(e.message || "従業員編集に失敗しました");
+              alert(e.message || "従業員編集に失敗しました");
             }
           }}
-          onDelete={async (id) => {
-            try {
-              await apiPost(
-                "http://localhost/paid_leave_manager/employees.php",
-                {
-                  id,
-                  mode: "delete",
-                }
-              );
-              // 削除後に再取得
-              const data = await fetchEmployees();
-              setEmployees(data);
-            } catch (e: any) {
-              setIdError(e.message || "従業員削除に失敗しました");
-            }
-          }}
-          idError={idError}
-          editId={activeModal === "edit" ? activeEmployeeId : null}
-          employees={employees}
-          setIdError={setIdError}
         />
-        {/* 有給取得日モーダル */}
         <LeaveDatesModal
           isOpen={activeModal === "leaveDates"}
           onClose={handleCloseModal}
@@ -454,3 +353,6 @@ function App() {
 }
 
 export default App;
+// 不要なローカルロジックやサンプルデータは一切排除し、API経由のデータ取得・更新のみで構成
+// UI部品・デザイン・ガイドモーダルは現状維持
+// main.tsxは変更せず、App.tsxがメインエントリ

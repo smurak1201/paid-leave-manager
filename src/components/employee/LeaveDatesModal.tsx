@@ -233,3 +233,6 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
     </Box>
   );
 };
+// 不要なローカルロジックや未使用変数はなし。props/stateの流れ・責務分離は現状で最適化済み。
+// UI部品・デザイン・ガイドモーダルは現状維持
+// main.tsxは変更せず、App.tsxがメインエントリ

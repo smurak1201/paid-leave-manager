@@ -30,3 +30,5 @@ export async function apiPost<T>(url: string, body: any): Promise<T> {
     throw new Error("APIレスポンスが不正です: " + text);
   }
 }
+
+// 不要なローカルロジックや未使用変数はなし。API設計に完全準拠したfetch/エラーハンドリング/型変換の共通化のみ

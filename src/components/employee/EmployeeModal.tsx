@@ -34,10 +34,6 @@ interface EmployeeModalProps {
   getEmployee: (id: number) => Employee | undefined;
   onAdd: (form: Employee) => void;
   onSave: (form: Employee) => void;
-  idError: string;
-  editId: number | null;
-  employees: Employee[];
-  setIdError: (msg: string) => void;
   onDelete?: (id: number) => Promise<void>;
 }
 
@@ -48,10 +44,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   getEmployee,
   onAdd,
   onSave,
-  idError,
-  editId,
-  employees,
-  setIdError,
 }) => {
   // 空の従業員初期値（追加時用）
   const emptyEmployee: Employee = {
@@ -72,21 +64,25 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   const [idInputValue, setIdInputValue] = useState(
     form.id ? String(form.id) : ""
   );
+  // idエラー（内部stateで管理）
+  const [idError, setIdError] = useState("");
 
   // 編集モードや初期化時にidInputValueも同期
   useEffect(() => {
     setIdInputValue(form.id ? String(form.id) : "");
   }, [employeeId, employee]);
 
-  // employeeIdまたはisOpenが変わったらform/idInputValueを初期化
+  // employeeIdまたはisOpenが変わったらform/idInputValue/idErrorを初期化
   useEffect(() => {
     if (isOpen) {
       if (employeeId) {
         setForm(employee ?? emptyEmployee);
         setIdInputValue(employee && employee.id ? String(employee.id) : "");
+        setIdError("");
       } else {
         setForm(emptyEmployee);
         setIdInputValue("");
+        setIdError("");
       }
     }
   }, [isOpen, employeeId, employee]);
@@ -96,10 +92,11 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     if (!isOpen) {
       setForm(emptyEmployee);
       setIdInputValue("");
+      setIdError("");
     }
   }, [isOpen]);
 
-  // 入力欄のonChangeハンドラ（id重複・数字バリデーションはuseEmployeeFormに集約）
+  // 入力欄のonChangeハンドラ（id重複・数字バリデーションを内部で完結）
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!form) return;
     if (e.target.name === "id") {
@@ -109,11 +106,8 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
         setIdError("従業員コードは半角数字のみ入力できます");
       } else if (
         e.target.value &&
-        employees.some(
-          (emp) =>
-            emp.id === Number(e.target.value) &&
-            (editId === null || emp.id !== editId)
-        )
+        Number(e.target.value) !== (employeeId ?? NaN) &&
+        getEmployee(Number(e.target.value))
       ) {
         setIdError("従業員コードが重複しています");
       } else if (!e.target.value) {
@@ -138,12 +132,12 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   );
 
   const handleSave = useCallback(() => {
-    if (editId) {
+    if (employeeId) {
       onSave(form);
     } else {
       onAdd(form);
     }
-  }, [editId, form, onAdd, onSave]);
+  }, [employeeId, form, onAdd, onSave]);
 
   if (!isOpen || !form) return null;
   return (
@@ -168,7 +162,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             fontSize="xl"
             letterSpacing={1}
           >
-            {editId ? "従業員編集" : "従業員追加"}
+            {employeeId ? "従業員編集" : "従業員追加"}
           </Text>
         </HStack>
         <Button
@@ -193,17 +187,17 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             </FormLabel>
             <Input
               name="id"
-              value={editId ? String(form.id) : idInputValue}
+              value={employeeId ? String(form.id) : idInputValue}
               onChange={handleChange}
               borderColor="teal.300"
-              bg={editId ? "gray.100" : "whiteAlpha.900"}
-              color={editId ? "gray.500" : undefined}
+              bg={employeeId ? "gray.100" : "whiteAlpha.900"}
+              color={employeeId ? "gray.500" : undefined}
               _placeholder={{ color: "teal.200" }}
               type="text"
               inputMode="numeric"
               pattern="^[0-9]*$"
               autoComplete="off"
-              disabled={!!editId}
+              disabled={!!employeeId}
             />
             {/* 入力中のidエラーを即時表示（1回のみ表示） */}
             {idInputValue && idError && (
@@ -212,7 +206,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
               </Text>
             )}
             {/* 編集時は従業員コードが編集不可である旨を薄く表示 */}
-            {editId && (
+            {employeeId && (
               <Text color="gray.400" fontSize="xs" mt={1}>
                 ※従業員コードは編集できません
               </Text>
@@ -270,7 +264,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
           >
             <Icon as={User} mr={2} />
-            {editId ? "保存" : "追加"}
+            {employeeId ? "保存" : "追加"}
           </Button>
           <Button
             onClick={onClose}
