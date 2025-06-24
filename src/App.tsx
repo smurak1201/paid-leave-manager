@@ -409,13 +409,10 @@ function App() {
             );
             return s || emptySummary;
           })()}
-          usedDates={(() => {
-            const emp = findEmployee(activeEmployeeId);
-            const summary = summaries.find(
-              (s) => s.employeeId === (emp?.employeeId ?? null)
-            );
-            return summary && summary.usedDates ? summary.usedDates : [];
-          })()}
+          usedDates={leaveUsages
+            .filter((u) => u.employeeId === activeEmployeeId)
+            .map((u) => u.usedDate)}
+          grantDetails={undefined}
         />
       </Box>
     </Box>
