@@ -375,10 +375,10 @@ function App() {
           onDeleteDate={async (idx) => {
             const emp = findEmployee(activeEmployeeId);
             if (!emp) return false;
-            const summary =
-              summaries.find((s) => s.employeeId === emp.employeeId) ||
-              emptySummary;
-            const usedDates = summary.usedDates;
+            // leaveUsagesから該当従業員のusedDate配列を取得
+            const usedDates = leaveUsages
+              .filter((u) => u.employeeId === emp.employeeId)
+              .map((u) => u.usedDate);
             const targetDate = usedDates[idx];
             if (!targetDate) {
               console.log("削除対象日付が見つかりません", { idx, usedDates });
