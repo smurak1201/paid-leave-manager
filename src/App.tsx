@@ -76,10 +76,10 @@ function App() {
       emps.map(async (emp) => {
         try {
           const data = await apiGet<any>(
-            `http://localhost/paid_leave_manager/leave_summary.php?employee_id=${emp.employeeId}` // ← employee_idに変更
+            `http://localhost/paid_leave_manager/leave_summary.php?employee_id=${emp.employeeId}`
           );
           return {
-            employeeId: emp.employeeId, // ← employeeIdで持つ
+            employeeId: emp.employeeId,
             grantThisYear: data.grantThisYear ?? 0,
             carryOver: data.carryOver ?? 0,
             used: data.used ?? 0,
@@ -98,6 +98,23 @@ function App() {
         }
       })
     );
+  };
+
+  // データ再取得をまとめて行う関数
+  const reloadAll = async () => {
+    const emps = await fetchEmployees();
+    setEmployees(emps);
+    setLeaveUsages(await fetchLeaveUsages());
+    setSummaries(await fetchSummaries(emps));
+    return emps;
+  };
+  // サマリーのデフォルト値
+  const emptySummary = {
+    grantThisYear: 0,
+    carryOver: 0,
+    used: 0,
+    remain: 0,
+    usedDates: [],
   };
 
   // --- 初回データ取得 ---
@@ -156,6 +173,10 @@ function App() {
   // --- 有給取得日編集用の状態・ロジック ---
   const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
   const [dateInput, setDateInput] = useState("");
+
+  // 従業員IDから従業員オブジェクトを取得
+  const findEmployee = (id: number | null) =>
+    employees.find((e) => e.employeeId === id) ?? null;
 
   // --- 画面描画 ---
   return (
@@ -221,7 +242,7 @@ function App() {
             onDelete={async (employeeId) => {
               try {
                 // 先に有給取得日を全て削除
-                const emp = employees.find((e) => e.employeeId === employeeId);
+                const emp = findEmployee(employeeId);
                 if (emp) {
                   const usages = leaveUsages.filter(
                     (u) => u.employeeId === emp.employeeId
@@ -236,15 +257,9 @@ function App() {
                 // 従業員本体を削除
                 await apiPost(
                   "http://localhost/paid_leave_manager/employees.php",
-                  {
-                    employee_id: employeeId,
-                    mode: "delete",
-                  }
+                  { employee_id: employeeId, mode: "delete" }
                 );
-                const data = await fetchEmployees();
-                setEmployees(data);
-                setLeaveUsages(await fetchLeaveUsages()); // 取得日も再取得
-                setSummaries(await fetchSummaries(data)); // サマリーも再取得
+                await reloadAll();
               } catch (e: any) {
                 alert(e.message || "従業員削除に失敗しました");
               }
@@ -258,9 +273,7 @@ function App() {
           isOpen={activeModal === "add" || activeModal === "edit"}
           onClose={() => setActiveModal(null)}
           employee={
-            activeModal === "edit"
-              ? employees.find((e) => e.employeeId === activeEmployeeId) ?? null
-              : null
+            activeModal === "edit" ? findEmployee(activeEmployeeId) : null
           }
           employees={employees}
           onAdd={async (form) => {
@@ -275,11 +288,9 @@ function App() {
                   mode: "add",
                 }
               );
-              const data = await fetchEmployees();
-              setEmployees(data);
+              const emps = await reloadAll();
               const ITEMS_PER_PAGE = 15;
-              const newTotal = data.length;
-              setCurrentPage(Math.ceil(newTotal / ITEMS_PER_PAGE));
+              setCurrentPage(Math.ceil(emps.length / ITEMS_PER_PAGE));
               setActiveEmployeeId(null);
               setActiveModal(null);
             } catch (e: any) {
@@ -299,8 +310,7 @@ function App() {
                   mode: "edit",
                 }
               );
-              const data = await fetchEmployees();
-              setEmployees(data);
+              await reloadAll();
               setActiveEmployeeId(null);
               setActiveModal(null);
             } catch (e: any) {
@@ -310,7 +320,7 @@ function App() {
           onDelete={async (employeeId) => {
             try {
               // 先に有給取得日を全て削除
-              const emp = employees.find((e) => e.employeeId === employeeId);
+              const emp = findEmployee(employeeId);
               if (emp) {
                 const usages = leaveUsages.filter(
                   (u) => u.employeeId === emp.employeeId
@@ -325,15 +335,9 @@ function App() {
               // 従業員本体を削除
               await apiPost(
                 "http://localhost/paid_leave_manager/employees.php",
-                {
-                  employee_id: employeeId,
-                  mode: "delete",
-                }
+                { employee_id: employeeId, mode: "delete" }
               );
-              const data = await fetchEmployees();
-              setEmployees(data);
-              setLeaveUsages(await fetchLeaveUsages()); // 取得日も再取得
-              setSummaries(await fetchSummaries(data)); // サマリーも再取得
+              await reloadAll();
               setActiveEmployeeId(null);
               setActiveModal(null);
             } catch (e: any) {
@@ -347,10 +351,7 @@ function App() {
           employeeId={activeEmployeeId}
           leaveUsages={leaveUsages}
           onAddDate={async (date) => {
-            const emp =
-              activeEmployeeId !== null
-                ? employees.find((e) => e.employeeId === activeEmployeeId)
-                : null;
+            const emp = findEmployee(activeEmployeeId);
             if (!emp) return;
             try {
               await apiPost(
@@ -360,27 +361,21 @@ function App() {
                   used_date: date,
                 }
               );
-              setLeaveUsages(await fetchLeaveUsages());
-              setSummaries(await fetchSummaries(employees));
+              await reloadAll();
               setDateInput("");
             } catch (e: any) {
               alert(e.message || "有給消化日の追加に失敗しました");
             }
           }}
           onDeleteDate={async (idx) => {
-            const emp =
-              activeEmployeeId !== null
-                ? employees.find((e) => e.employeeId === activeEmployeeId)
-                : null;
+            const emp = findEmployee(activeEmployeeId);
             if (!emp) return false;
-            // 画面に表示しているusedDatesから削除対象日付を特定
-            const id = emp.employeeId;
-            const summary = summaries.find((s) => s.employeeId === id);
-            const usedDates =
-              summary && summary.usedDates ? summary.usedDates : [];
+            const summary =
+              summaries.find((s) => s.employeeId === emp.employeeId) ||
+              emptySummary;
+            const usedDates = summary.usedDates;
             const targetDate = usedDates[idx];
             if (!targetDate) return false;
-            // leaveUsagesから該当日付・従業員IDのレコードを探す
             const target = leaveUsages.find(
               (u) =>
                 u.employeeId === emp.employeeId && u.usedDate === targetDate
@@ -391,8 +386,7 @@ function App() {
                 "http://localhost/paid_leave_manager/leave_usage_delete.php",
                 { id: target.id }
               );
-              setLeaveUsages(await fetchLeaveUsages());
-              setSummaries(await fetchSummaries(employees));
+              await reloadAll();
               return true;
             } catch (e: any) {
               alert(e.message || "有給消化日の削除に失敗しました");
@@ -406,13 +400,17 @@ function App() {
           currentPage={leaveDatesPage}
           onPageChange={setLeaveDatesPage}
           summary={(() => {
-            const id = activeEmployeeId !== null ? activeEmployeeId : null;
-            const s = summaries.find((s) => s.employeeId === id);
-            return s || { grantThisYear: 0, carryOver: 0, used: 0, remain: 0 };
+            const emp = findEmployee(activeEmployeeId);
+            const s = summaries.find(
+              (s) => s.employeeId === (emp?.employeeId ?? null)
+            );
+            return s || emptySummary;
           })()}
           usedDates={(() => {
-            const id = activeEmployeeId !== null ? activeEmployeeId : null;
-            const summary = summaries.find((s) => s.employeeId === id);
+            const emp = findEmployee(activeEmployeeId);
+            const summary = summaries.find(
+              (s) => s.employeeId === (emp?.employeeId ?? null)
+            );
             return summary && summary.usedDates ? summary.usedDates : [];
           })()}
         />
