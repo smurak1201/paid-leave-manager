@@ -131,21 +131,28 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     handleDeleteClick,
   }) => {
     return (
-      <>
-        <Td>{emp.employeeId}</Td> {/* 従業員IDを表示 */}
-        <Td>{emp.lastName}</Td>
-        <Td>{emp.firstName}</Td>
-        <Td>
+      // <tr>の直下に余計な空白や改行を出力しないため、Fragmentではなく配列で返す
+      [
+        <Td key="id">{emp.employeeId}</Td>,
+        <Td key="lastName">{emp.lastName}</Td>,
+        <Td key="firstName">{emp.firstName}</Td>,
+        <Td key="joinedAt">
           {(() => {
             const [y, m, d] = emp.joinedAt.split("-");
             return `${y}年${Number(m)}月${d ? Number(d) + "日" : ""}`;
           })()}
-        </Td>
-        <Td>{servicePeriod}</Td>
-        <Td isNumeric>{grantThisYear}</Td>
-        <Td isNumeric>{carryOver}</Td>
-        <Td isNumeric>{used}</Td>
-        <Td isNumeric>
+        </Td>,
+        <Td key="servicePeriod">{servicePeriod}</Td>,
+        <Td key="grantThisYear" isNumeric>
+          {grantThisYear}
+        </Td>,
+        <Td key="carryOver" isNumeric>
+          {carryOver}
+        </Td>,
+        <Td key="used" isNumeric>
+          {used}
+        </Td>,
+        <Td key="remain" isNumeric>
           <Badge
             colorScheme={remain <= 3 ? "red" : remain <= 7 ? "yellow" : "teal"}
             fontSize="md"
@@ -158,8 +165,8 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
           >
             {grantThisYear + carryOver - used}
           </Badge>
-        </Td>
-        <Td>
+        </Td>,
+        <Td key="actions">
           <HStack justify="center" gap={1}>
             <Tooltip content="確認" showArrow>
               <IconButton
@@ -195,8 +202,8 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               </IconButton>
             </Tooltip>
           </HStack>
-        </Td>
-      </>
+        </Td>,
+      ]
     );
   };
 
