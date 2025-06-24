@@ -152,6 +152,7 @@ function App() {
   // テーブル「確認」ボタン
   const handleView = (employeeId: number) => {
     setActiveEmployeeId(employeeId);
+    setActiveModal("leaveDates");
   };
   // テーブル「編集」ボタン
   const handleEdit = (employeeId: number) => {
