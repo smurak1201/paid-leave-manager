@@ -354,6 +354,7 @@ function App() {
           leaveUsages={leaveUsages}
           onAddDate={async (date) => {
             if (activeEmployeeId == null) return;
+            setActiveModal(null); // 先にモーダルを閉じる
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_add.php",
@@ -379,6 +380,7 @@ function App() {
             if (!targetDate) {
               return false;
             }
+            setActiveModal(null); // 先にモーダルを閉じる
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_delete.php",
