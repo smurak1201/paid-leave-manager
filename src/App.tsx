@@ -355,10 +355,11 @@ function App() {
             const emp = findEmployee(activeEmployeeId);
             if (!emp) return;
             try {
+              // leave_usage.employee_id には employees.employee_id（業務ID）を登録する
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_add.php",
                 {
-                  employee_id: emp.employeeId,
+                  employee_id: emp.employeeId, // ← emp.id（主キー）は絶対に使わない
                   used_date: date,
                 }
               );
@@ -376,12 +377,27 @@ function App() {
               emptySummary;
             const usedDates = summary.usedDates;
             const targetDate = usedDates[idx];
-            if (!targetDate) return false;
+            if (!targetDate) {
+              console.log("削除対象日付が見つかりません", { idx, usedDates });
+              return false;
+            }
+            // 日付フォーマットを統一して比較
+            const normalize = (d: string) => d && d.slice(0, 10);
             const target = leaveUsages.find(
               (u) =>
-                u.employeeId === emp.employeeId && u.usedDate === targetDate
+                u.employeeId === emp.employeeId &&
+                normalize(u.usedDate) === normalize(targetDate)
             );
-            if (!target) return false;
+            if (!target) {
+              console.log("削除対象usageが見つかりません", {
+                employeeId: emp.employeeId,
+                targetDate,
+                leaveUsages: leaveUsages.filter(
+                  (u) => u.employeeId === emp.employeeId
+                ),
+              });
+              return false;
+            }
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_delete.php",
