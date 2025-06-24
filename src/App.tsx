@@ -347,6 +347,7 @@ function App() {
           }}
         />
         <LeaveDatesModal
+          key={activeEmployeeId ?? "none"}
           isOpen={activeModal === "leaveDates"}
           onClose={() => setActiveModal(null)}
           employeeId={activeEmployeeId} // ここも従業員コード
@@ -364,11 +365,6 @@ function App() {
               await reloadAll();
               setDateInput("");
             } catch (e: any) {
-              console.error("有給消化日追加APIエラー", e);
-              console.dir(e);
-              try {
-                alert("[DEBUG] " + JSON.stringify(e));
-              } catch {}
               alert(e.message || "有給消化日の追加に失敗しました");
             }
           }}
@@ -381,7 +377,6 @@ function App() {
               .map((u) => u.usedDate);
             const targetDate = usedDates[idx];
             if (!targetDate) {
-              console.log("削除対象日付が見つかりません", { idx, usedDates });
               return false;
             }
             try {
