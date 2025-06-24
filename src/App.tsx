@@ -352,19 +352,23 @@ function App() {
           employeeId={activeEmployeeId} // ここも従業員コード
           leaveUsages={leaveUsages}
           onAddDate={async (date) => {
-            // leave_usage.employee_id には「従業員コード（従業員番号）」を登録する
             if (activeEmployeeId == null) return;
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_add.php",
                 {
-                  employee_id: activeEmployeeId, // ← 必ず従業員コードを渡す
+                  employee_id: Number(activeEmployeeId), // int型で送信
                   used_date: date,
                 }
               );
               await reloadAll();
               setDateInput("");
             } catch (e: any) {
+              console.error("有給消化日追加APIエラー", e);
+              console.dir(e);
+              try {
+                alert("[DEBUG] " + JSON.stringify(e));
+              } catch {}
               alert(e.message || "有給消化日の追加に失敗しました");
             }
           }}
@@ -380,27 +384,10 @@ function App() {
               console.log("削除対象日付が見つかりません", { idx, usedDates });
               return false;
             }
-            // 日付フォーマットを統一して比較
-            const normalize = (d: string) => d && d.slice(0, 10);
-            const target = leaveUsages.find(
-              (u) =>
-                u.employeeId === emp.employeeId &&
-                normalize(u.usedDate) === normalize(targetDate)
-            );
-            if (!target) {
-              console.log("削除対象usageが見つかりません", {
-                employeeId: emp.employeeId,
-                targetDate,
-                leaveUsages: leaveUsages.filter(
-                  (u) => u.employeeId === emp.employeeId
-                ),
-              });
-              return false;
-            }
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_delete.php",
-                { id: target.id }
+                { employee_id: emp.employeeId, used_date: targetDate }
               );
               await reloadAll();
               return true;
