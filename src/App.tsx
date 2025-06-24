@@ -151,12 +151,12 @@ function App() {
   // --- UIイベントハンドラ ---
   // テーブル「確認」ボタン
   const handleView = (employeeId: number) => {
-    setActiveEmployeeId(employeeId);
+    setActiveEmployeeId(employeeId); // employeeIdは必ず従業員コード（employee_id）を渡す
     setActiveModal("leaveDates");
   };
   // テーブル「編集」ボタン
   const handleEdit = (employeeId: number) => {
-    setActiveEmployeeId(employeeId);
+    setActiveEmployeeId(employeeId); // employeeIdは必ず従業員コード（employee_id）を渡す
     setActiveModal("edit");
   };
   // 「従業員追加」ボタン
@@ -239,7 +239,7 @@ function App() {
           <EmployeeTable
             employees={employees}
             summaries={summaries}
-            onEdit={handleEdit}
+            onEdit={(employeeId) => handleEdit(employeeId)} // employeeIdは従業員コード
             onDelete={async (employeeId) => {
               try {
                 // 先に有給取得日を全て削除
@@ -265,7 +265,7 @@ function App() {
                 alert(e.message || "従業員削除に失敗しました");
               }
             }}
-            onView={handleView}
+            onView={(employeeId) => handleView(employeeId)} // employeeIdは従業員コード
             currentPage={currentPage}
             onPageChange={setCurrentPage}
           />
@@ -349,17 +349,16 @@ function App() {
         <LeaveDatesModal
           isOpen={activeModal === "leaveDates"}
           onClose={() => setActiveModal(null)}
-          employeeId={activeEmployeeId}
+          employeeId={activeEmployeeId} // ここも従業員コード
           leaveUsages={leaveUsages}
           onAddDate={async (date) => {
-            const emp = findEmployee(activeEmployeeId);
-            if (!emp) return;
+            // leave_usage.employee_id には「従業員コード（従業員番号）」を登録する
+            if (activeEmployeeId == null) return;
             try {
-              // leave_usage.employee_id には employees.employee_id（業務ID）を登録する
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_add.php",
                 {
-                  employee_id: emp.employeeId, // ← emp.id（主キー）は絶対に使わない
+                  employee_id: activeEmployeeId, // ← 必ず従業員コードを渡す
                   used_date: date,
                 }
               );
