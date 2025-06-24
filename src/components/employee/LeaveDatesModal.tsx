@@ -49,15 +49,13 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
 }) => {
   if (!isOpen) return null;
   // usedDatesがあればそれを使う。なければgrantDetailsから生成
-  const dates = useMemo(
-    () =>
-      usedDates && usedDates.length > 0
-        ? [...usedDates].sort()
-        : grantDetails
-        ? grantDetails.flatMap((g) => g.usedDates).sort()
-        : [],
-    [usedDates, grantDetails]
-  );
+  const getDates = () =>
+    usedDates && usedDates.length > 0
+      ? [...usedDates].sort()
+      : grantDetails
+      ? grantDetails.flatMap((g) => g.usedDates).sort()
+      : [];
+  const dates = useMemo(getDates, [usedDates, grantDetails]);
   const remain = summary.remain;
 
   // ページネーション用
@@ -84,7 +82,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   // 削除モーダル用状態
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
-  const handleDeleteClick = useCallback((idx: number) => {
+  const handleDelete = useCallback((idx: number) => {
     setDeleteIdx(idx);
     setDeleteOpen(true);
   }, []);
@@ -95,7 +93,6 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
         setDeleteOpen(false);
         setDeleteIdx(null);
       }
-      // 削除失敗時は何もしない（親モーダルも閉じない）
     }
   }, [deleteIdx, onDeleteDate]);
   const handleDeleteClose = useCallback(() => {
@@ -114,6 +111,41 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
       await onAddDate(date);
     },
     [dates, onAddDate]
+  );
+
+  // ページネーション共通部品
+  const PageNav: React.FC<{
+    current: number;
+    total: number;
+    onChange: (n: number) => void;
+  }> = ({ current, total, onChange }) => (
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      gap={2}
+      mb={2}
+    >
+      <Button
+        size="sm"
+        onClick={() => onChange(Math.max(1, current - 1))}
+        disabled={current === 1}
+        variant="outline"
+      >
+        前へ
+      </Button>
+      <Text fontSize="sm" mx={2}>
+        {current} / {total}
+      </Text>
+      <Button
+        size="sm"
+        onClick={() => onChange(Math.min(total, current + 1))}
+        disabled={current === total}
+        variant="outline"
+      >
+        次へ
+      </Button>
+    </Box>
   );
 
   return (
@@ -179,35 +211,11 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
           <>
             {/* ページネーション（リストの上） */}
             {dates.length > ITEMS_PER_PAGE && (
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                gap={2}
-                mb={2}
-              >
-                <Button
-                  size="sm"
-                  onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  variant="outline"
-                >
-                  前へ
-                </Button>
-                <Text fontSize="sm" mx={2}>
-                  {currentPage} / {totalPages}
-                </Text>
-                <Button
-                  size="sm"
-                  onClick={() =>
-                    onPageChange(Math.min(totalPages, currentPage + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  variant="outline"
-                >
-                  次へ
-                </Button>
-              </Box>
+              <PageNav
+                current={currentPage}
+                total={totalPages}
+                onChange={onPageChange}
+              />
             )}
             <LeaveDateList
               dates={dates}
@@ -218,7 +226,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                 setEditDateIdx(idx);
                 setDateInput(pagedDates[idx] ?? "");
               }}
-              onDeleteDate={handleDeleteClick}
+              onDeleteDate={handleDelete}
               inputDateSmallStyle={inputDateSmallStyle}
               pagedDates={pagedDates}
               currentPage={currentPage}

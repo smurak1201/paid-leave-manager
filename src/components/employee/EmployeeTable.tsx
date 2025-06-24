@@ -200,6 +200,61 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     );
   };
 
+  // ページネーション共通部品
+  const PageNav: React.FC<{
+    current: number;
+    total: number;
+    onChange: (n: number) => void;
+  }> = ({ current, total, onChange }) => (
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      gap={2}
+      mb={2}
+    >
+      <button
+        onClick={() => onChange(Math.max(1, current - 1))}
+        disabled={current === 1}
+        style={{
+          padding: "4px 12px",
+          borderRadius: 6,
+          border: "1px solid #B2F5EA",
+          background: current === 1 ? "#eee" : "#fff",
+          color: "black",
+          cursor: current === 1 ? "not-allowed" : "pointer",
+        }}
+      >
+        前へ
+      </button>
+      <span style={{ fontSize: "0.95em", color: "black" }}>
+        {current} / {total}
+      </span>
+      <button
+        onClick={() => onChange(Math.min(total, current + 1))}
+        disabled={current === total}
+        style={{
+          padding: "4px 12px",
+          borderRadius: 6,
+          border: "1px solid #B2F5EA",
+          background: current === total ? "#eee" : "#fff",
+          color: "black",
+          cursor: current === total ? "not-allowed" : "pointer",
+        }}
+      >
+        次へ
+      </button>
+    </Box>
+  );
+
+  const getSummary = (id: number) =>
+    summaryMap.get(id) ?? {
+      grantThisYear: 0,
+      carryOver: 0,
+      used: 0,
+      remain: 0,
+    };
+
   return (
     <Box
       overflowX="auto"
@@ -216,45 +271,11 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     >
       {/* ページネーション（テーブル上部） */}
       {employees.length > ITEMS_PER_PAGE && (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          gap={2}
-          mb={2}
-        >
-          <button
-            onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-            style={{
-              padding: "4px 12px",
-              borderRadius: 6,
-              border: "1px solid #B2F5EA",
-              background: currentPage === 1 ? "#eee" : "#fff",
-              color: "black",
-              cursor: currentPage === 1 ? "not-allowed" : "pointer",
-            }}
-          >
-            前へ
-          </button>
-          <span style={{ fontSize: "0.95em", color: "black" }}>
-            {currentPage} / {totalPages}
-          </span>
-          <button
-            onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage === totalPages}
-            style={{
-              padding: "4px 12px",
-              borderRadius: 6,
-              border: "1px solid #B2F5EA",
-              background: currentPage === totalPages ? "#eee" : "#fff",
-              color: "black",
-              cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-            }}
-          >
-            次へ
-          </button>
-        </Box>
+        <PageNav
+          current={currentPage}
+          total={totalPages}
+          onChange={onPageChange}
+        />
       )}
       <Table
         variant="striped"
@@ -305,22 +326,13 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         <Tbody>
           <AnimatePresence>
             {pagedEmployees.map((emp, idx) => {
-              const summary = summaryMap.get(emp.employeeId) ?? {
-                grantThisYear: 0,
-                carryOver: 0,
-                used: 0,
-                remain: 0,
-              };
-              const grantThisYear = summary.grantThisYear;
-              const carryOver = summary.carryOver;
-              const used = summary.used;
-              const remain = summary.remain;
+              const summary = getSummary(emp.employeeId);
               const rowProps = {
                 emp,
-                grantThisYear,
-                carryOver,
-                used,
-                remain,
+                grantThisYear: summary.grantThisYear,
+                carryOver: summary.carryOver,
+                used: summary.used,
+                remain: summary.remain,
                 servicePeriod: getServicePeriod(emp.joinedAt),
                 onView,
                 onEdit,
@@ -328,7 +340,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               };
               const style = {
                 background:
-                  remain === 0
+                  summary.remain === 0
                     ? "#FFF5F5"
                     : idx % 2 === 1
                     ? "rgba(0, 128, 128, 0.06)"
