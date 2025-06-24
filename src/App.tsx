@@ -251,7 +251,7 @@ function App() {
                   for (const usage of usages) {
                     await apiPost(
                       "http://localhost/paid_leave_manager/leave_usage_delete.php",
-                      { id: usage.id }
+                      { employee_id: emp.employeeId, used_date: usage.usedDate }
                     );
                   }
                 }
