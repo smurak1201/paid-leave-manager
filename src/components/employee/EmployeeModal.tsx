@@ -45,59 +45,48 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   onAdd,
   onSave,
 }) => {
-  // 空の従業員初期値（追加時用）
-  const emptyEmployee: Employee = {
+  // form型: 入力中はemployeeIdはstringで保持
+  type FormType = Omit<Employee, "employeeId"> & { employeeId: string };
+  const emptyForm: FormType = {
     id: NaN,
-    employeeId: "", // 入力値はstringで保持
+    employeeId: "",
     lastName: "",
     firstName: "",
     joinedAt: "",
-  } as any;
-
-  const [form, setForm] = useState<any>(emptyEmployee);
+  };
+  const [form, setForm] = useState<FormType>(emptyForm);
   const [employeeIdError, setEmployeeIdError] = useState("");
 
-  // employeeが変わるたびにformを初期化
-  useEffect(() => {
-    if (isOpen && employee) {
+  // バリデーション関数
+  const validateEmployeeId = (value: string): string => {
+    if (value === "") return "従業員コードは必須です";
+    if (!/^[0-9]+$/.test(value))
+      return "従業員コードは半角数字のみ入力できます";
+    if (!employee && employees.some((emp) => String(emp.employeeId) === value))
+      return "従業員コードが重複しています";
+    return "";
+  };
+
+  // 初期化・リセット
+  const resetForm = () => {
+    if (employee) {
       setForm({ ...employee, employeeId: String(employee.employeeId) });
-      setEmployeeIdError("");
-    } else if (isOpen) {
-      setForm(emptyEmployee);
-      setEmployeeIdError("");
-    }
-  }, [employee, isOpen]);
-
-  // モーダルが閉じられたときにフォーム内容を初期化
-  useEffect(() => {
-    if (!isOpen) {
-      setForm(emptyEmployee);
-      setEmployeeIdError("");
-    }
-  }, [isOpen]);
-
-  // 入力欄のonChangeハンドラ（employeeId重複・数字バリデーションを内部で完結）
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!form) return;
-    if (e.target.name === "employeeId") {
-      const value = e.target.value;
-      setForm((prev: any) => ({ ...prev, employeeId: value }));
-      // バリデーション
-      if (value === "") {
-        setEmployeeIdError("従業員コードは必須です");
-      } else if (!/^[0-9]+$/.test(value)) {
-        setEmployeeIdError("従業員コードは半角数字のみ入力できます");
-      } else if (
-        !employee &&
-        employees.some((emp) => String(emp.employeeId) === value)
-      ) {
-        setEmployeeIdError("従業員コードが重複しています");
-      } else {
-        setEmployeeIdError("");
-      }
     } else {
-      setForm({ ...form, [e.target.name]: e.target.value });
+      setForm(emptyForm);
     }
+    setEmployeeIdError("");
+  };
+
+  useEffect(() => {
+    if (isOpen) resetForm();
+    // eslint-disable-next-line
+  }, [isOpen, employee]);
+
+  // 入力欄のonChangeハンドラ
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === "employeeId") setEmployeeIdError(validateEmployeeId(value));
   };
 
   const isSaveDisabled = useMemo(
@@ -111,14 +100,13 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   );
 
   const handleSave = useCallback(() => {
-    if (employee) {
-      onSave({ ...form, employeeId: Number(form.employeeId) });
-    } else {
-      onAdd({ ...form, employeeId: Number(form.employeeId) });
-    }
+    const submitForm = { ...form, employeeId: Number(form.employeeId) };
+    employee
+      ? onSave(submitForm as Employee)
+      : onAdd(submitForm as Omit<Employee, "id">);
   }, [employee, form, onAdd, onSave]);
 
-  if (!isOpen || !form) return null;
+  if (!isOpen) return null;
   return (
     <CustomModal isOpen={isOpen} onClose={onClose}>
       {/* GuideModalと同様、白背景・角丸・影付きBoxでラップ */}
@@ -159,7 +147,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
           <Icon as={X} boxSize={4} />
         </Button>
         <Stack gap={3} mb={6}>
-          <FormControl isRequired>
+          <FormControl isRequired isInvalid={!!employeeIdError}>
             <FormLabel>
               <Icon as={BadgeInfo} mr={2} />
               従業員コード
