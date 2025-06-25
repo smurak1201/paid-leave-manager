@@ -34,9 +34,7 @@ export const EmployeeTableRow: React.FC<
       <Td fontWeight="bold" color="teal.700" fontSize="md">
         {emp.employeeId}
       </Td>
-      <Td fontWeight="bold" color="gray.700">
-        {emp.lastName}
-      </Td>
+      <Td color="gray.700">{emp.lastName}</Td>
       <Td color="gray.700">{emp.firstName}</Td>
       <Td color="gray.600">{joinedAtJp}</Td>
       <Td color="gray.600">{servicePeriod}</Td>
