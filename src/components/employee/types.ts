@@ -98,6 +98,7 @@ export interface LeaveDatesModalProps {
     remain: number;
     usedDates: string[];
   }>;
+  addDateError?: string;
 }
 
 /**

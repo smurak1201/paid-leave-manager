@@ -174,6 +174,7 @@ function App() {
   // --- 有給取得日編集用の状態・ロジック ---
   const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
   const [dateInput, setDateInput] = useState("");
+  const [addDateError, setAddDateError] = useState("");
 
   // 従業員IDから従業員オブジェクトを取得
   const findEmployee = (id: number | null) =>
@@ -354,6 +355,7 @@ function App() {
           leaveUsages={leaveUsages}
           onAddDate={async (date) => {
             if (activeEmployeeId == null) return;
+            setAddDateError("");
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_add.php",
@@ -365,7 +367,7 @@ function App() {
               await reloadAll();
               setDateInput("");
             } catch (e: any) {
-              alert(e.message || "有給消化日の追加に失敗しました");
+              setAddDateError(e.message || "有給消化日の追加に失敗しました");
             }
           }}
           onDeleteDate={async (idx) => {
@@ -408,6 +410,7 @@ function App() {
             .filter((u) => u.employeeId === activeEmployeeId)
             .map((u) => u.usedDate)}
           grantDetails={undefined}
+          addDateError={addDateError}
         />
       </Box>
     </Box>

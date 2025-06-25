@@ -46,6 +46,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   summary,
   usedDates,
   grantDetails,
+  addDateError,
 }) => {
   if (!isOpen) return null;
   // usedDatesがあればそれを使う。なければgrantDetailsから生成
@@ -203,6 +204,11 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
           editDateIdx={editDateIdx}
           remainSimple={remain}
         />
+        {addDateError && (
+          <Text color="red.500" fontSize="sm" mt={-2} mb={2} textAlign="center">
+            {addDateError}
+          </Text>
+        )}
         {dates.length === 0 ? (
           <Text color="gray.500" textAlign="center">
             取得履歴なし
