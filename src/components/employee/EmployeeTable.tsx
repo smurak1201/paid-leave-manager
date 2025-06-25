@@ -23,7 +23,6 @@ import React, {
 } from "react";
 import { Table, Thead, Tbody, Tr, Th } from "@chakra-ui/table";
 import { Box } from "@chakra-ui/react";
-import { AnimatePresence } from "framer-motion";
 
 // ===== import: 型定義 =====
 import type { Employee, EmployeeSummary, EmployeeTableProps } from "./types";
@@ -226,35 +225,33 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
           </Tr>
         </Thead>
         <Tbody>
-          <AnimatePresence>
-            {pagedEmployees.map((emp, idx) => {
-              const summary = getSummary(emp.employeeId);
-              const rowProps = {
-                emp,
-                grantThisYear: summary.grantThisYear,
-                carryOver: summary.carryOver,
-                used: summary.used,
-                remain: summary.remain,
-                servicePeriod: getServicePeriod(emp.joinedAt),
-                onView,
-                onEdit,
-                handleDeleteClick,
-                rowIndex: idx,
-              };
-              const oddBg = idx % 2 === 1 ? "rgba(0,128,128,0.06)" : undefined;
-              return (
-                <FadeTableRow
-                  key={emp.id}
-                  style={{
-                    background: summary.remain === 0 ? "#FFF5F5" : oddBg,
-                    transition: "background 0.3s",
-                  }}
-                >
-                  <EmployeeTableRow {...rowProps} />
-                </FadeTableRow>
-              );
-            })}
-          </AnimatePresence>
+          {pagedEmployees.map((emp, idx) => {
+            const summary = getSummary(emp.employeeId);
+            const rowProps = {
+              emp,
+              grantThisYear: summary.grantThisYear,
+              carryOver: summary.carryOver,
+              used: summary.used,
+              remain: summary.remain,
+              servicePeriod: getServicePeriod(emp.joinedAt),
+              onView,
+              onEdit,
+              handleDeleteClick,
+              rowIndex: idx,
+            };
+            const oddBg = idx % 2 === 1 ? "rgba(0,128,128,0.06)" : undefined;
+            return (
+              <FadeTableRow
+                key={emp.id}
+                style={{
+                  background: summary.remain === 0 ? "#FFF5F5" : oddBg,
+                  transition: "background 0.3s",
+                }}
+              >
+                <EmployeeTableRow {...rowProps} />
+              </FadeTableRow>
+            );
+          })}
         </Tbody>
       </Table>
       <ConfirmDeleteModal
