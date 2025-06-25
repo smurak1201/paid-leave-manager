@@ -363,6 +363,7 @@ function App() {
           employeeId={activeEmployeeId} // ここも従業員コード
           leaveUsages={leaveUsages}
           onAddDate={async (date) => {
+            console.log("onAddDate called with:", date);
             if (activeEmployeeId == null) return;
             setAddDateError("");
             if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
@@ -391,10 +392,11 @@ function App() {
             } else {
               for (const grant of grantDetails) {
                 const from = grant.grantDate; // YYYY-MM-DD
-                const toDate = new Date(grant.grantDate);
-                toDate.setFullYear(toDate.getFullYear() + 2);
-                toDate.setDate(toDate.getDate() - 1);
-                const to = toDate.toISOString().slice(0, 10); // YYYY-MM-DD
+                if (!from || !/^\d{4}-\d{2}-\d{2}$/.test(from)) continue; // 不正な日付はスキップ
+                // grantDateの2年後の同日-1日を安全に計算
+                const [y, m, d] = from.split("-").map(Number);
+                const toDateObj = new Date(y + 2, m - 1, d - 1); // JSのDateは月0始まり
+                const to = toDateObj.toISOString().slice(0, 10); // YYYY-MM-DD
                 if (date >= from && date <= to) {
                   isValid = true;
                   break;
