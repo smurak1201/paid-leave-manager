@@ -230,9 +230,9 @@ function App() {
           onClose={guideDisclosure.onClose}
         />
         {loading ? (
-          <Box textAlign="center" py={10}>
+          <Flex align="center" justify="center" minH="300px">
             <Icons.Loader className="animate-spin" size={24} />
-          </Box>
+          </Flex>
         ) : error ? (
           <Box color="red.500" textAlign="center" py={10}>
             {error}
