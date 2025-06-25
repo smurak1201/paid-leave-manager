@@ -71,6 +71,21 @@ function App() {
       usedDate: u.used_date,
     }));
   };
+  type EmployeeSummary = {
+    employeeId: number;
+    grantThisYear: number;
+    carryOver: number;
+    used: number;
+    remain: number;
+    usedDates: string[];
+    grantDetails?: Array<{
+      grantDate: string;
+      days: number;
+      used: number;
+      remain: number;
+      usedDates: string[];
+    }>;
+  };
   const fetchSummaries = async (emps: Employee[]) => {
     return Promise.all(
       emps.map(async (emp) => {
@@ -85,6 +100,7 @@ function App() {
             used: data.used ?? 0,
             remain: data.remain ?? 0,
             usedDates: data.usedDates ?? [],
+            grantDetails: data.grantDetails ?? [],
           };
         } catch {
           return {
@@ -94,6 +110,7 @@ function App() {
             used: 0,
             remain: 0,
             usedDates: [],
+            grantDetails: [],
           };
         }
       })
@@ -134,14 +151,6 @@ function App() {
   }, []);
 
   // --- サマリー再取得 ---
-  type EmployeeSummary = {
-    employeeId: number;
-    grantThisYear: number;
-    carryOver: number;
-    used: number;
-    remain: number;
-    usedDates: string[];
-  };
   const [summaries, setSummaries] = useState<EmployeeSummary[]>([]);
   useEffect(() => {
     if (employees.length === 0) return;
@@ -356,12 +365,44 @@ function App() {
           onAddDate={async (date) => {
             if (activeEmployeeId == null) return;
             setAddDateError("");
+            if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+              setAddDateError("日付を正しく入力してください");
+              return;
+            }
             // 既存の有給取得日と重複していないかチェック
             const usedDates = leaveUsages
               .filter((u) => u.employeeId === activeEmployeeId)
               .map((u) => u.usedDate);
             if (usedDates.includes(date)) {
               setAddDateError("同じ有給取得日がすでに登録されています");
+              return;
+            }
+            // 有効期限チェック（どれか1つでも範囲内ならOK）
+            let isValid = false;
+            const empSummary = summaries.find(
+              (s) => s.employeeId === activeEmployeeId
+            );
+            const grantDetails =
+              empSummary && empSummary.grantDetails
+                ? empSummary.grantDetails
+                : [];
+            if (grantDetails.length === 0) {
+              isValid = true; // grantDetailsがない場合はチェックしない
+            } else {
+              for (const grant of grantDetails) {
+                const from = grant.grantDate; // YYYY-MM-DD
+                const toDate = new Date(grant.grantDate);
+                toDate.setFullYear(toDate.getFullYear() + 2);
+                toDate.setDate(toDate.getDate() - 1);
+                const to = toDate.toISOString().slice(0, 10); // YYYY-MM-DD
+                if (date >= from && date <= to) {
+                  isValid = true;
+                  break;
+                }
+              }
+            }
+            if (!isValid) {
+              setAddDateError("有効期限外の日付は登録できません");
               return;
             }
             try {
@@ -376,7 +417,6 @@ function App() {
               setDateInput("");
             } catch (e: any) {
               let msg = e?.message || "有給消化日の追加に失敗しました";
-              // 400エラーや入社日前の登録など、特定のエラー内容を日本語で分かりやすく
               if (msg.includes("400") || msg.includes("before joined")) {
                 msg = "入社日より前の日付は登録できません";
               } else if (msg.includes("duplicate")) {
@@ -424,7 +464,14 @@ function App() {
           usedDates={leaveUsages
             .filter((u) => u.employeeId === activeEmployeeId)
             .map((u) => u.usedDate)}
-          grantDetails={undefined}
+          grantDetails={(() => {
+            const empSummary = summaries.find(
+              (s) => s.employeeId === activeEmployeeId
+            );
+            return empSummary && empSummary.grantDetails
+              ? empSummary.grantDetails
+              : [];
+          })()}
           addDateError={addDateError}
         />
       </Box>
