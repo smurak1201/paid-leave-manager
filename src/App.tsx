@@ -393,10 +393,24 @@ function App() {
               for (const grant of grantDetails) {
                 const from = grant.grantDate; // YYYY-MM-DD
                 if (!from || !/^\d{4}-\d{2}-\d{2}$/.test(from)) continue; // 不正な日付はスキップ
-                // grantDateの2年後の同日-1日を安全に計算
-                const [y, m, d] = from.split("-").map(Number);
-                const toDateObj = new Date(y + 2, m - 1, d - 1); // JSのDateは月0始まり
-                const to = toDateObj.toISOString().slice(0, 10); // YYYY-MM-DD
+                // grantDateの2年後の同日-1日を文字列演算で計算
+                let [y, m, d] = from.split("-").map(Number);
+                // 日付を1日引く（1日なら前月末日、そうでなければ-1）
+                if (d === 1) {
+                  m -= 1;
+                  if (m === 0) {
+                    y -= 1;
+                    m = 12;
+                  }
+                  // 前月末日を求める
+                  d = new Date(y + 2, m, 0).getDate();
+                } else {
+                  d -= 1;
+                }
+                const toY = y + 2;
+                const toM = String(m).padStart(2, "0");
+                const toD = String(d).padStart(2, "0");
+                const to = `${toY}-${toM}-${toD}`;
                 if (date >= from && date <= to) {
                   isValid = true;
                   break;
