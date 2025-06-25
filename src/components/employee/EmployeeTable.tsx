@@ -224,7 +224,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
           </Tr>
         </Thead>
         <Tbody>
-          {pagedEmployees.map((emp) => {
+          {pagedEmployees.map((emp, i) => {
             const summary = getSummary(emp.employeeId);
             const rowProps = {
               emp,
@@ -236,6 +236,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               onView,
               onEdit,
               handleDeleteClick,
+              rowIndex: i, // 行インデックスを明示的に渡す
             };
             return <EmployeeTableRow key={emp.id} {...rowProps} />;
           })}
