@@ -58,16 +58,20 @@ export const DateInputRow: React.FC<DateInputRowProps> = ({
   const handleDateChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       onChangeDateInput(e.target.value);
-      if (
-        editDateIdx === null &&
-        e.target.value.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/) &&
-        remainSimple > 0
-      ) {
-        onAddDate(e.target.value);
-      }
+      // ここでonAddDateは呼ばない（追加ボタンでのみ追加）
     },
-    [onChangeDateInput, onAddDate, editDateIdx, remainSimple]
+    [onChangeDateInput]
   );
+
+  const handleAddClick = useCallback(() => {
+    if (
+      editDateIdx === null &&
+      dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/) &&
+      remainSimple > 0
+    ) {
+      onAddDate(dateInput);
+    }
+  }, [onAddDate, editDateIdx, remainSimple, dateInput]);
 
   const isSaveDisabled = useMemo(
     () => remainSimple === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/),
@@ -83,6 +87,20 @@ export const DateInputRow: React.FC<DateInputRowProps> = ({
         style={inputDateStyle}
         maxLength={10}
       />
+      {editDateIdx === null && (
+        <Button
+          colorScheme="teal"
+          onClick={handleAddClick}
+          px={4}
+          minW={"auto"}
+          disabled={isSaveDisabled}
+          cursor={isSaveDisabled ? "not-allowed" : "pointer"}
+          _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
+        >
+          <Icons.Plus size={16} style={{ marginRight: 6 }} />
+          追加
+        </Button>
+      )}
       {editDateIdx !== null && (
         <Button
           colorScheme="teal"
