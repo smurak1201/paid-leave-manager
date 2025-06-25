@@ -1,11 +1,13 @@
 import React from "react";
-import { Td } from "@chakra-ui/table";
+import { Td, Tr } from "@chakra-ui/table";
 import { Badge, HStack, IconButton, Icon } from "@chakra-ui/react";
 import { Icons } from "./icons";
 import { Tooltip } from "../ui/tooltip";
 import type { RowContentProps } from "./types";
 
-export const EmployeeTableRow: React.FC<RowContentProps> = ({
+export const EmployeeTableRow: React.FC<
+  RowContentProps & { rowIndex?: number }
+> = ({
   emp,
   grantThisYear,
   carryOver,
@@ -15,13 +17,18 @@ export const EmployeeTableRow: React.FC<RowContentProps> = ({
   onView,
   onEdit,
   handleDeleteClick,
+  rowIndex,
 }) => {
   const [y, m, d] = emp.joinedAt.split("-");
   const joinedAtJp = `${y}年${Number(m)}月${d ? Number(d) + "日" : ""}`;
+  const oddBg =
+    rowIndex !== undefined && rowIndex % 2 === 1
+      ? "rgba(0,128,128,0.06)"
+      : undefined;
   return (
-    <tr
+    <Tr
       style={{
-        background: remain === 0 ? "#FFF5F5" : undefined,
+        background: remain === 0 ? "#FFF5F5" : oddBg,
         transition: "background 0.3s",
       }}
     >
@@ -95,6 +102,6 @@ export const EmployeeTableRow: React.FC<RowContentProps> = ({
           </Tooltip>
         </HStack>
       </Td>
-    </tr>
+    </Tr>
   );
 };

@@ -239,20 +239,9 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 onView,
                 onEdit,
                 handleDeleteClick,
+                rowIndex: idx, // 追加
               };
-              const style = {
-                background:
-                  summary.remain === 0
-                    ? "#FFF5F5"
-                    : idx % 2 === 1
-                    ? "rgba(0, 128, 128, 0.06)"
-                    : undefined,
-              };
-              return (
-                <FadeTableRow key={emp.id} style={style}>
-                  <EmployeeTableRow {...rowProps} />
-                </FadeTableRow>
-              );
+              return <EmployeeTableRow key={emp.id} {...rowProps} />;
             })}
           </AnimatePresence>
         </Tbody>
