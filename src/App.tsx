@@ -463,14 +463,22 @@ function App() {
           })()}
           usedDates={leaveUsages
             .filter((u) => u.employeeId === activeEmployeeId)
-            .map((u) => u.usedDate)}
+            .map((u) => u.usedDate)
+            .filter(Boolean)}
           grantDetails={(() => {
             const empSummary = summaries.find(
               (s) => s.employeeId === activeEmployeeId
             );
-            return empSummary && empSummary.grantDetails
-              ? empSummary.grantDetails
-              : [];
+            if (empSummary && empSummary.grantDetails) {
+              // grantDetailsの各usedDatesもfilter(Boolean)で不正値除去
+              return empSummary.grantDetails.map((g) => ({
+                ...g,
+                usedDates: Array.isArray(g.usedDates)
+                  ? g.usedDates.filter(Boolean)
+                  : [],
+              }));
+            }
+            return [];
           })()}
           addDateError={addDateError}
         />
