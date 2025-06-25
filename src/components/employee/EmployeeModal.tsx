@@ -4,15 +4,19 @@
 // =============================
 //
 // 役割:
-// ・従業員の追加・編集フォームUI
-// ・バリデーション・初期化・props/state流れを明確化
+// ・従業員の追加・編集フォームUIを表示
+// ・バリデーションや初期化、入力値管理などフォームのロジックを担当
 //
 // 設計意図:
 // ・型安全・責務分離・UI/UX・可読性重視
-// ・props/stateの流れ・UI部品の責務を日本語コメントで明記
+// ・フォームの状態管理やバリデーションはこのコンポーネントで完結
+// ・UI部品の責務を明確にし、親コンポーネントはデータ管理に専念できるようにする
 
+// ===== import: 型定義 =====
 import type { Employee } from "./types";
+// ===== import: React本体・フック =====
 import React, { useState, useEffect } from "react";
+// ===== import: Chakra UI部品 =====
 import {
   Box,
   HStack,
@@ -23,21 +27,23 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { FormControl, FormLabel } from "@chakra-ui/form-control";
+// ===== import: アイコン =====
 import { User, X, BadgeInfo } from "lucide-react";
+// ===== import: カスタムUI部品・ユーティリティ =====
 import { CustomModal } from "../ui/CustomModal";
 import { validateEmployeeId } from "./utils";
 
-// EmployeeModalProps型をここで定義
+// props型: モーダルの開閉状態・従業員データ・追加/保存ハンドラなどを親から受け取る
 interface EmployeeModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  employee: Employee | null;
-  employees: Employee[];
-  onAdd: (form: Omit<Employee, "id">) => void;
-  onSave: (form: Employee) => void;
+  isOpen: boolean; // モーダル表示状態
+  onClose: () => void; // モーダルを閉じる関数
+  employee: Employee | null; // 編集対象の従業員（新規追加時はnull）
+  employees: Employee[]; // 全従業員リスト（ID重複チェック用）
+  onAdd: (form: Omit<Employee, "id">) => void; // 追加時のハンドラ
+  onSave: (form: Employee) => void; // 編集保存時のハンドラ
 }
 
-// form型: 入力中はemployeeIdはstringで保持
+// 入力フォームの型: 入力中はemployeeIdはstringで保持
 export type FormType = Omit<Employee, "employeeId"> & { employeeId: string };
 const emptyForm: FormType = {
   id: NaN,
@@ -55,7 +61,9 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   onAdd,
   onSave,
 }) => {
+  // 入力フォームの状態
   const [form, setForm] = useState<FormType>(emptyForm);
+  // 従業員IDのバリデーションエラー
   const [employeeIdError, setEmployeeIdError] = useState("");
 
   // 初期化・リセット

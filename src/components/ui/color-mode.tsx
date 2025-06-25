@@ -10,10 +10,10 @@
 // ・Chakra UI/next-themesを活用し、テーマ切替・状態管理を一元化
 // ・UI部品の責務分離・型安全性強化
 //
-// 使い方:
-// <ColorModeProvider>...</ColorModeProvider> で全体ラップ
-// useColorMode() で現在のモード・切替関数取得
-// <ColorModeButton /> で切替ボタン表示
+// import分類:
+// - Chakra UI部品
+// - next-themes
+// - React本体・フック
 
 "use client";
 
@@ -84,5 +84,3 @@ export const ColorModeButton = React.forwardRef<
     </ClientOnly>
   );
 });
-
-// useMemo, useCallback, useState, useEffect, useRef などを必要な箇所で活用し、リスト・コールバック・初期値計算などをメモ化・最適化する（パターンはEmployeeTable/LeaveDatesModal/EmployeeModalと同様）

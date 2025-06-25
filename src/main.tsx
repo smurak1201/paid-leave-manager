@@ -1,25 +1,23 @@
 // =============================
 // main.tsx
-// アプリのエントリーポイント
+// アプリのエントリーポイント（最初に実行されるファイル）
 // =============================
 //
 // 役割:
-// ・Reactアプリのルート要素を作成し、ProviderやAppをラップして描画
+// ・Reactアプリ全体をProviderでラップし、Appコンポーネントを描画する
+// ・ProviderはChakra UIなどのテーマやグローバル設定を一括で適用する
 //
 // 設計意図:
-// ・Providerで全体のUIテーマやグローバルな設定を一元管理
-//
-// ===== import: 外部ライブラリ =====
+// ・アプリ全体のUIテーマや状態管理を一元化し、どの画面でも同じデザイン・機能を使えるようにする
+// ・main.tsxは「最小限の起動処理」だけを担い、他のロジックはAppや各コンポーネントに分離
+
+// ===== import: React本体・DOM描画 =====
 import React from "react";
 import ReactDOM from "react-dom/client";
-
-// ===== import: UI/Provider =====
+// ===== import: UIテーマProvider =====
 import { Provider } from "@/components/ui/provider";
-
 // ===== import: アプリ本体 =====
 import App from "./App";
-
-// useMemo, useCallback, useState, useEffect, useRef などを必要な箇所で活用し、リスト・コールバック・初期値計算などをメモ化・最適化する（パターンはEmployeeTable/LeaveDatesModal/EmployeeModalと同様）
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

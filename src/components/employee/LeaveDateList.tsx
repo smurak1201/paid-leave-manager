@@ -4,19 +4,20 @@
 // =============================
 //
 // 役割:
-// ・有給取得日リストの表示・編集・削除ボタンUI
+// ・有給取得日リストを一覧表示し、各日付ごとに削除ボタンを表示
 //
 // 設計意図:
 // ・型安全・責務分離・UI/UX・可読性重視
+// ・リスト表示のみに責務を限定し、ロジックや状態管理は親に委譲
 
-// ===== import: 外部ライブラリ =====
+// ===== import: Chakra UI部品 =====
 import { Box, Button, Text } from "@chakra-ui/react";
+// ===== import: React本体・フック =====
 import React, { useMemo } from "react";
+// ===== import: アニメーション（未使用なら削除可） =====
 import { AnimatePresence } from "framer-motion";
-
 // ===== import: 型定義 =====
 import type { LeaveDateListProps } from "./types";
-
 // ===== import: アイコン =====
 import { Icons } from "./icons";
 
@@ -29,6 +30,7 @@ export const LeaveDateList: React.FC<LeaveDateListProps> = ({
   dates,
   onDeleteDate,
 }) => {
+  // 日付リストを日本語表記に変換し、インデックス付きでメモ化
   const memoizedDates = useMemo(() => {
     return dates.map((date, i) => {
       const [y, m, d] = date.split("-");
@@ -43,6 +45,7 @@ export const LeaveDateList: React.FC<LeaveDateListProps> = ({
 
   return (
     <Box as="ul" pl={0} m={0}>
+      {/* 各日付をリスト表示。削除ボタン付き */}
       <AnimatePresence>
         {memoizedDates.map(({ idx, date, jpDate }) => (
           <li
@@ -59,25 +62,17 @@ export const LeaveDateList: React.FC<LeaveDateListProps> = ({
               background: idx % 2 === 1 ? "rgba(0, 128, 128, 0.06)" : "white",
               display: "flex",
               alignItems: "center",
-              gap: 8,
+              justifyContent: "space-between",
             }}
           >
-            <Text fontWeight="bold" minW="2em">
-              {idx + 1}.
-            </Text>
-            <Text fontSize="sm" fontFamily="inherit" color="black">
-              {jpDate}
-            </Text>
+            <Text as="span">{jpDate}</Text>
             <Button
               size="xs"
-              variant="ghost"
               colorScheme="red"
-              minW={"auto"}
-              px={2}
+              variant="ghost"
               onClick={() => onDeleteDate(idx)}
-              aria-label="削除"
             >
-              <Icons.Trash2 size={15} />
+              <Icons.Trash2 size={16} /> 削除
             </Button>
           </li>
         ))}

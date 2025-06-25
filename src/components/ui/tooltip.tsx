@@ -10,14 +10,9 @@
 // ・再利用性・アクセシビリティ・柔軟なカスタマイズ性向上
 // ・UI部品の責務分離・props型の明示
 //
-// 使い方:
-// <Tooltip content="説明文">...</Tooltip>
-//
-// - showArrow: 矢印表示
-// - portalled: Portalでbody直下に描画するか
-// - content: ツールチップ内容
-// - contentProps: ChakraTooltip.ContentPropsを追加で渡せる
-// - disabled: 無効化
+// import分類:
+// - Chakra UI部品
+// - React本体・フック
 
 import { Tooltip as ChakraTooltip, Portal } from "@chakra-ui/react";
 import * as React from "react";
@@ -31,6 +26,11 @@ export interface TooltipProps extends ChakraTooltip.RootProps {
   disabled?: boolean;
 }
 
+/**
+ * Tooltip
+ * - Chakra UIベースのカスタムツールチップ
+ * - showArrow, portalled, content等で柔軟に制御
+ */
 export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
   function Tooltip(props, ref) {
     const {
@@ -65,5 +65,3 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
     );
   }
 );
-
-// useMemo, useCallback, useState, useEffect, useRef などを必要な箇所で活用し、リスト・コールバック・初期値計算などをメモ化・最適化する（パターンはEmployeeTable/LeaveDatesModal/EmployeeModalと同様）

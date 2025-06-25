@@ -4,16 +4,16 @@
 // =============================
 //
 // 役割:
-// ・従業員リストをテーブル表示
-// ・編集/削除/確認ボタンのハンドラをpropsで受け取る
-// ・UI部品の責務は「表示と操作ボタンの配置」のみに限定
-// ・業務ロジックや状態管理は親(App)で一元化
+// ・従業員リストをテーブル形式で表示する
+// ・編集/削除/確認などの操作ボタンを各行に配置する
+// ・ページネーションや削除モーダルなど、一覧画面のUIをまとめて管理
 //
 // 設計意図:
-// ・型安全・責務分離・UI/UX・可読性重視
-// ・props/stateの流れ・UI部品の責務を日本語コメントで明記
+// ・「表示と操作UIの配置」のみを責務とし、データ管理や業務ロジックは親(App)に委譲
+// ・型安全・責務分離・再利用性・可読性を重視
+// ・propsで必要なデータ・関数のみ受け取り、状態は最小限に
 
-// ===== import: 外部ライブラリ =====
+// ===== import: React本体・フック =====
 import React, {
   useState,
   useEffect,
@@ -21,23 +21,18 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
+// ===== import: Chakra UI（テーブル・レイアウト） =====
 import { Table, Thead, Tbody, Tr, Th } from "@chakra-ui/table";
 import { Box } from "@chakra-ui/react";
 
 // ===== import: 型定義 =====
 import type { Employee, EmployeeSummary, EmployeeTableProps } from "./types";
-
-// ===== import: アイコン・ユーティリティ =====
+// ===== import: ユーティリティ・アイコン =====
 import { getServicePeriod } from "./icons";
-
 // ===== import: UI部品 =====
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { EmployeeTableRow } from "./EmployeeTableRow";
 
-// propsの型定義。データと操作関数を親(App)から受け取る
-// EmployeeSummary, RowContentProps, EmployeeTablePropsの型定義の重複をtypes.tsに集約
-// ページネーションやsummaryMap、handleDeleteClick等のロジックの重複を整理
-// 不要なコメントや未使用変数を削除
 export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   employees,
   summaries,
@@ -47,9 +42,11 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   currentPage,
   onPageChange,
 }) => {
-  // ページネーション用
+  // 1ページあたりの表示件数
   const ITEMS_PER_PAGE = 15;
+  // 総ページ数を計算
   const totalPages = Math.max(1, Math.ceil(employees.length / ITEMS_PER_PAGE));
+  // 現在ページに表示する従業員リストを抽出
   const pagedEmployees = useMemo(
     () =>
       employees.slice(

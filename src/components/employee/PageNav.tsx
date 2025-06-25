@@ -1,12 +1,32 @@
+// =============================
+// PageNav.tsx
+// ページネーションUI部品
+// =============================
+//
+// 役割:
+// ・前へ/次へボタンでページ切り替え
+//
+// 設計意図:
+// ・UI部品の責務分離・再利用性・可読性重視
+//
+// import分類:
+// - React本体・フック
+// - Chakra UI部品
+
 import React from "react";
 import { Box } from "@chakra-ui/react";
 
 interface PageNavProps {
-  current: number;
-  total: number;
-  onChange: (n: number) => void;
+  current: number; // 現在ページ
+  total: number; // 総ページ数
+  onChange: (n: number) => void; // ページ変更時コールバック
 }
 
+/**
+ * ページネーション部品
+ * - 前へ/次へボタンでページ切り替え
+ * - current/total/onChangeで状態管理
+ */
 export const PageNav: React.FC<PageNavProps> = ({
   current,
   total,

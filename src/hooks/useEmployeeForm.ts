@@ -8,24 +8,25 @@
 //
 // 設計意図:
 // ・UI部品から分離し、再利用性・保守性・可読性向上
+// ・初学者が「どの関数がどこで使われるか」理解しやすいようコメント充実
 //
-// 使い方:
-// - useEmployeeFormを呼び出し、返却された状態・関数をフォームコンポーネントで利用
-// - 初期値、従業員一覧、編集中のIDを引数に渡す
+// import分類:
+// - React本体・フック
+// - 型定義
 
-// ===== import: 外部ライブラリ =====
 import { useState } from "react";
-
-// ===== import: 型定義 =====
 import type { Employee } from "../types/employee";
 
-// =============================
-// カスタムフック: useEmployeeForm
-// 従業員フォームの状態・バリデーション共通化カスタムフック
-// Appから渡された初期値・従業員一覧・編集中IDを元に、入力値やエラー状態を一元管理します。
-// =============================
+/**
+ * useEmployeeForm
+ * - 従業員フォームの状態・バリデーション共通化
+ * - UI部品から分離し、再利用性・保守性・可読性向上
+ *
+ * @param initial 初期値（従業員データ）
+ * @returns form: 入力値, setForm: 値更新関数, handleChange: 入力イベントハンドラ
+ */
 export function useEmployeeForm(initial: Employee) {
-  const [form, setForm] = useState<Employee>(initial);
+  const [form, setForm] = useState<Employee>(initial); // 入力値
 
   // 入力値変更時の状態更新
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

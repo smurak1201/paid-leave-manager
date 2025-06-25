@@ -8,8 +8,10 @@
 //
 // 設計意図:
 // ・UI部品の可読性・保守性向上
+//
+// import分類:
+// - 外部ライブラリ
 
-// ===== import: 外部ライブラリ =====
 import { X, Edit, Trash2, Plus, Info, Eye, Loader } from "lucide-react";
 
 // =============================
@@ -59,8 +61,3 @@ export function getServicePeriod(joinedAt: string, now: Date = new Date()): stri
   if (years < 0) return "-";
   return `${years}年${months}か月`;
 }
-
-// =============================
-// コンポーネント
-// =============================
-// なし

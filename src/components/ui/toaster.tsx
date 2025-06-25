@@ -10,12 +10,9 @@
 // ・グローバルな通知・ローディング・エラー表示の共通化
 // ・UI部品の責務分離・props型の明示
 //
-// 使い方:
-// import { toaster, Toaster } from "./toaster";
-// toaster.show({ title: "保存しました" }) など
-//
-// - Toaster: 画面のどこかで一度だけ配置
-// - toaster: imperative APIで通知表示
+// import分類:
+// - Chakra UI部品
+// - React本体・フック
 
 "use client";
 
@@ -29,6 +26,10 @@ import {
 } from "@chakra-ui/react";
 import { useMemo } from "react";
 
+/**
+ * toaster: imperative APIで通知表示
+ * Toaster: 画面のどこかで一度だけ配置
+ */
 export const toaster = createToaster({
   placement: "bottom-end",
   pauseOnPageIdle: true,

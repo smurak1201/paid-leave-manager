@@ -10,6 +10,10 @@
 // 設計意図:
 // ・UI部品の責務分離・再利用性・アクセシビリティ向上
 // ・Chakra UIのBoxでシンプルに実装
+//
+// import分類:
+// - React本体・フック
+// - Chakra UI部品
 
 import { useEffect, useRef } from "react";
 import { Box } from "@chakra-ui/react";

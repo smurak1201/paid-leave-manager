@@ -10,6 +10,10 @@
 // ・型安全性・保守性・可読性向上
 // ・props/stateの流れ・UI部品の責務を明確化
 // ・初学者が「どの型がどこで使われるか」理解しやすいようにコメント充実
+//
+// import分類:
+// - 業務データ型
+// - UI部品props型
 
 // ====== 業務データ型 ======
 
@@ -60,10 +64,8 @@ export interface RowContentProps {
   carryOver: number;
   used: number;
   remain: number;
-  servicePeriod: string;
-  onView: (id: number) => void;
-  onEdit: (id: number) => void;
-  handleDeleteClick: (id: number) => void;
+  onEdit: (emp: Employee) => void;
+  onDelete: (emp: Employee) => void;
 }
 
 /**

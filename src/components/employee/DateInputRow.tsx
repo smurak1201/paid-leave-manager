@@ -1,30 +1,31 @@
 // =============================
 // DateInputRow.tsx
-// 有給日付入力用小コンポーネント
+// 有給日付入力用の小コンポーネント
 // =============================
 //
-// このファイルは有給日付の入力欄UI部品です。
-// - propsとして日付値・編集状態・ハンドラ等を受け取る
-// - UI部品の小コンポーネント化・責務分離
+// 役割:
+// ・有給取得日を入力・追加・編集するためのUI部品
+// ・入力値・編集状態・バリデーション・追加/保存ボタンの有効/無効などをpropsで制御
 //
 // 設計意図:
-// - 入力欄の責務を分離し、モーダル本体の可読性・保守性を向上
-// - 初学者でも理解しやすいように全体の流れ・propsの意味を日本語コメントで明記
-//
+// ・入力欄の責務を分離し、モーダル本体の可読性・保守性を向上
+// ・初学者でも理解しやすいように、propsやロジックの意味を明記
 
-// 日付入力行のUI部品。追加・編集どちらにも使える汎用コンポーネントです。
-// 入力値・バリデーション・ボタンの有効/無効などをpropsで制御します。
+// ===== import: Chakra UI部品 =====
 import { Box, Button } from "@chakra-ui/react";
+// ===== import: アイコン =====
 import { Icons } from "./icons";
+// ===== import: React本体・フック =====
 import React, { useCallback, useMemo } from "react";
 
+// props型: 入力値・ハンドラ・編集状態などを親から受け取る
 interface DateInputRowProps {
-  dateInput: string;
-  onChangeDateInput: (v: string) => void;
-  onAddDate: (date: string) => void;
-  onSaveDate: () => void;
-  editDateIdx: number | null;
-  remainSimple: number;
+  dateInput: string; // 入力中の日付文字列
+  onChangeDateInput: (v: string) => void; // 入力値変更時のハンドラ
+  onAddDate: (date: string) => void; // 追加ボタン押下時のハンドラ
+  onSaveDate: () => void; // 編集保存ボタン押下時のハンドラ
+  editDateIdx: number | null; // 編集中インデックス（nullなら追加モード）
+  remainSimple: number; // 残日数（0なら追加不可）
 }
 
 /**
@@ -38,14 +39,16 @@ export const DateInputRow: React.FC<DateInputRowProps> = ({
   editDateIdx,
   remainSimple,
 }) => {
+  // 日付入力欄の値が変わったときの処理
   const handleDateChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       onChangeDateInput(e.target.value);
-      // ここでonAddDateは呼ばない（追加ボタンでのみ追加）
+      // 入力値が変わるたびに親へ通知
     },
     [onChangeDateInput]
   );
 
+  // 追加ボタン押下時の処理
   const handleAddClick = useCallback(() => {
     if (
       editDateIdx === null &&
@@ -56,6 +59,7 @@ export const DateInputRow: React.FC<DateInputRowProps> = ({
     }
   }, [onAddDate, editDateIdx, remainSimple, dateInput]);
 
+  // 追加・保存ボタンの活性/非活性判定
   const isSaveDisabled = useMemo(
     () => remainSimple === 0 || !dateInput.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/),
     [remainSimple, dateInput]

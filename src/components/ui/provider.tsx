@@ -10,17 +10,19 @@
 // ・アプリ全体のUIテーマ・ダーク/ライト切替を一元管理
 // ・UI部品の責務分離
 //
-// 使い方:
-// <Provider>...</Provider> でアプリ全体をラップ
-//
-// - ColorModeProvider: カラーモード切替用
-// - ChakraProvider: Chakra UIテーマ適用
+// import分類:
+// - Chakra UI部品
+// - ColorModeProvider
 
 "use client";
 
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { ColorModeProvider, type ColorModeProviderProps } from "./color-mode";
 
+/**
+ * Provider
+ * - ChakraProvider/ColorModeProviderで全体ラップ
+ */
 export function Provider(props: ColorModeProviderProps) {
   return (
     <ChakraProvider value={defaultSystem}>

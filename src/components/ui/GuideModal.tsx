@@ -8,6 +8,11 @@
 //
 // 設計意図:
 // ・UI部品の責務分離・可読性向上
+//
+// import分類:
+// - Chakra UI部品
+// - カスタムモーダル
+// - アイコン
 
 // ===== import: 外部ライブラリ・UI部品 =====
 import { Box, Heading, Text, Stack, Icon } from "@chakra-ui/react";

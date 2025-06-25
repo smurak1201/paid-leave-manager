@@ -9,13 +9,10 @@
 // 設計意図:
 // ・誤操作防止・UI/UX向上・責務分離
 //
-// 使い方:
-// <ConfirmDeleteModal isOpen={...} onClose={...} onConfirm={...} targetName={...} />
-//
-// - isOpen: モーダル表示状態
-// - onClose: 閉じる処理
-// - onConfirm: 削除確定処理
-// - targetName: 削除対象名（任意）
+// import分類:
+// - Chakra UI部品
+// - React本体・フック
+// - カスタムモーダル
 
 import { Button, Text, HStack, Box } from "@chakra-ui/react";
 import React, { useMemo } from "react";

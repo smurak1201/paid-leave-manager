@@ -8,16 +8,13 @@
 //
 // 設計意図:
 // ・UI部品から分離し、再利用性・保守性・可読性向上
-// ・初学者が「どの関数がどこで使われるか」理解しやすいようにコメント充実
+// ・初学者が「どの関数がどこで使われるか」理解しやすいようコメント充実
 //
-// 使い方:
-// - useLeaveDates(employee) を呼び出し、返却されるメソッドをコンポーネント内で利用
-// - employeeには編集対象の従業員データを渡す
+// import分類:
+// - React本体・フック
+// - 型定義
 
-// ===== import: 外部ライブラリ =====
 import { useState } from "react";
-
-// ===== import: 型定義 =====
 import type { Employee } from "../components/employee/types";
 
 /**
@@ -29,8 +26,8 @@ import type { Employee } from "../components/employee/types";
  * - 日付追加・編集・削除・バリデーションを一元管理
  */
 export function useLeaveDates(employee: Employee | null) {
-  const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
-  const [dateInput, setDateInput] = useState<string>("");
+  const [editDateIdx, setEditDateIdx] = useState<number | null>(null); // 編集中インデックス
+  const [dateInput, setDateInput] = useState<string>(""); // 入力中日付
 
   // 日付追加時のバリデーション・状態更新
   const handleAddDate = (date: string, onUpdate: (dates: string[]) => void, currentDates: string[] = []) => {

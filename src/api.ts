@@ -1,6 +1,23 @@
-// api.ts: バックエンドAPIとの通信を共通化するユーティリティ
-// fetch+エラーハンドリング+型変換を一元化
+// =============================
+// api.ts
+// バックエンドAPI通信共通ユーティリティ
+// =============================
+//
+// 役割:
+// ・fetch+エラーハンドリング+型変換を一元化し、API通信の共通化・簡素化
+//
+// 設計意図:
+// ・全API通信の型安全・エラー共通化・保守性向上
+// ・UI/ロジックからAPI通信の詳細を隠蔽し、再利用性・可読性向上
+//
+// import分類:
+// - なし（標準APIのみ）
 
+/**
+ * GETリクエスト用共通関数
+ * @param url APIエンドポイント
+ * @returns パース済みデータ（型T）
+ */
 export async function apiGet<T>(url: string): Promise<T> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`APIリクエスト失敗: ${res.status}`);
@@ -14,6 +31,12 @@ export async function apiGet<T>(url: string): Promise<T> {
   }
 }
 
+/**
+ * POSTリクエスト用共通関数
+ * @param url APIエンドポイント
+ * @param body リクエストボディ
+ * @returns パース済みデータ（型T）
+ */
 export async function apiPost<T>(url: string, body: any): Promise<T> {
   const res = await fetch(url, {
     method: "POST",
@@ -30,5 +53,3 @@ export async function apiPost<T>(url: string, body: any): Promise<T> {
     throw new Error("APIレスポンスが不正です: " + text);
   }
 }
-
-// 不要なローカルロジックや未使用変数はなし。API設計に完全準拠したfetch/エラーハンドリング/型変換の共通化のみ

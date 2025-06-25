@@ -4,15 +4,17 @@
 // =============================
 //
 // 役割:
-// ・従業員ごとの有給取得日を編集・確認するモーダルUI
-// ・propsで必要な情報・関数を受け取る
+// ・従業員ごとの有給取得日を編集・確認するためのモーダルUI
+// ・propsで必要な情報・関数（追加・削除・ページ切替など）を受け取る
 //
 // 設計意図:
 // ・型安全・責務分離・UI/UX・可読性重視
-// ・props/stateの流れ・UI部品の責務を日本語コメントで明記
+// ・モーダルの状態管理やロジックはこのコンポーネントで完結
+// ・UI部品の責務を明確にし、親コンポーネントはデータ管理に専念できるようにする
 
-// ===== import: 外部ライブラリ =====
+// ===== import: Chakra UI部品 =====
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
+// ===== import: React本体・フック =====
 import React, {
   useRef,
   useEffect,
@@ -20,11 +22,10 @@ import React, {
   useCallback,
   useState,
 } from "react";
+// ===== import: アイコン =====
 import { X } from "lucide-react";
-
 // ===== import: 型定義 =====
 import type { LeaveDatesModalProps } from "./types";
-
 // ===== import: ユーティリティ・UI部品 =====
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { DateInputRow } from "./DateInputRow";
@@ -47,15 +48,19 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   grantDetails,
   addDateError,
 }) => {
+  // モーダルが開いていない場合は何も表示しない
   if (!isOpen) return null;
-  // usedDatesがあればそれを使う。なければgrantDetailsから生成
+
+  // usedDatesがあればそれを使い、なければgrantDetailsから生成
   const getDates = () =>
     usedDates && usedDates.length > 0
       ? [...usedDates].sort()
       : grantDetails
       ? grantDetails.flatMap((g) => g.usedDates).sort()
       : [];
+  // 表示する日付リスト（ページネーション対応）
   const dates = useMemo(getDates, [usedDates, grantDetails]);
+  // 残日数（0なら追加不可）
   const remain = summary.remain;
 
   // ページネーション用
