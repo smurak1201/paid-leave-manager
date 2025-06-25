@@ -163,7 +163,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
             minW="3em"
             textAlign="center"
           >
-            {grantThisYear + carryOver - used}
+            {remain}
           </Badge>
         </Td>,
         <Td key="actions">
