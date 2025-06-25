@@ -161,4 +161,5 @@ export interface Pagination {
   onPageChange: (page: number) => void;
 }
 
-// 不要なローカルロジックや未使用型、サンプルデータ型のコメントアウト等は現状で最適化済み。API設計・props/stateの流れに完全準拠。
+// LeaveGrant, Employee, LeaveUsage, RowContentProps, LeaveDatesModalProps, LeaveDateListProps など型定義の重複・未使用を整理
+// 不要なコメントや未使用型を削除

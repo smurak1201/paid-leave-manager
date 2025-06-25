@@ -34,7 +34,6 @@ export interface EmployeeModalProps {
   employees: Employee[];
   onAdd: (form: Omit<Employee, "id">) => void;
   onSave: (form: Employee) => void;
-  onDelete?: (employeeId: number) => Promise<void>;
 }
 
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({

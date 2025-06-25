@@ -26,25 +26,6 @@ export const Icons = {
   Loader,
 };
 
-// 日付入力用のスタイル
-export const inputDateStyle: React.CSSProperties = {
-  border: "1px solid #B2F5EA",
-  borderRadius: 6,
-  padding: "6px 12px",
-  fontSize: 16,
-  outline: "none",
-  width: "100%",
-};
-
-// 小さい日付入力用のスタイル
-export const inputDateSmallStyle: React.CSSProperties = {
-  border: "1px solid #B2F5EA",
-  borderRadius: 6,
-  padding: "4px 8px",
-  fontSize: 16,
-  outline: "none",
-};
-
 // =============================
 // ユーティリティ関数
 // =============================

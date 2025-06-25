@@ -157,29 +157,6 @@ function App() {
     fetchSummaries(employees).then(setSummaries);
   }, [employees]);
 
-  // --- UIイベントハンドラ ---
-  // テーブル「確認」ボタン
-  const handleView = (employeeId: number) => {
-    setActiveEmployeeId(employeeId); // employeeIdは必ず従業員コード（employee_id）を渡す
-    setActiveModal("leaveDates");
-  };
-  // テーブル「編集」ボタン
-  const handleEdit = (employeeId: number) => {
-    setActiveEmployeeId(employeeId); // employeeIdは必ず従業員コード（employee_id）を渡す
-    setActiveModal("edit");
-  };
-  // 「従業員追加」ボタン
-  const handleAdd = () => {
-    setActiveEmployeeId(null);
-    setActiveModal("add");
-  };
-
-  // --- 有給サマリー・詳細のAPI連携 ---
-  useEffect(() => {
-    if (employees.length === 0) return;
-    fetchSummaries(employees).then(setSummaries);
-  }, [employees]);
-
   // --- 有給取得日編集用の状態・ロジック ---
   const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
   const [dateInput, setDateInput] = useState("");
@@ -249,7 +226,7 @@ function App() {
           <EmployeeTable
             employees={employees}
             summaries={summaries}
-            onEdit={(employeeId) => handleEdit(employeeId)} // employeeIdは従業員コード
+            onEdit={handleEdit}
             onDelete={async (employeeId) => {
               try {
                 // 先に有給取得日を全て削除
@@ -275,7 +252,7 @@ function App() {
                 alert(e.message || "従業員削除に失敗しました");
               }
             }}
-            onView={(employeeId) => handleView(employeeId)} // employeeIdは従業員コード
+            onView={handleView}
             currentPage={currentPage}
             onPageChange={setCurrentPage}
           />
@@ -328,42 +305,15 @@ function App() {
               alert(e.message || "従業員編集に失敗しました");
             }
           }}
-          onDelete={async (employeeId) => {
-            try {
-              // 先に有給取得日を全て削除
-              const emp = findEmployee(employeeId);
-              if (emp) {
-                const usages = leaveUsages.filter(
-                  (u) => u.employeeId === emp.employeeId
-                );
-                for (const usage of usages) {
-                  await apiPost(
-                    "http://localhost/paid_leave_manager/leave_usage_delete.php",
-                    { id: usage.id }
-                  );
-                }
-              }
-              // 従業員本体を削除
-              await apiPost(
-                "http://localhost/paid_leave_manager/employees.php",
-                { employee_id: employeeId, mode: "delete" }
-              );
-              await reloadAll();
-              setActiveEmployeeId(null);
-              setActiveModal(null);
-            } catch (e: any) {
-              alert(e.message || "従業員削除に失敗しました");
-            }
-          }}
+          onDelete={undefined}
         />
         <LeaveDatesModal
           key={activeEmployeeId ?? "none"}
           isOpen={activeModal === "leaveDates"}
           onClose={() => setActiveModal(null)}
-          employeeId={activeEmployeeId} // ここも従業員コード
+          employeeId={activeEmployeeId}
           leaveUsages={leaveUsages}
           onAddDate={async (date) => {
-            console.log("onAddDate called with:", date);
             if (activeEmployeeId == null) return;
             setAddDateError("");
             if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
@@ -382,7 +332,7 @@ function App() {
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_add.php",
                 {
-                  employee_id: Number(activeEmployeeId), // int型で送信
+                  employee_id: Number(activeEmployeeId),
                   used_date: date,
                 }
               );
@@ -435,7 +385,6 @@ function App() {
             );
             return s || emptySummary;
           })()}
-          // 有効期限内の取得日のみを抽出して渡す（summaryのusedDatesをそのまま利用）
           usedDates={(() => {
             const empSummary = summaries.find(
               (s) => s.employeeId === activeEmployeeId
@@ -447,7 +396,6 @@ function App() {
               (s) => s.employeeId === activeEmployeeId
             );
             if (empSummary && empSummary.grantDetails) {
-              // grantDetailsの各usedDatesもfilter(Boolean)で不正値除去
               return empSummary.grantDetails.map((g) => ({
                 ...g,
                 usedDates: Array.isArray(g.usedDates)

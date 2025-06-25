@@ -26,7 +26,7 @@ import { Box, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
 
 // ===== import: 型定義 =====
-import type { Employee, RowContentProps } from "./types";
+import type { Employee, RowContentProps, EmployeeTableProps } from "./types";
 
 // ===== import: アイコン・ユーティリティ =====
 import { Icons, getServicePeriod } from "./icons";
@@ -37,25 +37,9 @@ import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { FadeTableRow } from "./FadeTableRow";
 
 // propsの型定義。データと操作関数を親(App)から受け取る
-interface EmployeeSummary {
-  employeeId: number;
-  grantThisYear: number;
-  carryOver: number;
-  used: number;
-  remain: number;
-}
-
-interface EmployeeTableProps {
-  employees: Employee[];
-  summaries: EmployeeSummary[];
-  onEdit: (employeeId: number) => void;
-  onDelete: (employeeId: number) => void;
-  onView: (employeeId: number) => void;
-  currentPage: number; // 現在のページ番号
-  onPageChange: (page: number) => void; // ページ切替ハンドラ
-}
-
-// 従業員一覧テーブル本体
+// EmployeeSummary, RowContentProps, EmployeeTablePropsの型定義の重複をtypes.tsに集約
+// ページネーションやsummaryMap、handleDeleteClick等のロジックの重複を整理
+// 不要なコメントや未使用変数を削除
 export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   employees,
   summaries,

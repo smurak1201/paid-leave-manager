@@ -27,26 +27,22 @@ import { Icons } from "./icons";
 export const LeaveDateList: React.FC<LeaveDateListProps> = ({
   dates,
   onDeleteDate,
-  pagedDates,
-  currentPage,
-  ITEMS_PER_PAGE,
 }) => {
-  const memoizedPagedDates = useMemo(() => {
-    return pagedDates.map((date, i) => {
-      const idx = (currentPage - 1) * ITEMS_PER_PAGE + i;
+  const memoizedDates = useMemo(() => {
+    return dates.map((date, i) => {
       const [y, m, d] = date.split("-");
       const jpDate = `${y}年${m}月${d}日`;
       return {
-        idx,
+        idx: i,
         date,
         jpDate,
       };
     });
-  }, [pagedDates, currentPage, ITEMS_PER_PAGE]);
+  }, [dates]);
 
   return (
     <Box as="ul" pl={0} m={0}>
-      {memoizedPagedDates.map(({ idx, date, jpDate }) => (
+      {memoizedDates.map(({ idx, date, jpDate }) => (
         <Box
           as="li"
           key={date + idx}

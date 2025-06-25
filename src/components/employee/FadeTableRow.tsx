@@ -36,19 +36,7 @@ const MotionTr = motion.tr;
 
 export const FadeTableRow: React.FC<
   React.ComponentPropsWithoutRef<"tr"> & { inProp?: boolean }
-> = ({
-  inProp = true,
-  children,
-  onAnimationStart,
-  onDragStart,
-  onDragEnd,
-  onDrag,
-  onDragOver,
-  onDragEnter,
-  onDragLeave,
-  onDrop,
-  ...rest
-}) => {
+> = ({ inProp = true, children, ...rest }) => {
   const animationProps = useMemo(
     () => ({
       initial: { opacity: 0, y: 10 },
@@ -65,4 +53,4 @@ export const FadeTableRow: React.FC<
     </MotionTr>
   );
 };
-// FadeTableRowはemployeeId型の影響なし。型安全なまま現状維持。
+// 不要なコメントや未使用propsの削除
