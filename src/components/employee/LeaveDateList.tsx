@@ -26,12 +26,7 @@ import { Icons } from "./icons";
  */
 export const LeaveDateList: React.FC<LeaveDateListProps> = ({
   dates,
-  editDateIdx,
-  dateInput,
-  onChangeDateInput,
-  onEditDate,
   onDeleteDate,
-  inputDateSmallStyle,
   pagedDates,
   currentPage,
   ITEMS_PER_PAGE,
@@ -72,30 +67,10 @@ export const LeaveDateList: React.FC<LeaveDateListProps> = ({
           <Text fontWeight="bold" minW="2em">
             {idx + 1}.
           </Text>
-          {editDateIdx === idx ? (
-            <input
-              type="date"
-              value={dateInput}
-              onChange={(e) => onChangeDateInput(e.target.value)}
-              style={inputDateSmallStyle}
-              maxLength={10}
-            />
-          ) : (
-            <Text fontSize="sm" fontFamily="inherit" color="black">
-              {jpDate}
-            </Text>
-          )}
-          <Button
-            size="xs"
-            variant="ghost"
-            colorScheme="teal"
-            minW={"auto"}
-            px={2}
-            onClick={() => onEditDate(idx)}
-            aria-label="編集"
-          >
-            <Icons.Edit size={15} />
-          </Button>
+          <Text fontSize="sm" fontFamily="inherit" color="black">
+            {jpDate}
+          </Text>
+          {/* 編集ボタンは削除 */}
           <Button
             size="xs"
             variant="ghost"
