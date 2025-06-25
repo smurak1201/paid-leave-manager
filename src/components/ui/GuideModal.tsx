@@ -9,56 +9,51 @@
 // 設計意図:
 // ・UI部品の責務分離・可読性向上
 
-// ===== import: 型定義 =====
-import type { GuideModalProps } from "../employee/types";
 // ===== import: 外部ライブラリ・UI部品 =====
-import { Box, Heading, Text, Button, Stack, Icon } from "@chakra-ui/react";
+import { Box, Heading, Text, Stack, Icon } from "@chakra-ui/react";
 import { CustomModal } from "./CustomModal";
 import { Icons } from "../employee/icons";
-import { useMemo } from "react";
 
-export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
-  // サンプル表データ
-  const tableData = useMemo(
-    () => [
-      {
-        year: "2022年度",
-        grant: 12,
-        used: 2,
-        carryOver: 10,
-        validUntil: "2024年度末",
-      },
-      {
-        year: "2023年度",
-        grant: 14,
-        used: 1,
-        carryOver: 13,
-        validUntil: "2025年度末",
-      },
-      {
-        year: "2024年度",
-        grant: 16,
-        used: 0,
-        carryOver: 0,
-        validUntil: "2026年度末",
-      },
-    ],
-    []
-  );
-  // 年次有給休暇ガイドライン表データ
-  const guidelineData = useMemo(
-    () => [
-      { tenure: "6か月", grant: 10 },
-      { tenure: "1年6か月", grant: 11 },
-      { tenure: "2年6か月", grant: 12 },
-      { tenure: "3年6か月", grant: 14 },
-      { tenure: "4年6か月", grant: 16 },
-      { tenure: "5年6か月", grant: 18 },
-      { tenure: "6年6か月以上", grant: 20 },
-    ],
-    []
-  );
+// セクションタイトル用共通props
+const sectionTitleProps = { fontWeight: "bold", mt: 4, mb: 1 };
 
+const tableData = [
+  {
+    year: "2022年度",
+    grant: 12,
+    used: 2,
+    carryOver: 10,
+    validUntil: "2024年度末",
+  },
+  {
+    year: "2023年度",
+    grant: 14,
+    used: 1,
+    carryOver: 13,
+    validUntil: "2025年度末",
+  },
+  {
+    year: "2024年度",
+    grant: 16,
+    used: 0,
+    carryOver: 0,
+    validUntil: "2026年度末",
+  },
+];
+const guidelineData = [
+  { tenure: "6か月", grant: 10 },
+  { tenure: "1年6か月", grant: 11 },
+  { tenure: "2年6か月", grant: 12 },
+  { tenure: "3年6か月", grant: 14 },
+  { tenure: "4年6か月", grant: 16 },
+  { tenure: "5年6か月", grant: 18 },
+  { tenure: "6年6か月以上", grant: 20 },
+];
+
+export const GuideModal: React.FC<{ open: boolean; onClose: () => void }> = ({
+  open,
+  onClose,
+}) => {
   return (
     <CustomModal isOpen={open} onClose={onClose}>
       <Box
@@ -73,21 +68,21 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
         maxW="900px"
         w="90vw"
       >
-        <Button
-          position="absolute"
-          top={2}
-          right={2}
-          size="sm"
-          variant="ghost"
-          colorScheme="teal"
+        <button
+          style={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            zIndex: 1,
+          }}
           onClick={onClose}
-          p={2}
-          minW={"auto"}
           aria-label="閉じる"
-          zIndex={1}
         >
           <Icon as={Icons.X} boxSize={4} />
-        </Button>
+        </button>
         <Heading size="md" mb={4} color="teal.700">
           有給休暇管理ガイド
         </Heading>
@@ -95,28 +90,26 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
           <Text>
             このアプリは、従業員ごとの有給休暇の付与日数・取得状況・残日数を一元管理できます。
           </Text>
-          <Text fontWeight="bold" mt={2}>
-            付与日数と繰越日数について：
+          <Text {...sectionTitleProps}>付与日数と繰越日数について：</Text>
+          <Text as="ul" pl={5} mb={2}>
+            <Text as="li">毎年の付与日数は勤続年数に応じて決まります。</Text>
+            <Text as="li">
+              未消化分は翌年に繰り越されますが、繰越できるのは最大2年分までです。
+            </Text>
+            <Text as="li">
+              2年以上前の有給は自動的に消滅し、消滅した分は繰り越されません。
+            </Text>
+            <Text as="li">
+              有給を消化する際は、繰越分・今年度分を問わず「古い付与分から順に消化」されます（法令順守）。
+            </Text>
+            <Text as="li">
+              残日数の計算は、2年以内の有効な付与分のみを対象に、消化済み日数を差し引いて算出しています。
+            </Text>
+            <Text as="li">
+              これらのロジックは日本の労働基準法・厚生労働省ガイドラインに準拠しています。
+            </Text>
           </Text>
-          <Text>・毎年の付与日数は勤続年数に応じて決まります。</Text>
-          <Text>
-            ・未消化分は翌年に繰り越されますが、繰越できるのは最大2年分までです。
-          </Text>
-          <Text>
-            ・2年以上前の有給は自動的に消滅し、消滅した分は繰り越されません。
-          </Text>
-          <Text>
-            ・有給を消化する際は、繰越分・今年度分を問わず「古い付与分から順に消化」されます（法令順守）。
-          </Text>
-          <Text>
-            ・残日数の計算は、2年以内の有効な付与分のみを対象に、消化済み日数を差し引いて算出しています。
-          </Text>
-          <Text>
-            ・これらのロジックは日本の労働基準法・厚生労働省ガイドラインに準拠しています。
-          </Text>
-          <Text fontWeight="bold" mt={4}>
-            【例】
-          </Text>
+          <Text {...sectionTitleProps}>【例】</Text>
           <Box
             as="pre"
             fontSize="sm"
@@ -126,15 +119,10 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
             w="100%"
             whiteSpace="pre-wrap"
           >
-            {`2022年度: 12日付与 → 2日消化 → 10日繰越
-2023年度: 14日付与 → 1日消化 → 13日繰越
-2024年度: 16日付与 → 未消化
-※2022年度分は2024年度末で自動消滅`}
+            {`2022年度: 12日付与 → 2日消化 → 10日繰越\n2023年度: 14日付与 → 1日消化 → 13日繰越\n2024年度: 16日付与 → 未消化\n※2022年度分は2024年度末で自動消滅`}
           </Box>
-          <Text fontWeight="bold" mt={4}>
-            付与日数・繰越日数のサンプル表
-          </Text>
-          <Box overflowX="auto" w="100%" pl={2}>
+          <Text {...sectionTitleProps}>付与日数・繰越日数のサンプル表</Text>
+          <Box overflowX="auto" w="100%" pl={2} mb={2}>
             <table
               style={{
                 borderCollapse: "collapse",
@@ -252,41 +240,39 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
               ※繰越は最大2年分まで。2年以上前の分は自動消滅します。
             </Text>
           </Box>
-          <Text fontWeight="bold" mt={4}>
-            主な機能：
+          <Text {...sectionTitleProps}>主な機能：</Text>
+          <Text as="ul" pl={5} mb={2}>
+            <Text as="li">従業員の追加・管理</Text>
+            <Text as="li">従業員情報の編集</Text>
+            <Text as="li">従業員の削除</Text>
+            <Text as="li">有給取得日の登録・編集・削除</Text>
+            <Text as="li">残日数の自動計算</Text>
           </Text>
-          <Text>・従業員の追加・管理</Text>
-          <Text>・従業員情報の編集</Text>
-          <Text>・従業員の削除</Text>
-          <Text>・有給取得日の登録・編集・削除</Text>
-          <Text>・残日数の自動計算</Text>
-          <Text fontWeight="bold" mt={4}>
-            使い方：
+          <Text {...sectionTitleProps}>使い方：</Text>
+          <Text as="ul" pl={5} mb={2}>
+            <Text as="li">「従業員追加」ボタンで新規従業員を登録</Text>
+            <Text as="li">
+              <Icon as={Icons.Edit} boxSize={4} mr={1} />
+              編集ボタンで従業員情報を編集
+            </Text>
+            <Text as="li">
+              <Icon as={Icons.Trash2} boxSize={4} mr={1} />
+              削除ボタンで従業員を削除
+            </Text>
+            <Text as="li">
+              <Icon as={Icons.Eye} boxSize={4} mr={1} />
+              確認ボタンで有給取得日を一覧・編集
+            </Text>
           </Text>
-          <Text>「従業員追加」ボタンで新規従業員を登録</Text>
-          <Text>
-            <Icon as={Icons.Edit} boxSize={4} mr={1} />
-            ：編集ボタンで従業員情報を編集
+          <Text {...sectionTitleProps}>日本の有給休暇制度（概要）</Text>
+          <Text as="ul" pl={5} mb={2}>
+            <Text as="li">
+              年次有給休暇は、雇用形態や勤続年数に応じて付与されます。
+            </Text>
+            <Text as="li">取得日数や残日数の管理が義務化されています。</Text>
+            <Text as="li">本アプリはその管理をサポートします。</Text>
           </Text>
-          <Text>
-            <Icon as={Icons.Trash2} boxSize={4} mr={1} />
-            ：削除ボタンで従業員を削除
-          </Text>
-          <Text>
-            <Icon as={Icons.Eye} boxSize={4} mr={1} />
-            ：確認ボタンで有給取得日を一覧・編集
-          </Text>
-          <Text fontWeight="bold" mt={4}>
-            日本の有給休暇制度（概要）
-          </Text>
-          <Text>
-            ・年次有給休暇は、雇用形態や勤続年数に応じて付与されます。
-          </Text>
-          <Text>・取得日数や残日数の管理が義務化されています。</Text>
-          <Text>・本アプリはその管理をサポートします。</Text>
-          <Text fontWeight="bold" mt={4}>
-            年次有給休暇 付与日数の目安表
-          </Text>
+          <Text {...sectionTitleProps}>年次有給休暇 付与日数の目安表</Text>
           <Box overflowX="auto" w="100%" pl={2}>
             <table
               style={{
