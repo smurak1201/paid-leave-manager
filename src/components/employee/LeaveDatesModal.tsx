@@ -102,16 +102,13 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   }, []);
 
   // 日付追加時の重複チェック付きラッパー
+  // handleAddDateの重複チェック・エラー表示はApp.tsxで行うため、ここではalertやaddDateError呼び出しは不要。
   const handleAddDate = useCallback(
     async (date: string) => {
       if (!date) return;
-      if (dates.includes(date)) {
-        alert("同じ有給取得日がすでに登録されています。");
-        return;
-      }
       await onAddDate(date);
     },
-    [dates, onAddDate]
+    [onAddDate]
   );
 
   // ページネーション共通部品

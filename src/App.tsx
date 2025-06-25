@@ -356,6 +356,14 @@ function App() {
           onAddDate={async (date) => {
             if (activeEmployeeId == null) return;
             setAddDateError("");
+            // 既存の有給取得日と重複していないかチェック
+            const usedDates = leaveUsages
+              .filter((u) => u.employeeId === activeEmployeeId)
+              .map((u) => u.usedDate);
+            if (usedDates.includes(date)) {
+              setAddDateError("同じ有給取得日がすでに登録されています");
+              return;
+            }
             try {
               await apiPost(
                 "http://localhost/paid_leave_manager/leave_usage_add.php",
