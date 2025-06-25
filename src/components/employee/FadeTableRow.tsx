@@ -34,8 +34,19 @@ import { motion } from "framer-motion";
 
 const MotionTr = motion.tr;
 
+// 型定義を修正: 不要なイベントハンドラを除外
 export const FadeTableRow: React.FC<
-  React.ComponentPropsWithoutRef<"tr"> & { inProp?: boolean }
+  Omit<
+    React.ComponentPropsWithoutRef<"tr">,
+    | "onAnimationStart"
+    | "onDragStart"
+    | "onDragEnd"
+    | "onDrag"
+    | "onDragOver"
+    | "onDragEnter"
+    | "onDragLeave"
+    | "onDrop"
+  > & { inProp?: boolean }
 > = ({ inProp = true, children, ...rest }) => {
   const animationProps = useMemo(
     () => ({
@@ -46,11 +57,9 @@ export const FadeTableRow: React.FC<
     }),
     []
   );
-
   return (
     <MotionTr {...animationProps} {...rest}>
       {children}
     </MotionTr>
   );
 };
-// 不要なコメントや未使用propsの削除

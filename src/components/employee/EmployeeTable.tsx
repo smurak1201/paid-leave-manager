@@ -26,7 +26,12 @@ import { Box, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
 
 // ===== import: 型定義 =====
-import type { Employee, RowContentProps, EmployeeTableProps } from "./types";
+import type {
+  Employee,
+  RowContentProps,
+  EmployeeSummary,
+  EmployeeTableProps,
+} from "./types";
 
 // ===== import: アイコン・ユーティリティ =====
 import { Icons, getServicePeriod } from "./icons";
@@ -113,7 +118,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     onView,
     onEdit,
     handleDeleteClick,
-  }) => {
+  }: RowContentProps) => {
     return (
       // <tr>の直下に余計な空白や改行を出力しないため、Fragmentではなく配列で返す
       [

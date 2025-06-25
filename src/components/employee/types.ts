@@ -38,6 +38,15 @@ export interface Employee {
   joinedAt: string;       // 入社年月日 (YYYY-MM-DD)
 }
 
+// EmployeeSummary型を明示的に定義
+export interface EmployeeSummary {
+  employeeId: number;
+  grantThisYear: number;
+  carryOver: number;
+  used: number;
+  remain: number;
+}
+
 // ====== UI部品・props型 ======
 
 /**
@@ -158,6 +167,17 @@ export interface UseLeaveDatesReturn {
 export interface Pagination {
   currentPage: number;
   totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+// EmployeeTableProps型を明示的に定義
+export interface EmployeeTableProps {
+  employees: Employee[];
+  summaries: EmployeeSummary[];
+  onEdit: (employeeId: number) => void;
+  onDelete: (employeeId: number) => void;
+  onView: (employeeId: number) => void;
+  currentPage: number;
   onPageChange: (page: number) => void;
 }
 

@@ -24,7 +24,6 @@ import {
 } from "@chakra-ui/react";
 import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import { User, X, BadgeInfo } from "lucide-react";
-import { inputDateStyle } from "./icons";
 import { CustomModal } from "../ui/CustomModal";
 
 export interface EmployeeModalProps {
@@ -212,7 +211,14 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             name="joinedAt"
             value={form.joinedAt || ""}
             onChange={handleChange}
-            style={inputDateStyle}
+            style={{
+              border: "1px solid #B2F5EA",
+              borderRadius: 6,
+              padding: "6px 12px",
+              fontSize: 16,
+              outline: "none",
+              width: "100%",
+            }}
           />
         </Box>
         <HStack justify="flex-end" gap={3}>

@@ -28,7 +28,6 @@ import type { LeaveDatesModalProps } from "./types";
 // ===== import: ユーティリティ・UI部品 =====
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { DateInputRow } from "./DateInputRow";
-import { inputDateSmallStyle } from "./icons";
 import { LeaveDateList } from "./LeaveDateList";
 
 // propsの型定義はtypes.tsに集約
@@ -230,7 +229,13 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                 setDateInput(pagedDates[idx] ?? "");
               }}
               onDeleteDate={handleDelete}
-              inputDateSmallStyle={inputDateSmallStyle}
+              inputDateSmallStyle={{
+                border: "1px solid #B2F5EA",
+                borderRadius: 6,
+                padding: "4px 8px",
+                fontSize: 16,
+                outline: "none",
+              }}
               pagedDates={pagedDates}
               currentPage={currentPage}
               ITEMS_PER_PAGE={ITEMS_PER_PAGE}

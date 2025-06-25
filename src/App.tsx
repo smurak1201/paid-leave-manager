@@ -119,11 +119,11 @@ function App() {
 
   // データ再取得をまとめて行う関数
   const reloadAll = async () => {
-    const emps = await fetchEmployees();
-    setEmployees(emps);
+    const employeesList = await fetchEmployees();
+    setEmployees(employeesList);
     setLeaveUsages(await fetchLeaveUsages());
-    setSummaries(await fetchSummaries(emps));
-    return emps;
+    setSummaries(await fetchSummaries(employeesList));
+    return employeesList;
   };
   // サマリーのデフォルト値
   const emptySummary = {
@@ -162,9 +162,21 @@ function App() {
   const [dateInput, setDateInput] = useState("");
   const [addDateError, setAddDateError] = useState("");
 
+  // --- 従業員編集モーダルを開く ---
+  const handleEdit = (employeeId: number) => {
+    setActiveEmployeeId(employeeId);
+    setActiveModal("edit");
+  };
+
   // 従業員IDから従業員オブジェクトを取得
   const findEmployee = (id: number | null) =>
     employees.find((e) => e.employeeId === id) ?? null;
+
+  // --- 従業員の有給取得日確認モーダルを開く ---
+  const handleView = (employeeId: number) => {
+    setActiveEmployeeId(employeeId);
+    setActiveModal("leaveDates");
+  };
 
   // --- 画面描画 ---
   return (
@@ -201,7 +213,10 @@ function App() {
           <Button
             colorScheme="teal"
             variant="outline"
-            onClick={handleAdd}
+            onClick={() => {
+              setActiveEmployeeId(null);
+              setActiveModal("add");
+            }}
             size="md"
             px={6}
             boxShadow="md"
@@ -276,9 +291,9 @@ function App() {
                   mode: "add",
                 }
               );
-              const emps = await reloadAll();
+              const employeesList = await reloadAll();
               const ITEMS_PER_PAGE = 15;
-              setCurrentPage(Math.ceil(emps.length / ITEMS_PER_PAGE));
+              setCurrentPage(Math.ceil(employeesList.length / ITEMS_PER_PAGE));
               setActiveEmployeeId(null);
               setActiveModal(null);
             } catch (e: any) {
@@ -305,7 +320,6 @@ function App() {
               alert(e.message || "従業員編集に失敗しました");
             }
           }}
-          onDelete={undefined}
         />
         <LeaveDatesModal
           key={activeEmployeeId ?? "none"}
