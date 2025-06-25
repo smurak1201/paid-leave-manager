@@ -32,7 +32,6 @@ import { getServicePeriod } from "./icons";
 
 // ===== import: UI部品 =====
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
-import { FadeTableRow } from "./FadeTableRow";
 import { EmployeeTableRow } from "./EmployeeTableRow";
 
 // propsの型定義。データと操作関数を親(App)から受け取る
@@ -225,7 +224,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
           </Tr>
         </Thead>
         <Tbody>
-          {pagedEmployees.map((emp, idx) => {
+          {pagedEmployees.map((emp) => {
             const summary = getSummary(emp.employeeId);
             const rowProps = {
               emp,
@@ -237,20 +236,8 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               onView,
               onEdit,
               handleDeleteClick,
-              rowIndex: idx,
             };
-            const oddBg = idx % 2 === 1 ? "rgba(0,128,128,0.06)" : undefined;
-            return (
-              <FadeTableRow
-                key={emp.id}
-                style={{
-                  background: summary.remain === 0 ? "#FFF5F5" : oddBg,
-                  transition: "background 0.3s",
-                }}
-              >
-                <EmployeeTableRow {...rowProps} />
-              </FadeTableRow>
-            );
+            return <EmployeeTableRow key={emp.id} {...rowProps} />;
           })}
         </Tbody>
       </Table>
