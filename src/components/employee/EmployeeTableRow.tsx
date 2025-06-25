@@ -1,5 +1,5 @@
 import React from "react";
-import { Td, Tr } from "@chakra-ui/table";
+import { Td } from "@chakra-ui/table";
 import { Badge, HStack, IconButton, Icon } from "@chakra-ui/react";
 import { Icons } from "./icons";
 import { Tooltip } from "../ui/tooltip";
@@ -21,17 +21,8 @@ export const EmployeeTableRow: React.FC<
 }) => {
   const [y, m, d] = emp.joinedAt.split("-");
   const joinedAtJp = `${y}年${Number(m)}月${d ? Number(d) + "日" : ""}`;
-  const oddBg =
-    rowIndex !== undefined && rowIndex % 2 === 1
-      ? "rgba(0,128,128,0.06)"
-      : undefined;
   return (
-    <Tr
-      style={{
-        background: remain === 0 ? "#FFF5F5" : oddBg,
-        transition: "background 0.3s",
-      }}
-    >
+    <>
       <Td fontWeight="bold" color="teal.700" fontSize="md">
         {emp.employeeId}
       </Td>
@@ -102,6 +93,6 @@ export const EmployeeTableRow: React.FC<
           </Tooltip>
         </HStack>
       </Td>
-    </Tr>
+    </>
   );
 };
