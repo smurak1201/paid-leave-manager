@@ -367,7 +367,14 @@ function App() {
               await reloadAll();
               setDateInput("");
             } catch (e: any) {
-              setAddDateError(e.message || "有給消化日の追加に失敗しました");
+              let msg = e?.message || "有給消化日の追加に失敗しました";
+              // 400エラーや入社日前の登録など、特定のエラー内容を日本語で分かりやすく
+              if (msg.includes("400") || msg.includes("before joined")) {
+                msg = "入社日より前の日付は登録できません";
+              } else if (msg.includes("duplicate")) {
+                msg = "同じ有給取得日がすでに登録されています";
+              }
+              setAddDateError(msg);
             }
           }}
           onDeleteDate={async (idx) => {
