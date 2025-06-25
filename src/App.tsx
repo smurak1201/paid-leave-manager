@@ -434,32 +434,12 @@ function App() {
             );
             return s || emptySummary;
           })()}
-          // 有効期限内の取得日のみを抽出して渡す
+          // 有効期限内の取得日のみを抽出して渡す（summaryのusedDatesをそのまま利用）
           usedDates={(() => {
             const empSummary = summaries.find(
               (s) => s.employeeId === activeEmployeeId
             );
-            if (!empSummary || !empSummary.grantDetails) return [];
-            const filtered: string[] = [];
-            empSummary.grantDetails.forEach((grant) => {
-              const grantDateStr = grant.grantDate;
-              if (!grantDateStr) return;
-              // grantDate, validUntil を Date 型で計算
-              const [y, m, d] = grantDateStr.split("-").map(Number);
-              const grantDate = new Date(y, m - 1, d);
-              const validUntil = new Date(y, m - 1, d);
-              validUntil.setFullYear(validUntil.getFullYear() + 2);
-              validUntil.setDate(validUntil.getDate() - 1); // 満了日
-              (grant.usedDates || []).forEach((ud) => {
-                if (!/^\d{4}-\d{2}-\d{2}$/.test(ud)) return;
-                const [uy, um, udt] = ud.split("-").map(Number);
-                const usedDate = new Date(uy, um - 1, udt);
-                if (usedDate >= grantDate && usedDate <= validUntil) {
-                  filtered.push(ud);
-                }
-              });
-            });
-            return filtered.filter(Boolean).sort();
+            return empSummary?.usedDates ?? [];
           })()}
           grantDetails={(() => {
             const empSummary = summaries.find(
