@@ -11,8 +11,8 @@
 // ・型安全・責務分離・UI/UX・可読性重視
 // ・props/stateの流れ・UI部品の責務を日本語コメントで明記
 
-import type { Employee } from "../../types/employee";
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import type { Employee, EmployeeModalProps } from "./types";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   HStack,
@@ -25,15 +25,17 @@ import {
 import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import { User, X, BadgeInfo } from "lucide-react";
 import { CustomModal } from "../ui/CustomModal";
+import { validateEmployeeId } from "./utils";
 
-export interface EmployeeModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  employee: Employee | null;
-  employees: Employee[];
-  onAdd: (form: Omit<Employee, "id">) => void;
-  onSave: (form: Employee) => void;
-}
+// form型: 入力中はemployeeIdはstringで保持
+export type FormType = Omit<Employee, "employeeId"> & { employeeId: string };
+const emptyForm: FormType = {
+  id: NaN,
+  employeeId: "",
+  lastName: "",
+  firstName: "",
+  joinedAt: "",
+};
 
 export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   isOpen,
@@ -43,27 +45,8 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   onAdd,
   onSave,
 }) => {
-  // form型: 入力中はemployeeIdはstringで保持
-  type FormType = Omit<Employee, "employeeId"> & { employeeId: string };
-  const emptyForm: FormType = {
-    id: NaN,
-    employeeId: "",
-    lastName: "",
-    firstName: "",
-    joinedAt: "",
-  };
   const [form, setForm] = useState<FormType>(emptyForm);
   const [employeeIdError, setEmployeeIdError] = useState("");
-
-  // バリデーション関数
-  const validateEmployeeId = (value: string): string => {
-    if (value === "") return "従業員コードは必須です";
-    if (!/^[0-9]+$/.test(value))
-      return "従業員コードは半角数字のみ入力できます";
-    if (!employee && employees.some((emp) => String(emp.employeeId) === value))
-      return "従業員コードが重複しています";
-    return "";
-  };
 
   // 初期化・リセット
   const resetForm = () => {
@@ -77,32 +60,29 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
 
   useEffect(() => {
     if (isOpen) resetForm();
-    // eslint-disable-next-line
   }, [isOpen, employee]);
 
   // 入力欄のonChangeハンドラ
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    if (name === "employeeId") setEmployeeIdError(validateEmployeeId(value));
+    if (name === "employeeId")
+      setEmployeeIdError(validateEmployeeId(value, employee, employees));
   };
 
-  const isSaveDisabled = useMemo(
-    () =>
-      !!employeeIdError ||
-      !form.employeeId ||
-      !form.lastName ||
-      !form.firstName ||
-      !form.joinedAt,
-    [employeeIdError, form]
-  );
+  const isSaveDisabled = () =>
+    !!employeeIdError ||
+    !form.employeeId ||
+    !form.lastName ||
+    !form.firstName ||
+    !form.joinedAt;
 
-  const handleSave = useCallback(() => {
+  const handleSave = () => {
     const submitForm = { ...form, employeeId: Number(form.employeeId) };
     employee
       ? onSave(submitForm as Employee)
       : onAdd(submitForm as Omit<Employee, "id">);
-  }, [employee, form, onAdd, onSave]);
+  };
 
   if (!isOpen) return null;
   return (
@@ -229,8 +209,8 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             px={6}
             fontWeight="bold"
             boxShadow="md"
-            disabled={isSaveDisabled}
-            cursor={isSaveDisabled ? "not-allowed" : "pointer"}
+            disabled={isSaveDisabled()}
+            cursor={isSaveDisabled() ? "not-allowed" : "pointer"}
             _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
           >
             <Icon as={User} mr={2} />

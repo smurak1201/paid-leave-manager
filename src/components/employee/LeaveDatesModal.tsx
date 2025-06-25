@@ -29,6 +29,7 @@ import type { LeaveDatesModalProps } from "./types";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { DateInputRow } from "./DateInputRow";
 import { LeaveDateList } from "./LeaveDateList";
+import { PageNav } from "./PageNav";
 
 // propsの型定義はtypes.tsに集約
 export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
@@ -110,41 +111,6 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
     [onAddDate]
   );
 
-  // ページネーション共通部品
-  const PageNav: React.FC<{
-    current: number;
-    total: number;
-    onChange: (n: number) => void;
-  }> = ({ current, total, onChange }) => (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      gap={2}
-      mb={2}
-    >
-      <Button
-        size="sm"
-        onClick={() => onChange(Math.max(1, current - 1))}
-        disabled={current === 1}
-        variant="outline"
-      >
-        前へ
-      </Button>
-      <Text fontSize="sm" mx={2}>
-        {current} / {total}
-      </Text>
-      <Button
-        size="sm"
-        onClick={() => onChange(Math.min(total, current + 1))}
-        disabled={current === total}
-        variant="outline"
-      >
-        次へ
-      </Button>
-    </Box>
-  );
-
   return (
     <Box
       position="fixed"
@@ -219,27 +185,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                 onChange={onPageChange}
               />
             )}
-            <LeaveDateList
-              dates={dates}
-              editDateIdx={editDateIdx}
-              dateInput={dateInput}
-              onChangeDateInput={setDateInput}
-              onEditDate={(idx) => {
-                setEditDateIdx(idx);
-                setDateInput(pagedDates[idx] ?? "");
-              }}
-              onDeleteDate={handleDelete}
-              inputDateSmallStyle={{
-                border: "1px solid #B2F5EA",
-                borderRadius: 6,
-                padding: "4px 8px",
-                fontSize: 16,
-                outline: "none",
-              }}
-              pagedDates={pagedDates}
-              currentPage={currentPage}
-              ITEMS_PER_PAGE={ITEMS_PER_PAGE}
-            />
+            <LeaveDateList dates={dates} onDeleteDate={handleDelete} />
           </>
         )}
         <Box display="flex" justifyContent="flex-end" gap={2} mt={4}>

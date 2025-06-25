@@ -170,3 +170,11 @@ export function getEmployeeLeaveSummary(
   const remain = grantThisYear + carryOver - used;
   return { grantThisYear, carryOver, used, remain };
 }
+
+// 従業員コードのバリデーション（utils.tsに移動推奨）
+export function validateEmployeeId(value: string, employee: Employee | null, employees: Employee[]): string {
+  if (value === "") return "従業員コードは必須です";
+  if (!/^[0-9]+$/.test(value)) return "従業員コードは半角数字のみ入力できます";
+  if (!employee && employees.some((emp) => String(emp.employeeId) === value)) return "従業員コードが重複しています";
+  return "";
+}

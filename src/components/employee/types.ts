@@ -116,15 +116,7 @@ export interface LeaveDatesModalProps {
  */
 export interface LeaveDateListProps {
   dates: string[];
-  editDateIdx: number | null;
-  dateInput: string;
-  onChangeDateInput: (v: string) => void;
-  onEditDate: (idx: number) => void;
   onDeleteDate: (idx: number) => void;
-  inputDateSmallStyle: React.CSSProperties;
-  pagedDates: string[];
-  currentPage: number;
-  ITEMS_PER_PAGE: number;
 }
 
 /**

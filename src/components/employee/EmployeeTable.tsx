@@ -21,25 +21,21 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/table";
-import { Box, Badge, IconButton, HStack, Icon } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th } from "@chakra-ui/table";
+import { Box } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
 
 // ===== import: 型定義 =====
-import type {
-  Employee,
-  RowContentProps,
-  EmployeeSummary,
-  EmployeeTableProps,
-} from "./types";
+import type { Employee, EmployeeSummary, EmployeeTableProps } from "./types";
 
 // ===== import: アイコン・ユーティリティ =====
-import { Icons, getServicePeriod } from "./icons";
+import { getServicePeriod } from "./icons";
 
 // ===== import: UI部品 =====
-import { Tooltip } from "../ui/tooltip";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { FadeTableRow } from "./FadeTableRow";
+import { EmployeeTableRow } from "./EmployeeTableRow";
+import { PageNav } from "./PageNav";
 
 // propsの型定義。データと操作関数を親(App)から受け取る
 // EmployeeSummary, RowContentProps, EmployeeTablePropsの型定義の重複をtypes.tsに集約
@@ -105,95 +101,6 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   const handleDeleteClose = () => {
     setDeleteOpen(false);
     setDeleteTarget(null);
-  };
-
-  // RowContentPropsの型定義はtypes.tsに移動済み
-  const RowContent: React.FC<RowContentProps> = ({
-    emp,
-    grantThisYear,
-    carryOver,
-    used,
-    remain,
-    servicePeriod,
-    onView,
-    onEdit,
-    handleDeleteClick,
-  }: RowContentProps) => {
-    return (
-      // <tr>の直下に余計な空白や改行を出力しないため、Fragmentではなく配列で返す
-      [
-        <Td key="id">{emp.employeeId}</Td>,
-        <Td key="lastName">{emp.lastName}</Td>,
-        <Td key="firstName">{emp.firstName}</Td>,
-        <Td key="joinedAt">
-          {(() => {
-            const [y, m, d] = emp.joinedAt.split("-");
-            return `${y}年${Number(m)}月${d ? Number(d) + "日" : ""}`;
-          })()}
-        </Td>,
-        <Td key="servicePeriod">{servicePeriod}</Td>,
-        <Td key="grantThisYear" isNumeric>
-          {grantThisYear}
-        </Td>,
-        <Td key="carryOver" isNumeric>
-          {carryOver}
-        </Td>,
-        <Td key="used" isNumeric>
-          {used}
-        </Td>,
-        <Td key="remain" isNumeric>
-          <Badge
-            colorScheme={remain <= 3 ? "red" : remain <= 7 ? "yellow" : "teal"}
-            fontSize="md"
-            px={3}
-            py={1}
-            borderRadius="md"
-            fontWeight="bold"
-            minW="3em"
-            textAlign="center"
-          >
-            {remain}
-          </Badge>
-        </Td>,
-        <Td key="actions">
-          <HStack justify="center" gap={1}>
-            <Tooltip content="確認" showArrow>
-              <IconButton
-                aria-label="確認"
-                size="sm"
-                variant="ghost"
-                colorScheme="blue"
-                onClick={() => onView(emp.employeeId)}
-              >
-                <Icon as={Icons.Eye} boxSize={5} />
-              </IconButton>
-            </Tooltip>
-            <Tooltip content="編集" showArrow>
-              <IconButton
-                aria-label="編集"
-                size="sm"
-                variant="ghost"
-                colorScheme="teal"
-                onClick={() => onEdit(emp.employeeId)}
-              >
-                <Icon as={Icons.Edit} boxSize={5} />
-              </IconButton>
-            </Tooltip>
-            <Tooltip content="削除" showArrow>
-              <IconButton
-                aria-label="削除"
-                size="sm"
-                variant="ghost"
-                colorScheme="red"
-                onClick={() => handleDeleteClick(emp.employeeId)}
-              >
-                <Icon as={Icons.Trash2} boxSize={5} />
-              </IconButton>
-            </Tooltip>
-          </HStack>
-        </Td>,
-      ]
-    );
   };
 
   // ページネーション共通部品
@@ -344,7 +251,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               };
               return (
                 <FadeTableRow key={emp.id} style={style}>
-                  <RowContent {...rowProps} />
+                  <EmployeeTableRow {...rowProps} />
                 </FadeTableRow>
               );
             })}
