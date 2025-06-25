@@ -35,7 +35,6 @@ import { getServicePeriod } from "./icons";
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { FadeTableRow } from "./FadeTableRow";
 import { EmployeeTableRow } from "./EmployeeTableRow";
-import { PageNav } from "./PageNav";
 
 // propsの型定義。データと操作関数を親(App)から受け取る
 // EmployeeSummary, RowContentProps, EmployeeTablePropsの型定義の重複をtypes.tsに集約

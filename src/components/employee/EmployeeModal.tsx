@@ -11,7 +11,7 @@
 // ・型安全・責務分離・UI/UX・可読性重視
 // ・props/stateの流れ・UI部品の責務を日本語コメントで明記
 
-import type { Employee, EmployeeModalProps } from "./types";
+import type { Employee } from "./types";
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -26,6 +26,16 @@ import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import { User, X, BadgeInfo } from "lucide-react";
 import { CustomModal } from "../ui/CustomModal";
 import { validateEmployeeId } from "./utils";
+
+// EmployeeModalProps型をここで定義
+interface EmployeeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  employee: Employee | null;
+  employees: Employee[];
+  onAdd: (form: Omit<Employee, "id">) => void;
+  onSave: (form: Employee) => void;
+}
 
 // form型: 入力中はemployeeIdはstringで保持
 export type FormType = Omit<Employee, "employeeId"> & { employeeId: string };

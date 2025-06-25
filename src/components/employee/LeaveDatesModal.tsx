@@ -38,7 +38,6 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   onAddDate,
   onDeleteDate,
   editDateIdx,
-  setEditDateIdx,
   dateInput,
   setDateInput,
   currentPage,
@@ -62,14 +61,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   // ページネーション用
   const ITEMS_PER_PAGE = 10;
   const totalPages = Math.max(1, Math.ceil(dates.length / ITEMS_PER_PAGE));
-  const pagedDates = useMemo(
-    () =>
-      dates.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-      ),
-    [dates, currentPage]
-  );
+
   // ページ切替時にリスト先頭へスクロール
   const listRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
