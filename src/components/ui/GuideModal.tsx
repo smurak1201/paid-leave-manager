@@ -264,9 +264,18 @@ export const GuideModal: React.FC<GuideModalProps> = ({ open, onClose }) => {
             使い方：
           </Text>
           <Text>「従業員追加」ボタンで新規従業員を登録</Text>
-          <Text>テーブルの編集ボタンで従業員情報を編集</Text>
-          <Text>テーブルの削除ボタンで従業員を削除</Text>
-          <Text>テーブルの確認ボタンで有給取得日を一覧・編集</Text>
+          <Text>
+            <Icon as={Icons.Edit} boxSize={4} mr={1} />
+            ：編集ボタンで従業員情報を編集
+          </Text>
+          <Text>
+            <Icon as={Icons.Trash2} boxSize={4} mr={1} />
+            ：削除ボタンで従業員を削除
+          </Text>
+          <Text>
+            <Icon as={Icons.Eye} boxSize={4} mr={1} />
+            ：確認ボタンで有給取得日を一覧・編集
+          </Text>
           <Text fontWeight="bold" mt={4}>
             日本の有給休暇制度（概要）
           </Text>
