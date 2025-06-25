@@ -401,11 +401,12 @@ function App() {
           onDeleteDate={async (idx) => {
             const emp = findEmployee(activeEmployeeId);
             if (!emp) return false;
-            // leaveUsagesから該当従業員のusedDate配列を取得
-            const usedDates = leaveUsages
-              .filter((u) => u.employeeId === emp.employeeId)
-              .map((u) => u.usedDate);
-            const targetDate = usedDates[idx];
+            // 表示しているusedDates（有効期限内のみ）を取得
+            const empSummary = summaries.find(
+              (s) => s.employeeId === emp.employeeId
+            );
+            const visibleUsedDates = empSummary?.usedDates ?? [];
+            const targetDate = visibleUsedDates[idx];
             if (!targetDate) {
               return false;
             }
