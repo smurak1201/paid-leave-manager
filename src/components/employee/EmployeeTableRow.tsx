@@ -19,15 +19,30 @@ export const EmployeeTableRow: React.FC<RowContentProps> = ({
   const [y, m, d] = emp.joinedAt.split("-");
   const joinedAtJp = `${y}年${Number(m)}月${d ? Number(d) + "日" : ""}`;
   return (
-    <tr>
-      <Td>{emp.employeeId}</Td>
-      <Td>{emp.lastName}</Td>
-      <Td>{emp.firstName}</Td>
-      <Td>{joinedAtJp}</Td>
-      <Td>{servicePeriod}</Td>
-      <Td isNumeric>{grantThisYear}</Td>
-      <Td isNumeric>{carryOver}</Td>
-      <Td isNumeric>{used}</Td>
+    <tr
+      style={{
+        background: remain === 0 ? "#FFF5F5" : undefined,
+        transition: "background 0.3s",
+      }}
+    >
+      <Td fontWeight="bold" color="teal.700" fontSize="md">
+        {emp.employeeId}
+      </Td>
+      <Td fontWeight="bold" color="gray.700">
+        {emp.lastName}
+      </Td>
+      <Td color="gray.700">{emp.firstName}</Td>
+      <Td color="gray.600">{joinedAtJp}</Td>
+      <Td color="gray.600">{servicePeriod}</Td>
+      <Td isNumeric color="teal.700">
+        {grantThisYear}
+      </Td>
+      <Td isNumeric color="teal.700">
+        {carryOver}
+      </Td>
+      <Td isNumeric color="teal.700">
+        {used}
+      </Td>
       <Td isNumeric>
         <Badge
           colorScheme={remain <= 3 ? "red" : remain <= 7 ? "yellow" : "teal"}
@@ -38,6 +53,7 @@ export const EmployeeTableRow: React.FC<RowContentProps> = ({
           fontWeight="bold"
           minW="3em"
           textAlign="center"
+          boxShadow="sm"
         >
           {remain}
         </Badge>
