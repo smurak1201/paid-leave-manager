@@ -183,10 +183,8 @@ function App() {
     setActiveModal("leaveDates");
   };
 
-  // --- 従業員削除ロジックを高階関数として分離 ---
-  // EmployeeTableのonDeleteに直接async関数を渡すのではなく、
-  // handleDeleteEmployee(employeeId) の形で分離し、責務を明確化
-  const handleDeleteEmployee = (employeeId: number) => async () => {
+  // --- 従業員削除ロジック: 高階関数をやめ、シンプルなasync関数に ---
+  const handleDeleteEmployee = async (employeeId: number) => {
     try {
       // 先に有給取得日を全て削除
       const emp = findEmployee(employeeId);
@@ -212,10 +210,8 @@ function App() {
     }
   };
 
-  // --- 有給取得日追加ロジックを高階関数として分離 ---
-  // LeaveDatesModalのonAddDateに直接async関数を渡すのではなく、
-  // handleAddDate(date) の形で分離し、責務を明確化
-  const handleAddDate = (employeeId: number | null) => async (date: string) => {
+  // --- 有給取得日追加ロジック: 高階関数をやめ、シンプルなasync関数に ---
+  const handleAddDate = async (employeeId: number | null, date: string) => {
     if (employeeId == null) return;
     setAddDateError("");
     if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
@@ -248,85 +244,66 @@ function App() {
     }
   };
 
-  // --- 有給取得日削除ロジックを高階関数として分離 ---
-  // LeaveDatesModalのonDeleteDateに直接async関数を渡すのではなく、
-  // handleDeleteDate(idx) の形で分離し、責務を明確化
-  const handleDeleteDate =
-    (employeeId: number | null, summaries: EmployeeSummary[]) =>
-    async (idx: number) => {
-      const emp = findEmployee(employeeId);
-      if (!emp) return false;
-      // 表示しているusedDates（有効期限内のみ）を取得
-      const empSummary = summaries.find((s) => s.employeeId === emp.employeeId);
-      const visibleUsedDates = empSummary?.usedDates ?? [];
-      const targetDate = visibleUsedDates[idx];
-      if (!targetDate) {
-        return false;
-      }
-      try {
-        await apiPost(
-          "http://localhost/paid_leave_manager/leave_usage_delete.php",
-          { employee_id: emp.employeeId, used_date: targetDate }
-        );
-        await reloadAll();
-        return true;
-      } catch (e: any) {
-        alert(e.message || "有給消化日の削除に失敗しました");
-        return false;
-      }
-    };
+  // --- 有給取得日削除ロジック: 高階関数をやめ、シンプルなasync関数に ---
+  const handleDeleteDate = async (employeeId: number | null, idx: number) => {
+    const emp = findEmployee(employeeId);
+    if (!emp) return false;
+    // 表示しているusedDates（有効期限内のみ）を取得
+    const empSummary = summaries.find((s) => s.employeeId === emp.employeeId);
+    const visibleUsedDates = empSummary?.usedDates ?? [];
+    const targetDate = visibleUsedDates[idx];
+    if (!targetDate) {
+      return false;
+    }
+    try {
+      await apiPost(
+        "http://localhost/paid_leave_manager/leave_usage_delete.php",
+        { employee_id: emp.employeeId, used_date: targetDate }
+      );
+      await reloadAll();
+      return true;
+    } catch (e: any) {
+      alert(e.message || "有給消化日の削除に失敗しました");
+      return false;
+    }
+  };
 
-  // --- 従業員追加ロジックを高階関数として分離 ---
-  const handleAddEmployee =
-    (
-      reloadAll: () => Promise<Employee[]>,
-      setCurrentPage: (page: number) => void,
-      setActiveEmployeeId: (id: number | null) => void,
-      setActiveModal: (modal: null | "add" | "edit" | "leaveDates") => void
-    ) =>
-    async (form: any) => {
-      try {
-        await apiPost("http://localhost/paid_leave_manager/employees.php", {
-          employee_id: form.employeeId,
-          last_name: form.lastName,
-          first_name: form.firstName,
-          joined_at: form.joinedAt,
-          mode: "add",
-        });
-        const employeesList = await reloadAll();
-        const ITEMS_PER_PAGE = 15;
-        setCurrentPage(Math.ceil(employeesList.length / ITEMS_PER_PAGE));
-        setActiveEmployeeId(null);
-        setActiveModal(null);
-      } catch (e: any) {
-        alert(e.message || "従業員追加に失敗しました");
-      }
-    };
-
-  // --- 従業員編集ロジックを高階関数として分離 ---
-  const handleSaveEmployee =
-    (
-      reloadAll: () => Promise<Employee[]>,
-      setActiveEmployeeId: (id: number | null) => void,
-      setActiveModal: (modal: null | "add" | "edit" | "leaveDates") => void
-    ) =>
-    async (form: any) => {
-      try {
-        await apiPost("http://localhost/paid_leave_manager/employees.php", {
-          id: form.id,
-          employee_id: form.employeeId,
-          last_name: form.lastName,
-          first_name: form.firstName,
-          joined_at: form.joinedAt,
-          mode: "edit",
-        });
-        await reloadAll();
-        setActiveEmployeeId(null);
-        setActiveModal(null);
-      } catch (e: any) {
-        alert(e.message || "従業員編集に失敗しました");
-      }
-    };
+  // --- 従業員追加・編集ロジックもシンプルなasync関数に ---
+  const handleAddEmployee = async (form: any) => {
+    try {
+      await apiPost("http://localhost/paid_leave_manager/employees.php", {
+        employee_id: form.employeeId,
+        last_name: form.lastName,
+        first_name: form.firstName,
+        joined_at: form.joinedAt,
+        mode: "add",
+      });
+      const employeesList = await reloadAll();
+      const ITEMS_PER_PAGE = 15;
+      setCurrentPage(Math.ceil(employeesList.length / ITEMS_PER_PAGE));
+      setActiveEmployeeId(null);
+      setActiveModal(null);
+    } catch (e: any) {
+      alert(e.message || "従業員追加に失敗しました");
+    }
+  };
+  const handleSaveEmployee = async (form: any) => {
+    try {
+      await apiPost("http://localhost/paid_leave_manager/employees.php", {
+        id: form.id,
+        employee_id: form.employeeId,
+        last_name: form.lastName,
+        first_name: form.firstName,
+        joined_at: form.joinedAt,
+        mode: "edit",
+      });
+      await reloadAll();
+      setActiveEmployeeId(null);
+      setActiveModal(null);
+    } catch (e: any) {
+      alert(e.message || "従業員編集に失敗しました");
+    }
+  };
 
   // --- summary, usedDates, grantDetailsのgetter関数を分離 ---
   const getSummary = (
@@ -339,6 +316,7 @@ function App() {
     const s = summaries.find((s) => s.employeeId === (emp?.employeeId ?? null));
     return s || emptySummary;
   };
+
   const getUsedDates = (
     activeEmployeeId: number | null,
     summaries: EmployeeSummary[]
@@ -346,6 +324,7 @@ function App() {
     const empSummary = summaries.find((s) => s.employeeId === activeEmployeeId);
     return empSummary?.usedDates ?? [];
   };
+
   const getGrantDetails = (
     activeEmployeeId: number | null,
     summaries: EmployeeSummary[]
@@ -426,8 +405,7 @@ function App() {
             employees={employees}
             summaries={summaries}
             onEdit={handleEdit}
-            // onDeleteは高階関数で分離したhandleDeleteEmployeeを渡す
-            onDelete={(employeeId) => handleDeleteEmployee(employeeId)()}
+            onDelete={handleDeleteEmployee}
             onView={handleView}
             currentPage={currentPage}
             onPageChange={setCurrentPage}
@@ -440,18 +418,8 @@ function App() {
             activeModal === "edit" ? findEmployee(activeEmployeeId) : null
           }
           employees={employees}
-          // onAdd, onSaveは高階関数で分離
-          onAdd={handleAddEmployee(
-            reloadAll,
-            setCurrentPage,
-            setActiveEmployeeId,
-            setActiveModal
-          )}
-          onSave={handleSaveEmployee(
-            reloadAll,
-            setActiveEmployeeId,
-            setActiveModal
-          )}
+          onAdd={handleAddEmployee}
+          onSave={handleSaveEmployee}
         />
         <LeaveDatesModal
           key={activeEmployeeId ?? "none"}
@@ -459,15 +427,14 @@ function App() {
           onClose={() => setActiveModal(null)}
           employeeId={activeEmployeeId}
           leaveUsages={leaveUsages}
-          onAddDate={handleAddDate(activeEmployeeId)}
-          onDeleteDate={handleDeleteDate(activeEmployeeId, summaries)}
+          onAddDate={(date) => handleAddDate(activeEmployeeId, date)}
+          onDeleteDate={(idx) => handleDeleteDate(activeEmployeeId, idx)}
           editDateIdx={editDateIdx}
           setEditDateIdx={setEditDateIdx}
           dateInput={dateInput}
           setDateInput={setDateInput}
           currentPage={leaveDatesPage}
           onPageChange={setLeaveDatesPage}
-          // summary, usedDates, grantDetailsはgetter関数で分離
           summary={getSummary(
             activeEmployeeId,
             employees,
