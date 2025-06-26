@@ -61,6 +61,8 @@ function App() {
       firstName: emp.first_name,
     }));
   };
+
+  // 有給取得日の取得
   const fetchLeaveUsages = async () => {
     const data = await apiGet<any[]>(
       "http://localhost/paid_leave_manager/leave_usages.php"
@@ -86,6 +88,8 @@ function App() {
       usedDates: string[];
     }>;
   };
+
+  // 従業員ごとの有給休暇サマリーを取得
   const fetchSummaries = async (emps: Employee[]) => {
     return Promise.all(
       emps.map(async (emp) => {
