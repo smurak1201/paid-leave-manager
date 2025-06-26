@@ -7,15 +7,15 @@
 ## 1. 学習時に意識すべきポイント
 
 - **責務分離**: 各コンポーネント・フック・ユーティリティの「役割」を意識し、どこで何を担当しているかを把握しましょう。
-- **型安全性**: TypeScript の型定義（`types.ts`など）を確認し、props や state の型がどのように守られているかを意識しましょう。
+- **型安全性**: TypeScript の型定義（`types/employee.ts` など）を確認し、props や state の型がどのように守られているかを意識しましょう。
 - **単方向データフロー**: props/state の流れ（親 → 子、id のみ渡しデータ参照は親で一元管理）を追い、React の設計思想を体感しましょう。
 - **UI/UX 設計**: Chakra UI や lucide-react の使い方、バリデーション・エラーメッセージ・モーダルの UX 改善ポイントを観察しましょう。
 - **バリデーション共通化**: カスタムフックやユーティリティでバリデーション処理がどのように共通化されているかを確認しましょう（例：従業員コードは半角数字・重複不可、即時エラー表示）。
 - **コメントの活用**: 各ファイル・関数・props のコメントを読み、設計意図や流れを理解しましょう。
-- **業務ロジック**: 有給付与・消化・繰越・時効消滅など、日本法令に即したロジックがどこでどう実装されているかを意識しましょう（`utils.ts`で一元管理）。
+- **業務ロジック**: 有給付与・消化・繰越・時効消滅など、日本法令に即したロジックがどこでどう実装されているかを意識しましょう（`components/employee/utils.ts` で一元管理）。
 - **可読性・保守性**: コードの分割・命名・重複排除・初学者向け配慮など、読みやすさ・直しやすさの工夫を探しましょう。
 - **ガイドの活用**: ガイドボタンから「有給休暇管理ガイド」モーダルを開き、法令準拠のロジックやサンプル表も確認できます。
-- **設計コメントの読み方**: すべての主要ファイル・関数・props・型定義に「設計意図・役割・import分類・ロジックや変数の解説コメント」が付与されています。まずコメントを読み、全体像→詳細の順で理解を深めましょう。
+- **設計コメントの読み方**: すべての主要ファイル・関数・props・型定義に「設計意図・役割・import 分類・ロジックや変数の解説コメント」が付与されています。まずコメントを読み、全体像 → 詳細の順で理解を深めましょう。
 
 ---
 
@@ -24,9 +24,8 @@
 1. **`App.tsx`**
    - アプリ全体の状態管理・UI 構成・props/state の流れ・イベントハンドラの全体像を把握。
    - コメントで設計意図や流れが明記されているので、まずここをじっくり読みましょう。
-2. **型定義・サンプルデータ**
-   - `components/employee/types.ts`（型定義）
-   - `sampleData/employees.ts`（初期データ、パスは `src/sampleData/employees.ts`）
+2. **型定義**
+   - `types/employee.ts`, `types/leaveUsage.ts`（型定義）
    - どんなデータ構造を扱うか、型安全性の担保方法を確認。
 3. **主要 UI コンポーネント**
    - `components/employee/EmployeeTable.tsx`（従業員一覧テーブル）
@@ -42,10 +41,10 @@
 5. **UI 部品・アイコン・ガイド**
    - `components/employee/icons.ts`（アイコン管理）
    - `components/ui/GuideModal.tsx`（有給休暇管理ガイドモーダル）
-   - `components/ui/tooltip.tsx`, `toaster.tsx`, `provider.tsx`, `CustomModal.tsx`, `ConfirmDeleteModal.tsx`, `color-mode.tsx`（UI部品の責務分離・設計コメント例）
+   - `components/ui/tooltip.tsx`, `toaster.tsx`, `provider.tsx`, `CustomModal.tsx`, `ConfirmDeleteModal.tsx`, `color-mode.tsx`（UI 部品の責務分離・設計コメント例）
    - UI の細部や学習サポートの工夫を観察。
 6. **API・設定ファイル**
-   - `api.ts`（API通信共通化・エラーハンドリング）
+   - `api.ts`（API 通信共通化・エラーハンドリング）
    - `.gitignore`, `package.json`, `tsconfig.*.json`, `vite.config.ts`, `eslint.config.js` など
    - 必要最小限の設定・不要記述の排除・型/構文チェックの工夫を確認。
 
