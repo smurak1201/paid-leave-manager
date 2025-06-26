@@ -36,17 +36,17 @@ import { apiGet, apiPost } from "./api";
 
 function App() {
   // --- グローバル状態管理 ---
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [leaveUsages, setLeaveUsages] = useState<LeaveUsage[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [leaveDatesPage, setLeaveDatesPage] = useState(1);
+  const [employees, setEmployees] = useState<Employee[]>([]); // 従業員リスト
+  const [leaveUsages, setLeaveUsages] = useState<LeaveUsage[]>([]); // 有給取得日リスト
+  const [currentPage, setCurrentPage] = useState(1); // 現在のページ番号
+  const [leaveDatesPage, setLeaveDatesPage] = useState(1); // 有給取得日の現在のページ番号
   const [activeModal, setActiveModal] = useState<
     null | "add" | "edit" | "leaveDates"
-  >(null);
-  const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null);
-  const guideDisclosure = useDisclosure();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  >(null); // アクティブなモーダルの状態
+  const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null); // アクティブな従業員ID
+  const guideDisclosure = useDisclosure(); // ガイドモーダルの開閉状態管理
+  const [loading, setLoading] = useState(true); // データ読み込み中フラグ
+  const [error, setError] = useState(""); // エラーメッセージ
 
   // --- データ取得・更新用関数 ---
   const fetchEmployees = async () => {
@@ -56,9 +56,9 @@ function App() {
     return data.map((emp: any) => ({
       ...emp,
       employeeId: Number(emp.employee_id), // number型で持つ
-      joinedAt: emp.joined_at,
-      lastName: emp.last_name,
-      firstName: emp.first_name,
+      joinedAt: emp.joined_at, // 入社日は文字列型
+      lastName: emp.last_name, // 姓は文字列型
+      firstName: emp.first_name, // 名は文字列型
     }));
   };
 
@@ -74,18 +74,19 @@ function App() {
     }));
   };
   type EmployeeSummary = {
-    employeeId: number;
-    grantThisYear: number;
-    carryOver: number;
-    used: number;
-    remain: number;
-    usedDates: string[];
+    employeeId: number; // 従業員ID
+    grantThisYear: number; // 今年の付与日数
+    carryOver: number; // 繰越日数
+    used: number; // 今年使用した日数
+    remain: number; // 残り日数
+    usedDates: string[]; // 今年使用した日付のリスト
     grantDetails?: Array<{
-      grantDate: string;
-      days: number;
-      used: number;
-      remain: number;
-      usedDates: string[];
+      // 付与の詳細情報
+      grantDate: string; // 付与日
+      days: number; // 付与日数
+      used: number; // 使用済み日数
+      remain: number; // 残り日数
+      usedDates: string[]; // 使用した日付のリスト
     }>;
   };
 
@@ -123,11 +124,11 @@ function App() {
 
   // データ再取得をまとめて行う関数
   const reloadAll = async () => {
-    const employeesList = await fetchEmployees();
-    setEmployees(employeesList);
-    setLeaveUsages(await fetchLeaveUsages());
-    setSummaries(await fetchSummaries(employeesList));
-    return employeesList;
+    const employeesList = await fetchEmployees(); // 従業員リストを取得
+    setEmployees(employeesList); // 従業員リストを更新
+    setLeaveUsages(await fetchLeaveUsages()); // 有給取得日を更新
+    setSummaries(await fetchSummaries(employeesList)); // サマリーを更新
+    return employeesList; // 更新後の従業員リストを返す
   };
   // サマリーのデフォルト値
   const emptySummary = {
