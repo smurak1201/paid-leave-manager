@@ -4,15 +4,28 @@
 // =============================
 //
 // 役割:
-// ・全体の状態管理（従業員リスト、モーダル開閉、選択中の従業員IDなど）
+// ・従業員・有給取得日など全体の状態管理
 // ・主要なUI部品（テーブル・モーダル等）の呼び出しとprops受け渡し
-// ・カスタムフックによるフォーム・日付編集・バリデーションの共通化
-// ・props/stateの流れは「idのみ渡し、データ参照はAppのstateから行う」
-// ・日本の有給休暇制度に即したロジックをUI/UX重視で実装
+// ・API通信やバリデーションなど業務ロジックの集約
 //
 // 設計意図:
-// ・単方向データフロー、props/stateの最小化、カスタムフック活用、責務分離、型・バリデーション共通化、小コンポーネント化
-// ・全てのprops/stateの流れ・UI部品の責務・業務ロジック・型定義・バリデーション・設計意図を日本語コメントで明記
+// ・単方向データフロー、状態の一元管理、責務分離
+// ・props/stateの流れ・UI部品の責務・業務ロジック・型定義を日本語コメントで明記
+//
+// propsに渡す関数や値は、できるだけシンプルな形で記述し、
+// 状態やロジックの流れが追いやすいようにしています。
+//
+// 各stateや関数の役割:
+// ・employees, leaveUsages, summaries: データの主な状態
+// ・currentPage, leaveDatesPage: ページネーション用
+// ・activeModal, activeEmployeeId: モーダル・選択中従業員の管理
+// ・editDateIdx, dateInput, addDateError: 有給日編集用の一時状態
+// ・handleAddEmployee, handleSaveEmployee, handleDeleteEmployee: 従業員の追加・編集・削除処理
+// ・handleAddDate, handleDeleteDate: 有給取得日の追加・削除処理
+// ・getSummary, getUsedDates, getGrantDetails: サマリー・日付リスト取得用のヘルパー
+//
+// UI部品には、必要なstate・関数のみをpropsで渡し、
+// それ以外のロジックはApp.tsx内で完結させています。
 
 // ===== import: 外部ライブラリ =====
 import { useEffect, useState } from "react";
