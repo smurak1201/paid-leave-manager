@@ -276,6 +276,92 @@ function App() {
       }
     };
 
+  // --- 従業員追加ロジックを高階関数として分離 ---
+  const handleAddEmployee =
+    (
+      reloadAll: () => Promise<Employee[]>,
+      setCurrentPage: (page: number) => void,
+      setActiveEmployeeId: (id: number | null) => void,
+      setActiveModal: (modal: null | "add" | "edit" | "leaveDates") => void
+    ) =>
+    async (form: any) => {
+      try {
+        await apiPost("http://localhost/paid_leave_manager/employees.php", {
+          employee_id: form.employeeId,
+          last_name: form.lastName,
+          first_name: form.firstName,
+          joined_at: form.joinedAt,
+          mode: "add",
+        });
+        const employeesList = await reloadAll();
+        const ITEMS_PER_PAGE = 15;
+        setCurrentPage(Math.ceil(employeesList.length / ITEMS_PER_PAGE));
+        setActiveEmployeeId(null);
+        setActiveModal(null);
+      } catch (e: any) {
+        alert(e.message || "従業員追加に失敗しました");
+      }
+    };
+
+  // --- 従業員編集ロジックを高階関数として分離 ---
+  const handleSaveEmployee =
+    (
+      reloadAll: () => Promise<Employee[]>,
+      setActiveEmployeeId: (id: number | null) => void,
+      setActiveModal: (modal: null | "add" | "edit" | "leaveDates") => void
+    ) =>
+    async (form: any) => {
+      try {
+        await apiPost("http://localhost/paid_leave_manager/employees.php", {
+          id: form.id,
+          employee_id: form.employeeId,
+          last_name: form.lastName,
+          first_name: form.firstName,
+          joined_at: form.joinedAt,
+          mode: "edit",
+        });
+        await reloadAll();
+        setActiveEmployeeId(null);
+        setActiveModal(null);
+      } catch (e: any) {
+        alert(e.message || "従業員編集に失敗しました");
+      }
+    };
+
+  // --- summary, usedDates, grantDetailsのgetter関数を分離 ---
+  const getSummary = (
+    activeEmployeeId: number | null,
+    employees: Employee[],
+    summaries: EmployeeSummary[],
+    emptySummary: any
+  ) => {
+    const emp = employees.find((e) => e.employeeId === activeEmployeeId);
+    const s = summaries.find((s) => s.employeeId === (emp?.employeeId ?? null));
+    return s || emptySummary;
+  };
+  const getUsedDates = (
+    activeEmployeeId: number | null,
+    summaries: EmployeeSummary[]
+  ) => {
+    const empSummary = summaries.find((s) => s.employeeId === activeEmployeeId);
+    return empSummary?.usedDates ?? [];
+  };
+  const getGrantDetails = (
+    activeEmployeeId: number | null,
+    summaries: EmployeeSummary[]
+  ) => {
+    const empSummary = summaries.find((s) => s.employeeId === activeEmployeeId);
+    if (empSummary && empSummary.grantDetails) {
+      return empSummary.grantDetails.map((g) => ({
+        ...g,
+        usedDates: Array.isArray(g.usedDates)
+          ? g.usedDates.filter(Boolean)
+          : [],
+      }));
+    }
+    return [];
+  };
+
   // --- 画面描画 ---
   return (
     <Box minH="100vh" bgGradient="linear(to-br, teal.50, white)" py={10}>
@@ -354,47 +440,18 @@ function App() {
             activeModal === "edit" ? findEmployee(activeEmployeeId) : null
           }
           employees={employees}
-          onAdd={async (form) => {
-            try {
-              await apiPost(
-                "http://localhost/paid_leave_manager/employees.php",
-                {
-                  employee_id: form.employeeId,
-                  last_name: form.lastName,
-                  first_name: form.firstName,
-                  joined_at: form.joinedAt,
-                  mode: "add",
-                }
-              );
-              const employeesList = await reloadAll();
-              const ITEMS_PER_PAGE = 15;
-              setCurrentPage(Math.ceil(employeesList.length / ITEMS_PER_PAGE));
-              setActiveEmployeeId(null);
-              setActiveModal(null);
-            } catch (e: any) {
-              alert(e.message || "従業員追加に失敗しました");
-            }
-          }}
-          onSave={async (form) => {
-            try {
-              await apiPost(
-                "http://localhost/paid_leave_manager/employees.php",
-                {
-                  id: form.id,
-                  employee_id: form.employeeId,
-                  last_name: form.lastName,
-                  first_name: form.firstName,
-                  joined_at: form.joinedAt,
-                  mode: "edit",
-                }
-              );
-              await reloadAll();
-              setActiveEmployeeId(null);
-              setActiveModal(null);
-            } catch (e: any) {
-              alert(e.message || "従業員編集に失敗しました");
-            }
-          }}
+          // onAdd, onSaveは高階関数で分離
+          onAdd={handleAddEmployee(
+            reloadAll,
+            setCurrentPage,
+            setActiveEmployeeId,
+            setActiveModal
+          )}
+          onSave={handleSaveEmployee(
+            reloadAll,
+            setActiveEmployeeId,
+            setActiveModal
+          )}
         />
         <LeaveDatesModal
           key={activeEmployeeId ?? "none"}
@@ -402,9 +459,7 @@ function App() {
           onClose={() => setActiveModal(null)}
           employeeId={activeEmployeeId}
           leaveUsages={leaveUsages}
-          // onAddDateは高階関数で分離したhandleAddDateを渡す
           onAddDate={handleAddDate(activeEmployeeId)}
-          // onDeleteDateも高階関数で分離
           onDeleteDate={handleDeleteDate(activeEmployeeId, summaries)}
           editDateIdx={editDateIdx}
           setEditDateIdx={setEditDateIdx}
@@ -412,33 +467,15 @@ function App() {
           setDateInput={setDateInput}
           currentPage={leaveDatesPage}
           onPageChange={setLeaveDatesPage}
-          summary={(() => {
-            const emp = findEmployee(activeEmployeeId);
-            const s = summaries.find(
-              (s) => s.employeeId === (emp?.employeeId ?? null)
-            );
-            return s || emptySummary;
-          })()}
-          usedDates={(() => {
-            const empSummary = summaries.find(
-              (s) => s.employeeId === activeEmployeeId
-            );
-            return empSummary?.usedDates ?? [];
-          })()}
-          grantDetails={(() => {
-            const empSummary = summaries.find(
-              (s) => s.employeeId === activeEmployeeId
-            );
-            if (empSummary && empSummary.grantDetails) {
-              return empSummary.grantDetails.map((g) => ({
-                ...g,
-                usedDates: Array.isArray(g.usedDates)
-                  ? g.usedDates.filter(Boolean)
-                  : [],
-              }));
-            }
-            return [];
-          })()}
+          // summary, usedDates, grantDetailsはgetter関数で分離
+          summary={getSummary(
+            activeEmployeeId,
+            employees,
+            summaries,
+            emptySummary
+          )}
+          usedDates={getUsedDates(activeEmployeeId, summaries)}
+          grantDetails={getGrantDetails(activeEmployeeId, summaries)}
           addDateError={addDateError}
         />
       </Box>
