@@ -196,7 +196,7 @@ function App() {
     setActiveModal("leaveDates");
   };
 
-  // --- 従業員削除ロジック: 高階関数をやめ、シンプルなasync関数に ---
+  // --- 従業員削除ロジック ---
   const handleDeleteEmployee = async (employeeId: number) => {
     try {
       // 先に有給取得日を全て削除
@@ -223,7 +223,7 @@ function App() {
     }
   };
 
-  // --- 有給取得日追加ロジック: 高階関数をやめ、シンプルなasync関数に ---
+  // --- 有給取得日追加ロジック ---
   const handleAddDate = async (employeeId: number | null, date: string) => {
     if (employeeId == null) return;
     setAddDateError("");
@@ -257,7 +257,7 @@ function App() {
     }
   };
 
-  // --- 有給取得日削除ロジック: 高階関数をやめ、シンプルなasync関数に ---
+  // --- 有給取得日削除ロジック ---
   const handleDeleteDate = async (employeeId: number | null, idx: number) => {
     const emp = findEmployee(employeeId);
     if (!emp) return false;
