@@ -281,7 +281,7 @@ function App() {
     }
   };
 
-  // --- 従業員追加・編集ロジックもシンプルなasync関数に ---
+  // --- 従業員追加・編集ロジック ---
   const handleAddEmployee = async (form: any) => {
     try {
       await apiPost("http://localhost/paid_leave_manager/employees.php", {
