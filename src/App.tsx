@@ -183,6 +183,99 @@ function App() {
     setActiveModal("leaveDates");
   };
 
+  // --- 従業員削除ロジックを高階関数として分離 ---
+  // EmployeeTableのonDeleteに直接async関数を渡すのではなく、
+  // handleDeleteEmployee(employeeId) の形で分離し、責務を明確化
+  const handleDeleteEmployee = (employeeId: number) => async () => {
+    try {
+      // 先に有給取得日を全て削除
+      const emp = findEmployee(employeeId);
+      if (emp) {
+        const usages = leaveUsages.filter(
+          (u) => u.employeeId === emp.employeeId
+        );
+        for (const usage of usages) {
+          await apiPost(
+            "http://localhost/paid_leave_manager/leave_usage_delete.php",
+            { employee_id: emp.employeeId, used_date: usage.usedDate }
+          );
+        }
+      }
+      // 従業員本体を削除
+      await apiPost("http://localhost/paid_leave_manager/employees.php", {
+        employee_id: employeeId,
+        mode: "delete",
+      });
+      await reloadAll();
+    } catch (e: any) {
+      alert(e.message || "従業員削除に失敗しました");
+    }
+  };
+
+  // --- 有給取得日追加ロジックを高階関数として分離 ---
+  // LeaveDatesModalのonAddDateに直接async関数を渡すのではなく、
+  // handleAddDate(date) の形で分離し、責務を明確化
+  const handleAddDate = (employeeId: number | null) => async (date: string) => {
+    if (employeeId == null) return;
+    setAddDateError("");
+    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      setAddDateError("日付を正しく入力してください");
+      return;
+    }
+    // 既存の有給取得日と重複していないかチェック
+    const usedDates = leaveUsages
+      .filter((u) => u.employeeId === employeeId)
+      .map((u) => u.usedDate);
+    if (usedDates.includes(date)) {
+      setAddDateError("同じ有給取得日がすでに登録されています");
+      return;
+    }
+    try {
+      await apiPost("http://localhost/paid_leave_manager/leave_usage_add.php", {
+        employee_id: Number(employeeId),
+        used_date: date,
+      });
+      await reloadAll();
+      setDateInput("");
+    } catch (e: any) {
+      let msg = e?.message || "有給消化日の追加に失敗しました";
+      if (msg.includes("400") || msg.includes("before joined")) {
+        msg = "入社日より前の日付は登録できません";
+      } else if (msg.includes("duplicate")) {
+        msg = "同じ有給取得日がすでに登録されています";
+      }
+      setAddDateError(msg);
+    }
+  };
+
+  // --- 有給取得日削除ロジックを高階関数として分離 ---
+  // LeaveDatesModalのonDeleteDateに直接async関数を渡すのではなく、
+  // handleDeleteDate(idx) の形で分離し、責務を明確化
+  const handleDeleteDate =
+    (employeeId: number | null, summaries: EmployeeSummary[]) =>
+    async (idx: number) => {
+      const emp = findEmployee(employeeId);
+      if (!emp) return false;
+      // 表示しているusedDates（有効期限内のみ）を取得
+      const empSummary = summaries.find((s) => s.employeeId === emp.employeeId);
+      const visibleUsedDates = empSummary?.usedDates ?? [];
+      const targetDate = visibleUsedDates[idx];
+      if (!targetDate) {
+        return false;
+      }
+      try {
+        await apiPost(
+          "http://localhost/paid_leave_manager/leave_usage_delete.php",
+          { employee_id: emp.employeeId, used_date: targetDate }
+        );
+        await reloadAll();
+        return true;
+      } catch (e: any) {
+        alert(e.message || "有給消化日の削除に失敗しました");
+        return false;
+      }
+    };
+
   // --- 画面描画 ---
   return (
     <Box minH="100vh" bgGradient="linear(to-br, teal.50, white)" py={10}>
@@ -247,31 +340,8 @@ function App() {
             employees={employees}
             summaries={summaries}
             onEdit={handleEdit}
-            onDelete={async (employeeId) => {
-              try {
-                // 先に有給取得日を全て削除
-                const emp = findEmployee(employeeId);
-                if (emp) {
-                  const usages = leaveUsages.filter(
-                    (u) => u.employeeId === emp.employeeId
-                  );
-                  for (const usage of usages) {
-                    await apiPost(
-                      "http://localhost/paid_leave_manager/leave_usage_delete.php",
-                      { employee_id: emp.employeeId, used_date: usage.usedDate }
-                    );
-                  }
-                }
-                // 従業員本体を削除
-                await apiPost(
-                  "http://localhost/paid_leave_manager/employees.php",
-                  { employee_id: employeeId, mode: "delete" }
-                );
-                await reloadAll();
-              } catch (e: any) {
-                alert(e.message || "従業員削除に失敗しました");
-              }
-            }}
+            // onDeleteは高階関数で分離したhandleDeleteEmployeeを渡す
+            onDelete={(employeeId) => handleDeleteEmployee(employeeId)()}
             onView={handleView}
             currentPage={currentPage}
             onPageChange={setCurrentPage}
@@ -332,65 +402,10 @@ function App() {
           onClose={() => setActiveModal(null)}
           employeeId={activeEmployeeId}
           leaveUsages={leaveUsages}
-          onAddDate={async (date) => {
-            if (activeEmployeeId == null) return;
-            setAddDateError("");
-            if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-              setAddDateError("日付を正しく入力してください");
-              return;
-            }
-            // 既存の有給取得日と重複していないかチェック
-            const usedDates = leaveUsages
-              .filter((u) => u.employeeId === activeEmployeeId)
-              .map((u) => u.usedDate);
-            if (usedDates.includes(date)) {
-              setAddDateError("同じ有給取得日がすでに登録されています");
-              return;
-            }
-            try {
-              await apiPost(
-                "http://localhost/paid_leave_manager/leave_usage_add.php",
-                {
-                  employee_id: Number(activeEmployeeId),
-                  used_date: date,
-                }
-              );
-              await reloadAll();
-              setDateInput("");
-            } catch (e: any) {
-              let msg = e?.message || "有給消化日の追加に失敗しました";
-              if (msg.includes("400") || msg.includes("before joined")) {
-                msg = "入社日より前の日付は登録できません";
-              } else if (msg.includes("duplicate")) {
-                msg = "同じ有給取得日がすでに登録されています";
-              }
-              setAddDateError(msg);
-            }
-          }}
-          onDeleteDate={async (idx) => {
-            const emp = findEmployee(activeEmployeeId);
-            if (!emp) return false;
-            // 表示しているusedDates（有効期限内のみ）を取得
-            const empSummary = summaries.find(
-              (s) => s.employeeId === emp.employeeId
-            );
-            const visibleUsedDates = empSummary?.usedDates ?? [];
-            const targetDate = visibleUsedDates[idx];
-            if (!targetDate) {
-              return false;
-            }
-            try {
-              await apiPost(
-                "http://localhost/paid_leave_manager/leave_usage_delete.php",
-                { employee_id: emp.employeeId, used_date: targetDate }
-              );
-              await reloadAll();
-              return true;
-            } catch (e: any) {
-              alert(e.message || "有給消化日の削除に失敗しました");
-              return false;
-            }
-          }}
+          // onAddDateは高階関数で分離したhandleAddDateを渡す
+          onAddDate={handleAddDate(activeEmployeeId)}
+          // onDeleteDateも高階関数で分離
+          onDeleteDate={handleDeleteDate(activeEmployeeId, summaries)}
           editDateIdx={editDateIdx}
           setEditDateIdx={setEditDateIdx}
           dateInput={dateInput}
