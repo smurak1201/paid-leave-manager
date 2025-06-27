@@ -101,6 +101,9 @@ export const GuideModal: React.FC<{ open: boolean; onClose: () => void }> = ({
             <Text as="li">
               未消化分は翌年に繰り越されますが、繰越できるのは最大2年分までです。
             </Text>
+            <Text as="li" color="teal.700" fontWeight="bold">
+              ※繰越日数は最大20日までです（法令上の上限）。
+            </Text>
             <Text as="li">
               2年以上前の有給は自動的に消滅し、消滅した分は繰り越されません。
             </Text>
