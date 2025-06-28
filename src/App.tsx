@@ -63,9 +63,7 @@ function App() {
 
   // --- データ取得・更新用関数 ---
   const fetchEmployees = async () => {
-    const data = await apiGet<any[]>(
-      "http://localhost/paid_leave_manager/employees.php"
-    );
+    const data = await apiGet<any[]>("http://localhost:8000/api/employees");
     return data.map((emp: any) => ({
       ...emp,
       employeeId: Number(emp.employee_id), // number型で持つ
@@ -77,9 +75,7 @@ function App() {
 
   // 有給取得日の取得
   const fetchLeaveUsages = async () => {
-    const data = await apiGet<any[]>(
-      "http://localhost/paid_leave_manager/leave_usages.php"
-    );
+    const data = await apiGet<any[]>("http://localhost:8000/api/leave-usages");
     return data.map((u: any) => ({
       ...u,
       employeeId: Number(u.employee_id), // number型で持つ

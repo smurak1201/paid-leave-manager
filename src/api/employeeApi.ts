@@ -5,7 +5,7 @@
 import { apiGet, apiPost } from "../api";
 import type { Employee } from "../types/employee";
 
-const BASE_URL = "http://localhost/paid_leave_manager/employees.php";
+const BASE_URL = "http://localhost:8000/api/employees";
 
 /**
  * 従業員一覧を取得
