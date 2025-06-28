@@ -109,7 +109,7 @@ function App() {
       emps.map(async (emp) => {
         try {
           const data = await apiGet<any>(
-            `http://localhost/paid_leave_manager/leave_summary.php?employee_id=${emp.employeeId}`
+            `http://localhost:8000/api/leave-summary?employee_id=${emp.employeeId}`
           );
           return {
             employeeId: emp.employeeId,
