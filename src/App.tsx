@@ -63,7 +63,9 @@ function App() {
 
   // --- データ取得・更新用関数 ---
   const fetchEmployees = async () => {
-    const data = await apiGet<any[]>("http://localhost:8000/api/employees");
+    const data = await apiGet<any[]>(
+      "http://172.18.119.226:8000/api/employees"
+    );
     return data.map((emp: any) => ({
       ...emp,
       employeeId: Number(emp.employee_id), // number型で持つ
@@ -75,7 +77,9 @@ function App() {
 
   // 有給取得日の取得
   const fetchLeaveUsages = async () => {
-    const data = await apiGet<any[]>("http://localhost:8000/api/leave-usages");
+    const data = await apiGet<any[]>(
+      "http://172.18.119.226:8000/api/leave-usages"
+    );
     return data.map((u: any) => ({
       ...u,
       employeeId: Number(u.employee_id), // number型で持つ
@@ -105,7 +109,7 @@ function App() {
       emps.map(async (emp) => {
         try {
           const data = await apiGet<any>(
-            `http://localhost:8000/api/leave-summary?employee_id=${emp.employeeId}`
+            `http://172.18.119.226:8000/api/leave-summary?employee_id=${emp.employeeId}`
           );
           return {
             employeeId: emp.employeeId,
@@ -202,14 +206,14 @@ function App() {
           (u) => u.employeeId === emp.employeeId
         );
         for (const usage of usages) {
-          await apiPost(
-            "http://localhost/paid_leave_manager/leave_usage_delete.php",
-            { employee_id: emp.employeeId, used_date: usage.usedDate }
-          );
+          await apiPost("http://172.18.119.226:8000/api/leave-usages/delete", {
+            employee_id: emp.employeeId,
+            used_date: usage.usedDate,
+          });
         }
       }
       // 従業員本体を削除
-      await apiPost("http://localhost/paid_leave_manager/employees.php", {
+      await apiPost("http://172.18.119.226:8000/api/employees", {
         employee_id: employeeId,
         mode: "delete",
       });
@@ -236,7 +240,7 @@ function App() {
       return;
     }
     try {
-      await apiPost("http://localhost/paid_leave_manager/leave_usage_add.php", {
+      await apiPost("http://172.18.119.226:8000/api/leave-usages/add", {
         employee_id: Number(employeeId),
         used_date: date,
       });
@@ -265,10 +269,10 @@ function App() {
       return false;
     }
     try {
-      await apiPost(
-        "http://localhost/paid_leave_manager/leave_usage_delete.php",
-        { employee_id: emp.employeeId, used_date: targetDate }
-      );
+      await apiPost("http://172.18.119.226:8000/api/leave-usages/delete", {
+        employee_id: emp.employeeId,
+        used_date: targetDate,
+      });
       await reloadAll();
       return true;
     } catch (e: any) {
@@ -280,7 +284,7 @@ function App() {
   // --- 従業員追加・編集ロジック ---
   const handleAddEmployee = async (form: any) => {
     try {
-      await apiPost("http://localhost/paid_leave_manager/employees.php", {
+      await apiPost("http://172.18.119.226:8000/api/employees", {
         employee_id: form.employeeId,
         last_name: form.lastName,
         first_name: form.firstName,
@@ -298,7 +302,7 @@ function App() {
   };
   const handleSaveEmployee = async (form: any) => {
     try {
-      await apiPost("http://localhost/paid_leave_manager/employees.php", {
+      await apiPost("http://172.18.119.226:8000/api/employees", {
         id: form.id,
         employee_id: form.employeeId,
         last_name: form.lastName,

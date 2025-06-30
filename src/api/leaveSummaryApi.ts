@@ -19,7 +19,7 @@ export interface LeaveSummary {
   }>;
 }
 
-const BASE_URL = "http://localhost:8000/api/leave-summary";
+const BASE_URL = "http://172.18.119.226:8000/api/leave-summary";
 
 /**
  * 有給サマリーを取得

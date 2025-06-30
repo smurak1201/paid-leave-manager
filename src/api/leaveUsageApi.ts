@@ -5,9 +5,9 @@
 import { apiGet, apiPost } from "../api";
 import type { LeaveUsage } from "../types/leaveUsage";
 
-const BASE_URL = "http://localhost:8000/api/leave-usages";
-const ADD_URL = "http://localhost:8000/api/leave-usages/add";
-const DELETE_URL = "http://localhost:8000/api/leave-usages/delete";
+const BASE_URL = "http://172.18.119.226:8000/api/leave-usages";
+const ADD_URL = "http://172.18.119.226:8000/api/leave-usages/add";
+const DELETE_URL = "http://172.18.119.226:8000/api/leave-usages/delete";
 
 /**
  * 有給消化履歴一覧を取得
