@@ -20,7 +20,7 @@ export async function fetchEmployees(): Promise<Employee[]> {
  * @param form - idを除く従業員情報（employeeId必須, number型）
  */
 export async function addEmployee(form: Omit<Employee, "id">): Promise<void> {
-  await apiPost(BASE_URL, { ...form, employee_id: form.employeeId, mode: "add" });
+  await apiPost(BASE_URL, form);
 }
 
 /**
@@ -28,7 +28,11 @@ export async function addEmployee(form: Omit<Employee, "id">): Promise<void> {
  * @param form - 編集後の従業員情報（id, employeeId含む, number型）
  */
 export async function editEmployee(form: Employee): Promise<void> {
-  await apiPost(BASE_URL, { ...form, employee_id: form.employeeId, mode: "edit" });
+  await fetch(`${BASE_URL}/${form.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(form),
+  });
 }
 
 /**
@@ -36,7 +40,9 @@ export async function editEmployee(form: Employee): Promise<void> {
  * @param employeeId - 削除対象の従業員ID（number型）
  */
 export async function deleteEmployee(employeeId: number): Promise<void> {
-  await apiPost(BASE_URL, { employee_id: employeeId, mode: "delete" });
+  await fetch(`${BASE_URL}/${employeeId}`, {
+    method: "DELETE",
+  });
 }
 
 // エラーハンドリング例（必要に応じて各関数でtry-catchを追加してください）
