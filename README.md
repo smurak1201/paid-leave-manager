@@ -1,4 +1,4 @@
-# 有給休暇管理アプリ
+# 有給休暇管理アプリ（React + Laravel）
 
 このアプリは、日本の労働基準法・厚生労働省ガイドラインに準拠した有給休暇管理を効率化するための Web アプリです。従業員ごとの有給付与・消化・繰越・時効消滅を自動計算し、直感的な UI で管理できます。
 
@@ -6,11 +6,18 @@
 
 ## クイックスタート
 
+### フロントエンド（React/Vite）
+
 1. `npm install` で依存パッケージをインストール
 2. `npm run dev` でローカル開発サーバー起動
 3. ブラウザで `http://localhost:5173` を開く
 
-バックエンド（Laravel）は `php artisan serve` で起動してください。
+### バックエンド（Laravel）
+
+1. `composer install` で依存パッケージをインストール
+2. `.env` 設定（DB 接続・APP_KEY 生成など）
+3. `php artisan migrate --seed` で DB 初期化・マスターデータ投入
+4. `php artisan serve` でローカル API サーバー起動
 
 ---
 
@@ -27,6 +34,7 @@
 - **バリデーション・エラーハンドリング**
   - 入力値の即時チェック、重複エラーの即時表示
   - フォームリセット・モーダル閉時の状態初期化
+  - サーバー側バリデーション（FormRequest）・API エラー統一
 - **UI/UX**
   - モーダルによる直感的な操作
   - ページネーション（従業員・有給日一覧）
@@ -35,6 +43,10 @@
   - 型定義・カスタムフック・ユーティリティによるロジック分離
   - 主要なファイル・関数・props・型定義に「設計意図・役割・ロジックや変数の解説コメント」を付与
   - 保守性・可読性重視
+  - バックエンド・フロントエンドともに統一フォーマットの設計コメント
+- **RESTful API 設計**
+  - 従業員・有給取得日・付与マスター API すべて RESTful 設計で統一
+  - CORS・ネットワーク・型整合性も考慮
 
 ---
 
@@ -44,6 +56,8 @@
 - TypeScript
 - Chakra UI
 - Laravel (API バックエンド)
+- PHP 8.1+
+- SQLite/MySQL/PostgreSQL
 - ESLint/Prettier
 
 ---
@@ -56,7 +70,13 @@
 - `src/components/ui/` : 汎用 UI コンポーネント
 - `src/learning_guide.md` : コードリーディング用ガイド
 - `src/api.ts` : API 通信共通処理・エラーハンドリング
-- `app/Http/Controllers/LeaveUsageController.php` : 有給付与・消化・繰越・時効消滅ロジック（Laravel）
+- `src/api/employeeApi.ts` : 従業員 API 通信ロジック
+- `src/api/leaveUsageApi.ts` : 有給取得日 API 通信ロジック
+- `src/api/leaveGrantMasterApi.ts` : 付与マスター API 通信ロジック
+- `app/Http/Controllers/EmployeesController.php` : 従業員 API コントローラ
+- `app/Http/Controllers/LeaveUsageController.php` : 有給付与・消化・繰越・時効消滅ロジック
+- `app/Http/Controllers/LeaveGrantMasterController.php` : 付与マスター API コントローラ
+- `backend_learning_guide.md` : Laravel バックエンド学習ガイド
 
 ---
 
@@ -69,6 +89,7 @@
 - FIFO（先入れ先出し）消化順序
 - 有効期限切れ分の自動失効
 - 日単位での有給取得・管理
+- API/型/コメントの統一・リファクタリング
 
 ---
 
@@ -83,6 +104,13 @@
 - 特別休暇・その他休暇との区別
 
 これらの要件が必要な場合は、個別に追加実装が必要です。
+
+---
+
+## 学習・実務での活用ポイント
+
+- コントローラ・モデル・FormRequest（バリデーション）・業務ロジックの分離、冒頭の設計コメントを参考に、React/Laravel API 設計・法令準拠ロジックの実装例として活用できます。
+- 詳細は `learning_guide.md`（フロントエンド）、`backend_learning_guide.md`（バックエンド）を参照してください。
 
 ---
 
