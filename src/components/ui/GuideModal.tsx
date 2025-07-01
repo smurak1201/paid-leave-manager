@@ -345,6 +345,32 @@ export const GuideModal: React.FC<{ open: boolean; onClose: () => void }> = ({
               （参考：労働基準法第39条・厚生労働省ガイドライン）
             </Text>
           </Box>
+          <Text {...sectionTitleProps}>
+            本アプリで対応している日本の有給休暇制度ロジック：
+          </Text>
+          <Text as="ul" pl={5} mb={2}>
+            <Text as="li">
+              勤続年数に応じた付与日数の自動計算（正社員モデル）
+            </Text>
+            <Text as="li">付与日ごとに2年の有効期限管理</Text>
+            <Text as="li">前回付与分の残日数（最大20日）を繰越</Text>
+            <Text as="li">最大保有日数40日（付与＋繰越の合計）</Text>
+            <Text as="li">FIFO（先入れ先出し）消化順序</Text>
+            <Text as="li">有効期限切れ分の自動失効</Text>
+            <Text as="li">日単位での有給取得・管理</Text>
+          </Text>
+          <Text {...sectionTitleProps}>
+            未対応・追加実装が必要な主なロジック：
+          </Text>
+          <Text as="ul" pl={5} mb={2}>
+            <Text as="li">年5日取得義務（2019年法改正）</Text>
+            <Text as="li">出勤率8割判定による付与可否</Text>
+            <Text as="li">雇用形態別付与（パート・短時間労働者等）</Text>
+            <Text as="li">時間単位・半日単位有給</Text>
+            <Text as="li">付与基準日（入社日以外の基準日管理）</Text>
+            <Text as="li">失効日数の明示・管理</Text>
+            <Text as="li">特別休暇・その他休暇との区別</Text>
+          </Text>
         </Stack>
       </Box>
     </CustomModal>
