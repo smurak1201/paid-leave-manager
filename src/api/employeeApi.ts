@@ -28,7 +28,16 @@ export async function addEmployee(form: Omit<Employee, "id">): Promise<void> {
  * @param form - 編集後の従業員情報（id, employeeId含む, number型）
  */
 export async function editEmployee(form: Employee): Promise<void> {
-  await apiPost(BASE_URL, { ...form, employee_id: form.employeeId, mode: "edit" });
+  await fetch(`${BASE_URL}/${form.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      employee_id: form.employeeId,
+      last_name: form.lastName,
+      first_name: form.firstName,
+      joined_at: form.joinedAt,
+    }),
+  });
 }
 
 /**
