@@ -227,7 +227,7 @@ function App() {
     }
   };
 
-  // --- 有給取得日削除ロジック ---
+  // --- 有給取得日削除ロジック（RESTful: id指定） ---
   const handleDeleteDate = async (employeeId: number | null, idx: number) => {
     const emp = findEmployee(employeeId);
     if (!emp) return false;
@@ -238,11 +238,18 @@ function App() {
     if (!targetDate) {
       return false;
     }
+    // 対象のLeaveUsage（id）を特定
+    const targetUsage = leaveUsages.find(
+      (u) => u.employeeId === emp.employeeId && u.usedDate === targetDate
+    );
+    if (!targetUsage) {
+      alert("該当する有給消化履歴が見つかりません");
+      return false;
+    }
     try {
-      await apiPost("http://172.18.119.226:8000/api/leave-usages/delete", {
-        employee_id: emp.employeeId,
-        used_date: targetDate,
-      });
+      // RESTful DELETE: id指定
+      const { deleteLeaveUsage } = await import("./api/leaveUsageApi");
+      await deleteLeaveUsage(targetUsage.id);
       await reloadAll();
       return true;
     } catch (e: any) {

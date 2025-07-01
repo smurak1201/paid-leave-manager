@@ -6,8 +6,6 @@ import { apiGet, apiPost } from "../api";
 import type { LeaveUsage } from "../types/leaveUsage";
 
 const BASE_URL = "/api/leave-usages";
-const ADD_URL = "/api/leave-usages/add";
-const DELETE_URL = "/api/leave-usages/delete";
 
 /**
  * 有給消化履歴一覧を取得
@@ -23,15 +21,20 @@ export async function fetchLeaveUsages(): Promise<LeaveUsage[]> {
  * @param usedDate - 消化日
  */
 export async function addLeaveUsage(employeeId: number, usedDate: string): Promise<void> {
-  await apiPost(ADD_URL, { employee_id: employeeId, used_date: usedDate });
+  await apiPost(BASE_URL, { employee_id: employeeId, used_date: usedDate });
 }
 
 /**
- * 有給消化履歴を削除
- * @param employeeId - 対象従業員ID（number型）
- * @param usedDate - 消化日
- * ※PK(id)でなくビジネスキーで削除する設計
+ * 有給消化履歴を削除（RESTful: id指定）
+ * @param id - 削除対象の有給消化履歴ID
  */
-export async function deleteLeaveUsage(employeeId: number, usedDate: string): Promise<void> {
-  await apiPost(DELETE_URL, { employee_id: employeeId, used_date: usedDate });
+export async function deleteLeaveUsage(id: number): Promise<void> {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "DELETE",
+    mode: "cors",
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`APIエラー: ${res.status} ${errorText}`);
+  }
 }

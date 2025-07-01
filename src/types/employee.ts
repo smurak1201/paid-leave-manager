@@ -26,3 +26,12 @@ export interface Employee {
   firstName: string;     // 名
   joinedAt: string;      // 入社年月日 (YYYY-MM-DD)
 }
+
+/**
+ * 有給付与マスターAPI型
+ */
+export interface LeaveGrantMaster {
+  id: number;
+  months: number;
+  days: number;
+}
