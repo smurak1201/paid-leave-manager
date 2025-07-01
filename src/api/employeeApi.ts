@@ -5,7 +5,7 @@
 import { apiGet, apiPost } from "../api";
 import type { Employee } from "../types/employee";
 
-const BASE_URL = "http://172.18.119.226:8000/api/employees";
+const BASE_URL = "/api/employees";
 
 /**
  * 従業員一覧を取得
@@ -20,7 +20,7 @@ export async function fetchEmployees(): Promise<Employee[]> {
  * @param form - idを除く従業員情報（employeeId必須, number型）
  */
 export async function addEmployee(form: Omit<Employee, "id">): Promise<void> {
-  await apiPost(BASE_URL, form);
+  await apiPost(BASE_URL, { ...form, employee_id: form.employeeId, mode: "add" });
 }
 
 /**
@@ -28,11 +28,7 @@ export async function addEmployee(form: Omit<Employee, "id">): Promise<void> {
  * @param form - 編集後の従業員情報（id, employeeId含む, number型）
  */
 export async function editEmployee(form: Employee): Promise<void> {
-  await fetch(`${BASE_URL}/${form.id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(form),
-  });
+  await apiPost(BASE_URL, { ...form, employee_id: form.employeeId, mode: "edit" });
 }
 
 /**
@@ -40,9 +36,7 @@ export async function editEmployee(form: Employee): Promise<void> {
  * @param employeeId - 削除対象の従業員ID（number型）
  */
 export async function deleteEmployee(employeeId: number): Promise<void> {
-  await fetch(`${BASE_URL}/${employeeId}`, {
-    method: "DELETE",
-  });
+  await apiPost(BASE_URL, { employee_id: employeeId, mode: "delete" });
 }
 
 // エラーハンドリング例（必要に応じて各関数でtry-catchを追加してください）
