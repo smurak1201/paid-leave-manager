@@ -46,7 +46,7 @@ import { GuideModal } from "./components/ui/GuideModal";
 
 // ===== import: API =====
 import { apiGet, apiPost } from "./api";
-import { editEmployee } from "./api/employeeApi";
+import { editEmployee, deleteEmployee } from "./api/employeeApi";
 import { addLeaveUsage } from "./api/leaveUsageApi";
 
 function App() {
@@ -201,24 +201,7 @@ function App() {
   // --- 従業員削除ロジック ---
   const handleDeleteEmployee = async (employeeId: number) => {
     try {
-      // 先に有給取得日を全て削除
-      const emp = findEmployee(employeeId);
-      if (emp) {
-        const usages = leaveUsages.filter(
-          (u) => u.employeeId === emp.employeeId
-        );
-        for (const usage of usages) {
-          await apiPost("http://172.18.119.226:8000/api/leave-usages/delete", {
-            employee_id: emp.employeeId,
-            used_date: usage.usedDate,
-          });
-        }
-      }
-      // 従業員本体を削除
-      await apiPost("http://172.18.119.226:8000/api/employees", {
-        employee_id: employeeId,
-        mode: "delete",
-      });
+      await deleteEmployee(employeeId);
       await reloadAll();
     } catch (e: any) {
       alert(e.message || "従業員削除に失敗しました");
