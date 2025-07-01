@@ -19,7 +19,7 @@ export interface LeaveSummary {
   }>;
 }
 
-const BASE_URL = "http://localhost/paid_leave_manager/leave_summary.php";
+const BASE_URL = "/api/leave-summary";
 
 /**
  * 有給サマリーを取得
