@@ -28,16 +28,25 @@ export async function addEmployee(form: Omit<Employee, "id">): Promise<void> {
  * @param form - 編集後の従業員情報（id, employeeId含む, number型）
  */
 export async function editEmployee(form: Employee): Promise<void> {
-  await fetch(`${BASE_URL}/${form.id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      employee_id: form.employeeId,
-      last_name: form.lastName,
-      first_name: form.firstName,
-      joined_at: form.joinedAt,
-    }),
-  });
+  try {
+    const res = await fetch(`${BASE_URL}/${form.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        employee_id: form.employeeId,
+        last_name: form.lastName,
+        first_name: form.firstName,
+        joined_at: form.joinedAt,
+      }),
+    });
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`APIエラー: ${res.status} ${errorText}`);
+    }
+  } catch (error) {
+    alert(error);
+    throw error;
+  }
 }
 
 /**
