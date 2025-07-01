@@ -247,6 +247,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               servicePeriod: getServicePeriod(emp.joinedAt),
               onView,
               onEdit,
+              onDelete, // 追加
               handleDeleteClick,
               rowIndex: i, // 行インデックスを明示的に渡す
             };

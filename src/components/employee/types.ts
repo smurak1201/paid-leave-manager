@@ -64,8 +64,11 @@ export interface RowContentProps {
   carryOver: number;
   used: number;
   remain: number;
-  onEdit: (emp: Employee) => void;
-  onDelete: (emp: Employee) => void;
+  servicePeriod: string; // 勤続年数（X年Yか月）を追加
+  onEdit: (employeeId: number) => void; // 型を修正
+  onDelete: (employeeId: number) => void; // 型を修正
+  onView: (employeeId: number) => void; // 追加
+  handleDeleteClick: (employeeId: number) => void; // 追加
 }
 
 /**
