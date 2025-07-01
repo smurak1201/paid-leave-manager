@@ -71,7 +71,7 @@ function App() {
       "http://172.18.119.226:8000/api/leave-usages"
     );
     return data.map((u: any) => ({
-      ...u,
+      id: u.id, // ← 追加: DB主キーを明示的にセット
       employeeId: Number(u.employee_id), // number型で持つ
       usedDate: u.used_date,
     }));
