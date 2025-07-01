@@ -54,12 +54,11 @@ export async function editEmployee(form: Employee): Promise<void> {
  * @param employeeId - 削除対象の従業員ID（number型）
  */
 export async function deleteEmployee(employeeId: number): Promise<void> {
-  await apiPost(BASE_URL, { employee_id: employeeId, mode: "delete" });
+  const res = await fetch(`${BASE_URL}/${employeeId}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`APIエラー: ${res.status} ${errorText}`);
+  }
 }
-
-// エラーハンドリング例（必要に応じて各関数でtry-catchを追加してください）
-// try {
-//   await addEmployee(form);
-// } catch (error) {
-//   alert("従業員の追加に失敗しました");
-// }
