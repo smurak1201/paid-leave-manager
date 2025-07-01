@@ -46,6 +46,7 @@ import { GuideModal } from "./components/ui/GuideModal";
 
 // ===== import: API =====
 import { apiGet, apiPost } from "./api";
+import { editEmployee } from "./api/employeeApi";
 
 function App() {
   // --- グローバル状態管理 ---
@@ -302,13 +303,12 @@ function App() {
   };
   const handleSaveEmployee = async (form: any) => {
     try {
-      await apiPost("http://172.18.119.226:8000/api/employees", {
+      await editEmployee({
         id: form.id,
-        employee_id: form.employeeId,
-        last_name: form.lastName,
-        first_name: form.firstName,
-        joined_at: form.joinedAt,
-        mode: "edit",
+        employeeId: form.employeeId,
+        lastName: form.lastName,
+        firstName: form.firstName,
+        joinedAt: form.joinedAt,
       });
       await reloadAll();
       setActiveEmployeeId(null);
