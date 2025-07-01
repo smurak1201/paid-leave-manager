@@ -50,6 +50,7 @@ export async function editEmployee(form: Employee): Promise<void> {
         first_name: form.firstName,
         joined_at: form.joinedAt,
       }),
+      mode: "cors", // 追加
     });
     if (!res.ok) {
       const errorText = await res.text();
@@ -68,6 +69,7 @@ export async function editEmployee(form: Employee): Promise<void> {
 export async function deleteEmployee(employeeId: number): Promise<void> {
   const res = await fetch(`${BASE_URL}/${employeeId}`, {
     method: "DELETE",
+    mode: "cors", // 追加
   });
   if (!res.ok) {
     const errorText = await res.text();
