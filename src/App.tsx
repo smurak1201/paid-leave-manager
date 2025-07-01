@@ -47,6 +47,7 @@ import { GuideModal } from "./components/ui/GuideModal";
 // ===== import: API =====
 import { apiGet, apiPost } from "./api";
 import { editEmployee } from "./api/employeeApi";
+import { addLeaveUsage } from "./api/leaveUsageApi";
 
 function App() {
   // --- グローバル状態管理 ---
@@ -241,10 +242,7 @@ function App() {
       return;
     }
     try {
-      await apiPost("http://172.18.119.226:8000/api/leave-usages/add", {
-        employee_id: Number(employeeId),
-        used_date: date,
-      });
+      await addLeaveUsage(employeeId, date); // ← 共通APIユーティリティ経由に修正
       await reloadAll();
       setDateInput("");
     } catch (e: any) {
