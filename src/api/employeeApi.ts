@@ -5,7 +5,8 @@
 import { apiGet, apiPost } from "../api";
 import type { Employee } from "../types/employee";
 
-const BASE_URL = "/api/employees";
+// 開発用: バックエンドAPIのURLを明示
+const BASE_URL = "http://localhost:8000/api/employees";
 
 /**
  * 従業員一覧を取得
