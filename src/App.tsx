@@ -17,6 +17,7 @@
 
 // ===== import: 外部ライブラリ =====
 import { useEffect, useState } from "react";
+import LoginForm from "./components/LoginForm";
 import { Box, Heading, Button, Flex, useDisclosure } from "@chakra-ui/react";
 
 // ===== import: 型定義 =====
@@ -38,7 +39,17 @@ import { editEmployee, deleteEmployee } from "./api/employeeApi";
 import { addLeaveUsage } from "./api/leaveUsageApi";
 
 function App() {
+  // 認証状態
+  const [auth, setAuth] = useState<{
+    token: string;
+    role: string;
+    employee_id: number | null;
+  } | null>(null);
   // --- グローバル状態管理 ---
+  // 認証済みでなければログイン画面を表示
+  if (!auth) {
+    return <LoginForm onLoginSuccess={setAuth} />;
+  }
   const [employees, setEmployees] = useState<Employee[]>([]); // 従業員リスト
   const [leaveUsages, setLeaveUsages] = useState<LeaveUsage[]>([]); // 有給取得日リスト
   const [currentPage, setCurrentPage] = useState(1); // 現在のページ番号
@@ -55,7 +66,8 @@ function App() {
   // 従業員一覧を従業員コード（employeeId）の昇順で返す
   const fetchEmployees = async () => {
     const data = await apiGet<any[]>(
-      "http://172.18.119.226:8000/api/employees"
+      "/api/employees",
+      auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined
     );
     return data
       .map((emp: any) => ({
@@ -65,17 +77,18 @@ function App() {
         lastName: emp.last_name,
         firstName: emp.first_name,
       }))
-      .sort((a, b) => a.employeeId - b.employeeId); // employeeIdの昇順でソート
+      .sort((a, b) => a.employeeId - b.employeeId);
   };
 
   // 有給取得日の取得
   const fetchLeaveUsages = async () => {
     const data = await apiGet<any[]>(
-      "http://172.18.119.226:8000/api/leave-usages"
+      "/api/leave-usages",
+      auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined
     );
     return data.map((u: any) => ({
-      id: u.id, // ← 追加: DB主キーを明示的にセット
-      employeeId: Number(u.employee_id), // number型で持つ
+      id: u.id,
+      employeeId: Number(u.employee_id),
       usedDate: u.used_date,
     }));
   };
@@ -102,7 +115,8 @@ function App() {
       emps.map(async (emp) => {
         try {
           const data = await apiGet<any>(
-            `http://172.18.119.226:8000/api/leave-summary?employee_id=${emp.employeeId}`
+            `/api/leave-summary?employee_id=${emp.employeeId}`,
+            auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined
           );
           return {
             employeeId: emp.employeeId,
