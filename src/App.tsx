@@ -52,17 +52,20 @@ function App() {
   const [error, setError] = useState(""); // エラーメッセージ
 
   // --- データ取得・更新用関数 ---
+  // 従業員一覧を従業員コード（employeeId）の昇順で返す
   const fetchEmployees = async () => {
     const data = await apiGet<any[]>(
       "http://172.18.119.226:8000/api/employees"
     );
-    return data.map((emp: any) => ({
-      ...emp,
-      employeeId: Number(emp.employee_id), // number型で持つ
-      joinedAt: emp.joined_at, // 入社日は文字列型
-      lastName: emp.last_name, // 姓は文字列型
-      firstName: emp.first_name, // 名は文字列型
-    }));
+    return data
+      .map((emp: any) => ({
+        ...emp,
+        employeeId: Number(emp.employee_id),
+        joinedAt: emp.joined_at,
+        lastName: emp.last_name,
+        firstName: emp.first_name,
+      }))
+      .sort((a, b) => a.employeeId - b.employeeId); // employeeIdの昇順でソート
   };
 
   // 有給取得日の取得
