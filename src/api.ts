@@ -14,10 +14,21 @@
 /**
  * GETリクエスト用共通関数
  * @param url APIエンドポイント
+ * @param headers 追加ヘッダー（認証等）
  * @returns パース済みデータ（型T）
  */
-export async function apiGet<T>(url: string): Promise<T> {
-  const res = await fetch(url);
+export async function apiGet<T>(
+  url: string,
+  headers?: Record<string, string>
+): Promise<T> {
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(headers || {}),
+    },
+    credentials: "include", // Sanctum用
+  });
   if (!res.ok) throw new Error(`APIリクエスト失敗: ${res.status}`);
   const text = await res.text();
   try {
