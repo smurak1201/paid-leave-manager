@@ -1,3 +1,18 @@
+// --- 起動時にサーバー側の認証状態を検証し、無効なら自動ログアウト ---
+useEffect(() => {
+  // useEffect内でauth, setAuthを参照するため、関数本体の直後に記述
+  if (!auth) return;
+  apiGet(
+    "http://172.18.119.226:8000/api/employees",
+    auth.token ? { Authorization: `Bearer ${auth.token}` } : undefined
+  ).catch((e) => {
+    if (e.message && e.message.includes("401")) {
+      setAuth(null);
+      sessionStorage.removeItem("auth");
+    }
+  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [auth]);
 // =====================================================
 // App.tsx
 // -----------------------------------------------------
