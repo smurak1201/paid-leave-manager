@@ -1,18 +1,14 @@
-// --- 起動時にサーバー側の認証状態を検証し、無効なら自動ログアウト ---
-useEffect(() => {
-  // useEffect内でauth, setAuthを参照するため、関数本体の直後に記述
-  if (!auth) return;
-  apiGet(
-    "http://172.18.119.226:8000/api/employees",
-    auth.token ? { Authorization: `Bearer ${auth.token}` } : undefined
-  ).catch((e) => {
-    if (e.message && e.message.includes("401")) {
-      setAuth(null);
-      sessionStorage.removeItem("auth");
-    }
-  });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [auth]);
+// =====================================================
+// App.tsx
+// -----------------------------------------------------
+// このファイルは「有給休暇管理アプリ」のメインコンポーネントです。
+// 主な役割:
+//   - 従業員・有給取得日など全体の状態管理
+//   - 主要なUI部品（テーブル・モーダル等）の呼び出しとprops受け渡し
+//   - API通信やバリデーションなど業務ロジックの集約
+// 設計意図:
+//   - 単方向データフロー、状態の一元管理、責務分離
+//   - props/stateの流れ・UI部品の責務・業務ロジック・型定義を日本語コメントで明記
 // =====================================================
 // App.tsx
 // -----------------------------------------------------
@@ -64,6 +60,20 @@ function App() {
     const saved = sessionStorage.getItem("auth");
     return saved ? JSON.parse(saved) : null;
   });
+  // --- 起動時にサーバー側の認証状態を検証し、無効なら自動ログアウト ---
+  useEffect(() => {
+    if (!auth) return;
+    apiGet(
+      "http://172.18.119.226:8000/api/employees",
+      auth.token ? { Authorization: `Bearer ${auth.token}` } : undefined
+    ).catch((e) => {
+      if (e.message && e.message.includes("401")) {
+        setAuth(null);
+        sessionStorage.removeItem("auth");
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth]);
   const [employees, setEmployees] = useState<Employee[]>([]); // 従業員リスト
   const [leaveUsages, setLeaveUsages] = useState<LeaveUsage[]>([]); // 有給取得日リスト
   const [currentPage, setCurrentPage] = useState(1); // 現在のページ番号
