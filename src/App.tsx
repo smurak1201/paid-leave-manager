@@ -232,7 +232,7 @@ function App() {
     }
   };
 
-  // --- 有給取得日追加ロジック ---
+  // --- 有給取得日追加ロジック（認証ヘッダー付与対応） ---
   const handleAddDate = async (employeeId: number | null, date: string) => {
     if (employeeId == null) return;
     setAddDateError("");
@@ -249,7 +249,11 @@ function App() {
       return;
     }
     try {
-      await addLeaveUsage(employeeId, date); // ← 共通APIユーティリティ経由に修正
+      await addLeaveUsage(
+        employeeId,
+        date,
+        auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined
+      );
       await reloadAll();
       setDateInput("");
     } catch (e: any) {

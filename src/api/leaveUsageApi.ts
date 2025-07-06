@@ -30,8 +30,12 @@ export async function fetchLeaveUsages(): Promise<LeaveUsage[]> {
  * @param employeeId - 対象従業員ID（number型）
  * @param usedDate - 消化日
  */
-export async function addLeaveUsage(employeeId: number, usedDate: string): Promise<void> {
-  await apiPost(BASE_URL, { employee_id: employeeId, used_date: usedDate });
+export async function addLeaveUsage(
+  employeeId: number,
+  usedDate: string,
+  headers?: Record<string, string>
+): Promise<void> {
+  await apiPost(BASE_URL, { employee_id: employeeId, used_date: usedDate }, headers);
 }
 
 /**
