@@ -368,32 +368,46 @@ function App() {
         >
           有給休暇管理
         </Heading>
-        <Flex mb={6} justify="flex-end" gap={4}>
+        <Flex mb={6} justify="space-between" gap={4}>
+          {/* 左側：ログアウトボタン */}
           <Button
-            colorScheme="teal"
+            colorScheme="red"
             variant="outline"
-            onClick={guideDisclosure.onOpen}
+            onClick={() => setAuth(null)}
             size="md"
             px={6}
             boxShadow="md"
           >
-            <Icons.Info size={18} style={{ marginRight: 6 }} />
-            ガイド
+            ログアウト
           </Button>
-          <Button
-            colorScheme="teal"
-            variant="outline"
-            onClick={() => {
-              setActiveEmployeeId(null);
-              setActiveModal("add");
-            }}
-            size="md"
-            px={6}
-            boxShadow="md"
-          >
-            <Icons.Plus size={18} style={{ marginRight: 6 }} />
-            従業員追加
-          </Button>
+          {/* 右側：ガイド・従業員追加ボタン */}
+          <Flex gap={4}>
+            <Button
+              colorScheme="teal"
+              variant="outline"
+              onClick={guideDisclosure.onOpen}
+              size="md"
+              px={6}
+              boxShadow="md"
+            >
+              <Icons.Info size={18} style={{ marginRight: 6 }} />
+              ガイド
+            </Button>
+            <Button
+              colorScheme="teal"
+              variant="outline"
+              onClick={() => {
+                setActiveEmployeeId(null);
+                setActiveModal("add");
+              }}
+              size="md"
+              px={6}
+              boxShadow="md"
+            >
+              <Icons.Plus size={18} style={{ marginRight: 6 }} />
+              従業員追加
+            </Button>
+          </Flex>
         </Flex>
         <GuideModal
           open={guideDisclosure.open}
