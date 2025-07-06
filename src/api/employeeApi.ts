@@ -39,11 +39,14 @@ export async function addEmployee(form: Omit<Employee, "id">): Promise<void> {
  * 従業員情報を編集
  * @param form - 編集後の従業員情報（id, employeeId含む, number型）
  */
-export async function editEmployee(form: Employee): Promise<void> {
+export async function editEmployee(form: Employee, headers?: Record<string, string>): Promise<void> {
   try {
     const res = await fetch(`${BASE_URL}/${form.id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(headers || {}),
+      },
       body: JSON.stringify({
         employee_id: form.employeeId,
         last_name: form.lastName,
@@ -67,9 +70,12 @@ export async function editEmployee(form: Employee): Promise<void> {
  * 従業員を削除
  * @param employeeId - 削除対象の従業員ID（number型）
  */
-export async function deleteEmployee(employeeId: number): Promise<void> {
+export async function deleteEmployee(employeeId: number, headers?: Record<string, string>): Promise<void> {
   const res = await fetch(`${BASE_URL}/${employeeId}`, {
     method: "DELETE",
+    headers: {
+      ...(headers || {}),
+    },
     mode: "cors",
     credentials: "include",
   });

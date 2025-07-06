@@ -38,9 +38,12 @@ export async function addLeaveUsage(employeeId: number, usedDate: string): Promi
  * 有給消化履歴を削除（RESTful: id指定）
  * @param id - 削除対象の有給消化履歴ID
  */
-export async function deleteLeaveUsage(id: number): Promise<void> {
+export async function deleteLeaveUsage(id: number, headers?: Record<string, string>): Promise<void> {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
+    headers: {
+      ...(headers || {}),
+    },
     mode: "cors",
     credentials: "include",
   });

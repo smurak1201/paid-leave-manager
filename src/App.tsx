@@ -305,13 +305,17 @@ function App() {
   // --- 従業員追加・編集ロジック ---
   const handleAddEmployee = async (form: any) => {
     try {
-      await apiPost("http://172.18.119.226:8000/api/employees", {
-        employee_id: form.employeeId,
-        last_name: form.lastName,
-        first_name: form.firstName,
-        joined_at: form.joinedAt,
-        mode: "add",
-      });
+      await apiPost(
+        "http://172.18.119.226:8000/api/employees",
+        {
+          employee_id: form.employeeId,
+          last_name: form.lastName,
+          first_name: form.firstName,
+          joined_at: form.joinedAt,
+          mode: "add",
+        },
+        auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined
+      );
       const employeesList = await reloadAll();
       const ITEMS_PER_PAGE = 15;
       setCurrentPage(Math.ceil(employeesList.length / ITEMS_PER_PAGE));

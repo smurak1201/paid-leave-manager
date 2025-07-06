@@ -47,12 +47,13 @@ export async function apiGet<T>(
  * @param body リクエストボディ
  * @returns パース済みデータ（型T）
  */
-export async function apiPost<T>(url: string, body: any): Promise<T> {
+export async function apiPost<T>(url: string, body: any, headers?: Record<string, string>): Promise<T> {
   const res = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
+      ...(headers || {}),
     },
     body: JSON.stringify(body),
     credentials: "include", // 認証Cookieを送信

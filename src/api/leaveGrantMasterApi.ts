@@ -43,10 +43,13 @@ export async function addLeaveGrantMaster(data: Omit<LeaveGrantMaster, "id">): P
  * @param id - 編集対象ID
  * @param data - months, days
  */
-export async function editLeaveGrantMaster(id: number, data: Omit<LeaveGrantMaster, "id">): Promise<void> {
+export async function editLeaveGrantMaster(id: number, data: Omit<LeaveGrantMaster, "id">, headers?: Record<string, string>): Promise<void> {
   await fetch(`${BASE_URL}/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(headers || {}),
+    },
     body: JSON.stringify(data),
     mode: "cors",
     credentials: "include",
@@ -57,9 +60,12 @@ export async function editLeaveGrantMaster(id: number, data: Omit<LeaveGrantMast
  * 有給付与マスターを削除
  * @param id - 削除対象ID
  */
-export async function deleteLeaveGrantMaster(id: number): Promise<void> {
+export async function deleteLeaveGrantMaster(id: number, headers?: Record<string, string>): Promise<void> {
   await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
+    headers: {
+      ...(headers || {}),
+    },
     mode: "cors",
     credentials: "include",
   });
