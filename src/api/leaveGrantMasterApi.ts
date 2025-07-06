@@ -49,6 +49,7 @@ export async function editLeaveGrantMaster(id: number, data: Omit<LeaveGrantMast
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
     mode: "cors",
+    credentials: "include",
   });
 }
 
@@ -60,5 +61,6 @@ export async function deleteLeaveGrantMaster(id: number): Promise<void> {
   await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
     mode: "cors",
+    credentials: "include",
   });
 }

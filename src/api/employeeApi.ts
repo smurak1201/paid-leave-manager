@@ -51,6 +51,7 @@ export async function editEmployee(form: Employee): Promise<void> {
         joined_at: form.joinedAt,
       }),
       mode: "cors",
+      credentials: "include",
     });
     if (!res.ok) {
       const errorText = await res.text();
@@ -70,6 +71,7 @@ export async function deleteEmployee(employeeId: number): Promise<void> {
   const res = await fetch(`${BASE_URL}/${employeeId}`, {
     method: "DELETE",
     mode: "cors",
+    credentials: "include",
   });
   if (!res.ok) {
     const errorText = await res.text();

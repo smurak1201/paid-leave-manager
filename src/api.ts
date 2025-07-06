@@ -55,6 +55,7 @@ export async function apiPost<T>(url: string, body: any): Promise<T> {
       "Accept": "application/json",
     },
     body: JSON.stringify(body),
+    credentials: "include", // 認証Cookieを送信
   });
   if (!res.ok) throw new Error(`APIリクエスト失敗: ${res.status}`);
   const text = await res.text();

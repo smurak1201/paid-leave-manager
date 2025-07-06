@@ -42,6 +42,7 @@ export async function deleteLeaveUsage(id: number): Promise<void> {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
     mode: "cors",
+    credentials: "include",
   });
   if (!res.ok) {
     const errorText = await res.text();
