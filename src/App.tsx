@@ -64,9 +64,10 @@ function App() {
 
   // --- データ取得・更新用関数 ---
   // 従業員一覧を従業員コード（employeeId）の昇順で返す
+  const API_BASE = "http://172.18.119.226:8000";
   const fetchEmployees = async () => {
     const data = await apiGet<any[]>(
-      "/api/employees",
+      `${API_BASE}/api/employees`,
       auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined
     );
     return data
@@ -83,7 +84,7 @@ function App() {
   // 有給取得日の取得
   const fetchLeaveUsages = async () => {
     const data = await apiGet<any[]>(
-      "/api/leave-usages",
+      `${API_BASE}/api/leave-usages`,
       auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined
     );
     return data.map((u: any) => ({
@@ -115,7 +116,7 @@ function App() {
       emps.map(async (emp) => {
         try {
           const data = await apiGet<any>(
-            `/api/leave-summary?employee_id=${emp.employeeId}`,
+            `${API_BASE}/api/leave-summary?employee_id=${emp.employeeId}`,
             auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined
           );
           return {
