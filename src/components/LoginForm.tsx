@@ -20,10 +20,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     setError("");
     setLoading(true);
     try {
+      // 1. 事前にCSRFクッキーを取得
+      await fetch("http://172.18.119.226:8000/sanctum/csrf-cookie", {
+        credentials: "include",
+      });
+      // 2. ログインAPIを実行
       const res = await fetch("http://172.18.119.226:8000/api/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
         body: JSON.stringify({ login_id: loginId, password }),
+        credentials: "include",
       });
       const data = await res.json();
       if (!res.ok) {
