@@ -25,6 +25,7 @@ export async function apiGet<T>(
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "Accept": "application/json",
       ...(headers || {}),
     },
     credentials: "include", // Sanctum用
@@ -49,7 +50,10 @@ export async function apiGet<T>(
 export async function apiPost<T>(url: string, body: any): Promise<T> {
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    },
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`APIリクエスト失敗: ${res.status}`);
