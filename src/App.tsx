@@ -9,17 +9,6 @@
 // 設計意図:
 //   - 単方向データフロー、状態の一元管理、責務分離
 //   - props/stateの流れ・UI部品の責務・業務ロジック・型定義を日本語コメントで明記
-// =====================================================
-// App.tsx
-// -----------------------------------------------------
-// このファイルは「有給休暇管理アプリ」のメインコンポーネントです。
-// 主な役割:
-//   - 従業員・有給取得日など全体の状態管理
-//   - 主要なUI部品（テーブル・モーダル等）の呼び出しとprops受け渡し
-//   - API通信やバリデーションなど業務ロジックの集約
-// 設計意図:
-//   - 単方向データフロー、状態の一元管理、責務分離
-//   - props/stateの流れ・UI部品の責務・業務ロジック・型定義を日本語コメントで明記
 //   - 学習用途でも可読性・責務分離・型安全を重視
 // 使い方:
 //   - 主要な状態・ロジックはApp.tsx内で完結し、UI部品には必要なstate/関数のみをpropsで渡す
@@ -230,7 +219,7 @@ function App() {
     setActiveModal("leaveDates");
   };
 
-  // --- 従業員削除ロジック ---
+  // --- 従業員削除ロジック（認証ヘッダー付与対応） ---
   const handleDeleteEmployee = async (employeeId: number) => {
     try {
       await deleteEmployee(
@@ -274,7 +263,7 @@ function App() {
     }
   };
 
-  // --- 有給取得日削除ロジック（RESTful: id指定） ---
+  // --- 有給取得日削除ロジック（RESTful: id指定・認証ヘッダー付与対応） ---
   const handleDeleteDate = async (employeeId: number | null, idx: number) => {
     const emp = findEmployee(employeeId);
     if (!emp) return false;
@@ -308,7 +297,7 @@ function App() {
     }
   };
 
-  // --- 従業員追加・編集ロジック ---
+  // --- 従業員追加・編集ロジック（認証ヘッダー付与対応） ---
   const handleAddEmployee = async (form: any) => {
     try {
       await apiPost(
