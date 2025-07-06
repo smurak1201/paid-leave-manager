@@ -20,7 +20,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("/api/login", {
+      const res = await fetch("http://172.18.119.226:8000/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ login_id: loginId, password }),
