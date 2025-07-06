@@ -19,7 +19,7 @@
 // import分類:
 // - 外部ライブラリ
 
-import { X, Edit, Trash2, Plus, Info, Eye, Loader } from "lucide-react";
+import { X, Edit, Trash2, Plus, Info, Eye, Loader, Sun, Moon } from "lucide-react";
 
 // =============================
 // アイコン・スタイル定義
@@ -33,6 +33,8 @@ export const Icons = {
   Info,
   Eye,
   Loader,
+  Sun,
+  Moon,
 };
 
 // =============================
