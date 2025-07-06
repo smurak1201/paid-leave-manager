@@ -15,7 +15,7 @@
 import { apiGet, apiPost } from "../api";
 import type { LeaveUsage } from "../types/leaveUsage";
 
-const BASE_URL = "/api/leave-usages";
+const BASE_URL = "http://172.18.119.226:8000/api/leave-usages";
 
 /**
  * 有給消化履歴一覧を取得

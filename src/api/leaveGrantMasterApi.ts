@@ -20,7 +20,7 @@ export interface LeaveGrantMaster {
   days: number;
 }
 
-const BASE_URL = "/api/leave-grant-master";
+const BASE_URL = "http://172.18.119.226:8000/api/leave-grant-master";
 
 /**
  * 有給付与マスター一覧を取得
