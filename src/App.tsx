@@ -62,11 +62,6 @@ function App() {
   const [dateInput, setDateInput] = useState("");
   const [addDateError, setAddDateError] = useState("");
 
-  // ====== 認証済みでなければログイン画面を表示 ======
-  if (!auth) {
-    return <LoginForm onLoginSuccess={setAuth} />;
-  }
-
   // --- データ取得・更新用関数 ---
   // 従業員一覧を従業員コード（employeeId）の昇順で返す
   const fetchEmployees = async () => {
@@ -349,6 +344,9 @@ function App() {
   };
 
   // --- 画面描画 ---
+  if (!auth) {
+    return <LoginForm onLoginSuccess={setAuth} />;
+  }
   return (
     <Box minH="100vh" bgGradient="linear(to-br, teal.50, white)" py={10}>
       <Box
