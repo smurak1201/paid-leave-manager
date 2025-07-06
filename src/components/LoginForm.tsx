@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Box, Button, Input, Heading, Text } from "@chakra-ui/react";
 
 interface LoginFormProps {
   onLoginSuccess: (user: {
@@ -43,48 +44,63 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <form
+    <Box
+      as="form"
       onSubmit={handleSubmit}
-      style={{
-        maxWidth: 320,
-        margin: "2rem auto",
-        padding: 24,
-        border: "1px solid #ccc",
-        borderRadius: 8,
-      }}
+      maxW="320px"
+      mx="auto"
+      mt={12}
+      p={8}
+      borderWidth={1}
+      borderRadius="lg"
+      boxShadow="md"
+      bg="white"
     >
-      <h2>ログイン</h2>
-      <div style={{ marginBottom: 12 }}>
-        <label>
+      <Heading as="h2" size="md" mb={6} textAlign="center">
+        ログイン
+      </Heading>
+      <Box mb={4}>
+        <Text mb={1} fontWeight="bold">
           ログインID
-          <br />
-          <input
-            type="text"
-            value={loginId}
-            onChange={(e) => setLoginId(e.target.value)}
-            required
-            style={{ width: "100%" }}
-          />
-        </label>
-      </div>
-      <div style={{ marginBottom: 12 }}>
-        <label>
+        </Text>
+        <Input
+          type="text"
+          value={loginId}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setLoginId(e.target.value)
+          }
+          autoFocus
+          required
+        />
+      </Box>
+      <Box mb={4}>
+        <Text mb={1} fontWeight="bold">
           パスワード
-          <br />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ width: "100%" }}
-          />
-        </label>
-      </div>
-      {error && <div style={{ color: "red", marginBottom: 12 }}>{error}</div>}
-      <button type="submit" disabled={loading} style={{ width: "100%" }}>
+        </Text>
+        <Input
+          type="password"
+          value={password}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPassword(e.target.value)
+          }
+          required
+        />
+      </Box>
+      {error && (
+        <Text color="red.500" mb={3} textAlign="center">
+          {error}
+        </Text>
+      )}
+      <Button
+        type="submit"
+        colorScheme="teal"
+        width="100%"
+        loading={loading}
+        mt={2}
+      >
         {loading ? "ログイン中..." : "ログイン"}
-      </button>
-    </form>
+      </Button>
+    </Box>
   );
 };
 
