@@ -233,7 +233,10 @@ function App() {
   // --- 従業員削除ロジック ---
   const handleDeleteEmployee = async (employeeId: number) => {
     try {
-      await deleteEmployee(employeeId);
+      await deleteEmployee(
+        employeeId,
+        auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined
+      );
       await reloadAll();
     } catch (e: any) {
       alert(e.message || "従業員削除に失敗しました");
@@ -293,7 +296,10 @@ function App() {
     try {
       // RESTful DELETE: id指定
       const { deleteLeaveUsage } = await import("./api/leaveUsageApi");
-      await deleteLeaveUsage(targetUsage.id);
+      await deleteLeaveUsage(
+        targetUsage.id,
+        auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined
+      );
       await reloadAll();
       return true;
     } catch (e: any) {
@@ -327,13 +333,16 @@ function App() {
   };
   const handleSaveEmployee = async (form: any) => {
     try {
-      await editEmployee({
-        id: form.id,
-        employeeId: form.employeeId,
-        lastName: form.lastName,
-        firstName: form.firstName,
-        joinedAt: form.joinedAt,
-      });
+      await editEmployee(
+        {
+          id: form.id,
+          employeeId: form.employeeId,
+          lastName: form.lastName,
+          firstName: form.firstName,
+          joinedAt: form.joinedAt,
+        },
+        auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined
+      );
       await reloadAll();
       setActiveEmployeeId(null);
       setActiveModal(null);
