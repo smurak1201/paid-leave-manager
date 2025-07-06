@@ -24,18 +24,13 @@
 "use client";
 
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
-import { ColorModeProvider, type ColorModeProviderProps } from "./color-mode";
 
 /**
  * Provider
- * - ChakraProvider/ColorModeProviderで全体ラップ
+ * - ChakraProviderで全体ラップ
  */
-export function Provider(props: ColorModeProviderProps) {
-  return (
-    <ChakraProvider value={defaultSystem}>
-      <ColorModeProvider {...props} />
-    </ChakraProvider>
-  );
+export function Provider({ children }: { children: React.ReactNode }) {
+  return <ChakraProvider value={defaultSystem}>{children}</ChakraProvider>;
 }
 
 // useMemo, useCallback, useState, useEffect, useRef などを必要な箇所で活用し、リスト・コールバック・初期値計算などをメモ化・最適化する（パターンはEmployeeTable/LeaveDatesModal/EmployeeModalと同様）
