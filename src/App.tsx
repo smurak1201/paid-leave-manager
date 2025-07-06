@@ -44,7 +44,11 @@ function App() {
     token: string;
     role: string;
     employee_id: number | null;
-  } | null>(null);
+  } | null>(() => {
+    // セッションストレージから復元
+    const saved = sessionStorage.getItem("auth");
+    return saved ? JSON.parse(saved) : null;
+  });
   const [employees, setEmployees] = useState<Employee[]>([]); // 従業員リスト
   const [leaveUsages, setLeaveUsages] = useState<LeaveUsage[]>([]); // 有給取得日リスト
   const [currentPage, setCurrentPage] = useState(1); // 現在のページ番号
@@ -345,6 +349,16 @@ function App() {
     return [];
   };
 
+  // --- 認証状態の永続化 ---
+  // authが変化したらセッションストレージに保存
+  useEffect(() => {
+    if (auth) {
+      sessionStorage.setItem("auth", JSON.stringify(auth));
+    } else {
+      sessionStorage.removeItem("auth");
+    }
+  }, [auth]);
+
   // --- 画面描画 ---
   if (!auth) {
     return <LoginForm onLoginSuccess={setAuth} />;
@@ -373,7 +387,11 @@ function App() {
           <Button
             colorScheme="red"
             variant="outline"
-            onClick={() => setAuth(null)}
+            onClick={() => {
+              setAuth(null);
+              // セッションストレージもクリア
+              sessionStorage.removeItem("auth");
+            }}
             size="md"
             px={6}
             boxShadow="md"
