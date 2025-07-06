@@ -39,17 +39,12 @@ import { editEmployee, deleteEmployee } from "./api/employeeApi";
 import { addLeaveUsage } from "./api/leaveUsageApi";
 
 function App() {
-  // 認証状態
+  // ====== すべてのフックはトップレベルで宣言 ======
   const [auth, setAuth] = useState<{
     token: string;
     role: string;
     employee_id: number | null;
   } | null>(null);
-  // --- グローバル状態管理 ---
-  // 認証済みでなければログイン画面を表示
-  if (!auth) {
-    return <LoginForm onLoginSuccess={setAuth} />;
-  }
   const [employees, setEmployees] = useState<Employee[]>([]); // 従業員リスト
   const [leaveUsages, setLeaveUsages] = useState<LeaveUsage[]>([]); // 有給取得日リスト
   const [currentPage, setCurrentPage] = useState(1); // 現在のページ番号
@@ -61,6 +56,16 @@ function App() {
   const guideDisclosure = useDisclosure(); // ガイドモーダルの開閉状態管理
   const [loading, setLoading] = useState(true); // データ読み込み中フラグ
   const [error, setError] = useState(""); // エラーメッセージ
+  // --- 追加: サマリー・有給日編集用のstate ---
+  const [summaries, setSummaries] = useState<EmployeeSummary[]>([]);
+  const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
+  const [dateInput, setDateInput] = useState("");
+  const [addDateError, setAddDateError] = useState("");
+
+  // ====== 認証済みでなければログイン画面を表示 ======
+  if (!auth) {
+    return <LoginForm onLoginSuccess={setAuth} />;
+  }
 
   // --- データ取得・更新用関数 ---
   // 従業員一覧を従業員コード（employeeId）の昇順で返す
@@ -176,16 +181,12 @@ function App() {
   }, []);
 
   // --- サマリー再取得 ---
-  const [summaries, setSummaries] = useState<EmployeeSummary[]>([]);
   useEffect(() => {
     if (employees.length === 0) return;
-    fetchSummaries(employees).then(setSummaries);
+    fetchSummaries(employees).then((summaries) => {
+      setSummaries(summaries);
+    });
   }, [employees]);
-
-  // --- 有給取得日編集用の状態・ロジック ---
-  const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
-  const [dateInput, setDateInput] = useState("");
-  const [addDateError, setAddDateError] = useState("");
 
   // --- 従業員編集モーダルを開く ---
   const handleEdit = (employeeId: number) => {
