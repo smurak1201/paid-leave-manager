@@ -160,8 +160,9 @@ function App() {
     usedDates: [],
   };
 
-  // --- 初回データ取得 ---
+  // --- 初回データ取得（認証済みのときのみ） ---
   useEffect(() => {
+    if (!auth) return;
     setLoading(true);
     Promise.all([fetchEmployees(), fetchLeaveUsages()])
       .then(([emps, usages]) => {
@@ -174,7 +175,7 @@ function App() {
         setError("データの取得に失敗しました: " + (e.message || e));
         setLoading(false);
       });
-  }, []);
+  }, [auth]);
 
   // --- サマリー再取得 ---
   useEffect(() => {
