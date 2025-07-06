@@ -278,9 +278,16 @@ function App() {
     if (!targetDate) {
       return false;
     }
-    // 対象のLeaveUsage（id）を特定
+    // 日付フォーマットを統一して比較（ゼロ埋め）
+    const normalizeDate = (d: string) => {
+      const [y, m, day] = d.split("-");
+      return `${y}-${m.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    };
+    const normTargetDate = normalizeDate(targetDate);
     const targetUsage = leaveUsages.find(
-      (u) => u.employeeId === emp.employeeId && u.usedDate === targetDate
+      (u) =>
+        u.employeeId === emp.employeeId &&
+        normalizeDate(u.usedDate) === normTargetDate
     );
     if (!targetUsage) {
       alert("該当する有給消化履歴が見つかりません");
