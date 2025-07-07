@@ -251,7 +251,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               handleDeleteClick,
               rowIndex: i, // 行インデックスを明示的に渡す
             };
-            return <EmployeeTableRow key={emp.id} {...rowProps} />;
+            return <EmployeeTableRow key={emp.employeeId} {...rowProps} />;
           })}
         </Tbody>
       </Table>
