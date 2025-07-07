@@ -4,13 +4,13 @@ import { Box, Button, Input, Heading, Text } from "@chakra-ui/react";
 interface LoginFormProps {
   onLoginSuccess: (user: {
     role: string;
-    employee_id: number | null;
+    employee_id: string | null;
     token: string;
   }) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
-  const [loginId, setLoginId] = useState("");
+  const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: JSON.stringify({ login_id: loginId, password }),
+        body: JSON.stringify({ employee_id: employeeId, password }),
         credentials: "include",
       });
       const data = await res.json();
@@ -70,13 +70,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       </Heading>
       <Box mb={4}>
         <Text mb={1} fontWeight="bold">
-          ログインID
+          従業員ID
         </Text>
         <Input
           type="text"
-          value={loginId}
+          value={employeeId}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setLoginId(e.target.value)
+            setEmployeeId(e.target.value)
           }
           autoFocus
           required
