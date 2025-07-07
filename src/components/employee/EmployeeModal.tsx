@@ -109,7 +109,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     !form.joinedAt;
 
   const handleSave = () => {
-    const submitForm = { ...form, employeeId: Number(form.employeeId) };
+    const submitForm = { ...form, employeeId: form.employeeId };
     employee
       ? onSave(submitForm as Employee)
       : onAdd(submitForm as Omit<Employee, "id">);

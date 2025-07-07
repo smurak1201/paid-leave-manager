@@ -182,7 +182,8 @@ export function getEmployeeLeaveSummary(
 // 従業員コードのバリデーション（utils.tsに移動推奨）
 export function validateEmployeeId(value: string, employee: Employee | null, employees: Employee[]): string {
   if (value === "") return "従業員コードは必須です";
-  if (!/^[0-9]+$/.test(value)) return "従業員コードは半角数字のみ入力できます";
+  if (!/^[a-zA-Z0-9_-]+$/.test(value)) return "従業員コードは半角英数字・ハイフン・アンダースコアのみ利用できます";
+  if (value.length > 20) return "従業員コードは20文字以内で入力してください";
   if (!employee && employees.some((emp) => String(emp.employeeId) === value)) return "従業員コードが重複しています";
   return "";
 }
