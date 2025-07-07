@@ -43,7 +43,7 @@ function App() {
   const [auth, setAuth] = useState<{
     token: string;
     role: string;
-    employee_id: number | null;
+    employee_id: string | null;
   } | null>(() => {
     // セッションストレージから復元
     const saved = sessionStorage.getItem("auth");
@@ -91,12 +91,12 @@ function App() {
     return data
       .map((emp: any) => ({
         ...emp,
-        employeeId: Number(emp.employee_id),
+        employeeId: emp.employee_id,
         joinedAt: emp.joined_at,
         lastName: emp.last_name,
         firstName: emp.first_name,
       }))
-      .sort((a, b) => a.employeeId - b.employeeId);
+      .sort((a, b) => (a.employeeId > b.employeeId ? 1 : -1));
   };
 
   // 有給取得日の取得
@@ -107,12 +107,12 @@ function App() {
     );
     return data.map((u: any) => ({
       id: u.id,
-      employeeId: Number(u.employee_id),
+      employeeId: u.employee_id,
       usedDate: u.used_date,
     }));
   };
   type EmployeeSummary = {
-    employeeId: number; // 従業員ID
+    employeeId: string; // 従業員ID
     grantThisYear: number; // 今年の付与日数
     carryOver: number; // 繰越日数
     used: number; // 今年使用した日数
