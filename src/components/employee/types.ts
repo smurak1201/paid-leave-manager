@@ -36,7 +36,7 @@ export interface LeaveGrant {
  */
 export interface Employee {
   id: number;             // DB主キー
-  employeeId: number;     // 業務用従業員ID（number型で管理）
+  employeeId: string;     // 業務用従業員ID（string型で管理）
   lastName: string;       // 姓
   firstName: string;      // 名
   joinedAt: string;       // 入社年月日 (YYYY-MM-DD)
@@ -44,7 +44,7 @@ export interface Employee {
 
 // EmployeeSummary型を明示的に定義
 export interface EmployeeSummary {
-  employeeId: number;
+  employeeId: string;
   grantThisYear: number;
   carryOver: number;
   used: number;
@@ -65,10 +65,10 @@ export interface RowContentProps {
   used: number;
   remain: number;
   servicePeriod: string; // 勤続年数（X年Yか月）を追加
-  onEdit: (employeeId: number) => void; // 型を修正
-  onDelete: (employeeId: number) => void; // 型を修正
-  onView: (employeeId: number) => void; // 追加
-  handleDeleteClick: (employeeId: number) => void; // 追加
+  onEdit: (employeeId: string) => void;
+  onDelete: (employeeId: string) => void;
+  onView: (employeeId: string) => void;
+  handleDeleteClick: (employeeId: string) => void;
 }
 
 /**
@@ -81,14 +81,14 @@ export interface RowContentProps {
  */
 export interface LeaveUsage {
   id: number;
-  employeeId: number;
+  employeeId: string;
   usedDate: string;
 }
 
 export interface LeaveDatesModalProps {
   isOpen: boolean;
   onClose: () => void;
-  employeeId: number | null;
+  employeeId: string | null;
   leaveUsages: LeaveUsage[];
   onAddDate: (date: string) => void;
   onDeleteDate: (idx: number) => Promise<boolean>;
@@ -171,9 +171,9 @@ export interface Pagination {
 export interface EmployeeTableProps {
   employees: Employee[];
   summaries: EmployeeSummary[];
-  onEdit: (employeeId: number) => void;
-  onDelete: (employeeId: number) => void;
-  onView: (employeeId: number) => void;
+  onEdit: (employeeId: string) => void;
+  onDelete: (employeeId: string) => void;
+  onView: (employeeId: string) => void;
   currentPage: number;
   onPageChange: (page: number) => void;
 }

@@ -70,7 +70,7 @@ function App() {
   const [activeModal, setActiveModal] = useState<
     null | "add" | "edit" | "leaveDates"
   >(null); // アクティブなモーダルの状態
-  const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null); // アクティブな従業員ID
+  const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null); // アクティブな従業員ID
   const guideDisclosure = useDisclosure(); // ガイドモーダルの開閉状態管理
   const [loading, setLoading] = useState(true); // データ読み込み中フラグ
   const [error, setError] = useState(""); // エラーメッセージ
@@ -204,23 +204,23 @@ function App() {
   }, [employees]);
 
   // --- 従業員編集モーダルを開く ---
-  const handleEdit = (employeeId: number) => {
+  const handleEdit = (employeeId: string) => {
     setActiveEmployeeId(employeeId);
     setActiveModal("edit");
   };
 
   // 従業員IDから従業員オブジェクトを取得
-  const findEmployee = (id: number | null) =>
+  const findEmployee = (id: string | null) =>
     employees.find((e) => e.employeeId === id) ?? null;
 
   // --- 従業員の有給取得日確認モーダルを開く ---
-  const handleView = (employeeId: number) => {
+  const handleView = (employeeId: string) => {
     setActiveEmployeeId(employeeId);
     setActiveModal("leaveDates");
   };
 
   // --- 従業員削除ロジック（認証ヘッダー付与対応） ---
-  const handleDeleteEmployee = async (employeeId: number) => {
+  const handleDeleteEmployee = async (employeeId: string) => {
     try {
       await deleteEmployee(
         employeeId,
@@ -233,8 +233,8 @@ function App() {
   };
 
   // --- 有給取得日追加ロジック（認証ヘッダー付与対応） ---
-  const handleAddDate = async (employeeId: number | null, date: string) => {
-    if (employeeId == null) return;
+  const handleAddDate = async (employeeId: string | null, date: string) => {
+    if (!employeeId) return;
     setAddDateError("");
     if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       setAddDateError("日付を正しく入力してください");
@@ -268,7 +268,7 @@ function App() {
   };
 
   // --- 有給取得日削除ロジック（RESTful: id指定・認証ヘッダー付与対応） ---
-  const handleDeleteDate = async (employeeId: number | null, idx: number) => {
+  const handleDeleteDate = async (employeeId: string | null, idx: number) => {
     const emp = findEmployee(employeeId);
     if (!emp) return false;
     // 表示しているusedDates（有効期限内のみ）を取得
@@ -353,7 +353,7 @@ function App() {
 
   // --- summary, usedDates, grantDetailsのgetter関数を分離 ---
   const getSummary = (
-    activeEmployeeId: number | null,
+    activeEmployeeId: string | null,
     employees: Employee[],
     summaries: EmployeeSummary[],
     emptySummary: any
@@ -364,7 +364,7 @@ function App() {
   };
 
   const getUsedDates = (
-    activeEmployeeId: number | null,
+    activeEmployeeId: string | null,
     summaries: EmployeeSummary[]
   ) => {
     const empSummary = summaries.find((s) => s.employeeId === activeEmployeeId);
@@ -372,7 +372,7 @@ function App() {
   };
 
   const getGrantDetails = (
-    activeEmployeeId: number | null,
+    activeEmployeeId: string | null,
     summaries: EmployeeSummary[]
   ) => {
     const empSummary = summaries.find((s) => s.employeeId === activeEmployeeId);
