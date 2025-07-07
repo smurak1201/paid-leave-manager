@@ -70,7 +70,7 @@ export async function editEmployee(form: Employee, headers?: Record<string, stri
  * 従業員を削除
  * @param employeeId - 削除対象の従業員ID（number型）
  */
-export async function deleteEmployee(employeeId: number, headers?: Record<string, string>): Promise<void> {
+export async function deleteEmployee(employeeId: string, headers?: Record<string, string>): Promise<void> {
   const res = await fetch(`${BASE_URL}/${employeeId}`, {
     method: "DELETE",
     headers: {

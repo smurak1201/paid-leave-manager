@@ -31,7 +31,7 @@ export async function fetchLeaveUsages(): Promise<LeaveUsage[]> {
  * @param usedDate - 消化日
  */
 export async function addLeaveUsage(
-  employeeId: number,
+  employeeId: string,
   usedDate: string,
   headers?: Record<string, string>
 ): Promise<void> {

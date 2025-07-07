@@ -71,7 +71,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     [employees, currentPage]
   );
   const summaryMap = useMemo(() => {
-    const map = new Map<number, EmployeeSummary>();
+    const map = new Map<string, EmployeeSummary>();
     summaries.forEach((s) => map.set(s.employeeId, s));
     return map;
   }, [summaries]);
@@ -85,8 +85,8 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     if (currentPage > totalPages) onPageChange(totalPages);
   }, [employees.length, totalPages]);
 
-  // 削除対象の従業員ID（number型に修正）
-  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  // 削除対象の従業員ID（string型に修正）
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const prevEmployeesRef = useRef<Employee[]>(employees);
 
@@ -96,12 +96,12 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     prevEmployeesRef.current = employees;
   }, [employees]);
 
-  // 削除ボタンクリック時のハンドラ（number型に修正）
-  const handleDeleteClick = useCallback((id: number) => {
+  // 削除ボタンクリック時のハンドラ（string型に修正）
+  const handleDeleteClick = useCallback((id: string) => {
     setDeleteTarget(id);
     setDeleteOpen(true);
   }, []);
-  // 削除確定時のハンドラ（number型に修正）
+  // 削除確定時のハンドラ（string型に修正）
   const handleDeleteConfirm = () => {
     if (deleteTarget !== null) onDelete(deleteTarget);
     setDeleteOpen(false);
@@ -159,7 +159,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     </Box>
   );
 
-  const getSummary = (id: number) =>
+  const getSummary = (id: string) =>
     summaryMap.get(id) ?? {
       grantThisYear: 0,
       carryOver: 0,
@@ -262,7 +262,9 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         targetName={
           deleteTarget !== null
             ? (() => {
-                const emp = employees.find((e) => e.id === deleteTarget);
+                const emp = employees.find(
+                  (e) => e.employeeId === deleteTarget
+                );
                 return emp ? `${emp.lastName} ${emp.firstName}` : undefined;
               })()
             : undefined

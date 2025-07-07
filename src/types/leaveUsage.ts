@@ -12,6 +12,6 @@
 
 export interface LeaveUsage {
   id: number; // DB主キー
-  employeeId: number; // number型で統一
+  employeeId: string; // string型で統一
   usedDate: string; // YYYY-MM-DD
 }
