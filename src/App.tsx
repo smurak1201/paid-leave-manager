@@ -89,6 +89,7 @@ function App() {
       auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined
     );
     return data
+      .filter((emp: any) => emp.role !== "admin")
       .map((emp: any) => ({
         ...emp,
         employeeId: emp.employee_id,
