@@ -148,7 +148,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
           <X size={18} />
         </Button>
         <Heading as="h3" size="md" mb={4} color="teal.700" textAlign="center">
-          有給取得日
+          有給休暇取得日
         </Heading>
         <Text color="teal.700" fontWeight="bold" mb={1} textAlign="center">
           消化日数：{dates.length}日
@@ -205,7 +205,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
         </Box>
         {remain <= 0 && (
           <Text color="red.500" fontSize="sm" mt={2} textAlign="right">
-            残日数が0の場合、有給取得日は登録できません。
+            残日数が0の場合、有給休暇は登録できません。
           </Text>
         )}
       </Box>
