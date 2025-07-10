@@ -65,17 +65,24 @@
 ## ファイル構成（抜粋）
 
 - `src/App.tsx` : アプリ全体の状態管理・UI 構成のメインエントリ
-- `src/components/employee/` : 従業員・有給日関連の UI コンポーネント群
-- `src/hooks/` : カスタムフック（フォーム・日付編集・バリデーション等）
-- `src/components/ui/` : 汎用 UI コンポーネント
-- `src/learning_guide.md` : コードリーディング用ガイド
+
+- `src/App.tsx` : アプリ全体の状態管理・UI 構成のメインエントリ
+- `src/components/employee/` : 従業員・有給日関連の UI コンポーネント群（テーブル・モーダル・リスト等）
+- `src/components/ui/` : 汎用 UI コンポーネント（モーダル・トースト・ガイド等）
+- `src/hooks/` : カスタムフック（従業員・有給日データ取得/編集・フォームバリデーション等）
+- `src/types/` : 型定義ファイル（従業員・有給履歴・UI 用 props 等）
 - `src/api.ts` : API 通信共通処理・エラーハンドリング
 - `src/api/employeeApi.ts` : 従業員 API 通信ロジック
 - `src/api/leaveUsageApi.ts` : 有給取得日 API 通信ロジック
 - `src/api/leaveGrantMasterApi.ts` : 付与マスター API 通信ロジック
+- `src/components/employee/utils.ts` : 有給付与・残日数計算等のユーティリティ関数
+- `src/learning_guide.md` : フロントエンド設計・コードリーディングガイド
 - `app/Http/Controllers/EmployeesController.php` : 従業員 API コントローラ
-- `app/Http/Controllers/LeaveUsageController.php` : 有給付与・消化・繰越・時効消滅ロジック
+- `app/Http/Controllers/LeaveUsageController.php` : 有給取得日・消化・繰越・時効消滅ロジック
 - `app/Http/Controllers/LeaveGrantMasterController.php` : 付与マスター API コントローラ
+- `app/Http/Requests/EmployeeRequest.php` : 従業員バリデーション(FormRequest)
+- `database/seeders/AdminEmployeeSeeder.php` : 管理者従業員用シーダー
+- `database/seeders/LeaveGrantMasterSeeder.php` : 有給付与マスター用シーダー
 - `backend_learning_guide.md` : Laravel バックエンド学習ガイド
 
 ---
