@@ -1,3 +1,10 @@
+// --- LeaveDatesModalを開くたびにエラーをリセット ---
+useEffect(() => {
+  if (activeModal === "leaveDates") {
+    setAddDateError("");
+    setDateInput(""); // 必要なら入力欄もリセット
+  }
+}, [activeModal, activeEmployeeId]);
 // =====================================================
 // App.tsx
 // -----------------------------------------------------
