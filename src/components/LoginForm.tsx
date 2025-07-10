@@ -21,7 +21,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     setError("");
     setLoading(true);
     try {
-      // 閲覧者ログイン時はフルネーム連結パスワードを自動生成
+      // 閲覧者ログイン時は「姓＋名」をパスワードにする
       if (employeeId && password === "__viewer_auto__") {
         const emp = await fetchEmployeeById(employeeId);
         if (!emp) {
@@ -29,7 +29,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           setLoading(false);
           return;
         }
-        const viewerPassword = `${emp.employeeId}${emp.lastName}${emp.firstName}`;
+        const viewerPassword = `${emp.lastName}${emp.firstName}`;
         // 通常のログインAPIを呼ぶ
         await fetch("http://172.18.119.226:8000/sanctum/csrf-cookie", {
           credentials: "include",
