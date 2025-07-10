@@ -84,13 +84,16 @@ function App() {
   const [addDateError, setAddDateError] = useState("");
 
   // ===============================
+  // ▼APIのベースURL（関数スコープ先頭で定義）
+  // ===============================
+  const API_BASE = import.meta.env.VITE_API_URL || "";
+
+  // ===============================
   // ▼認証状態の検証（useEffect）
   // ===============================
   // 起動時にサーバー側の認証状態を検証し、無効なら自動ログアウト
   useEffect(() => {
     if (!auth) return;
-    // APIエンドポイントは環境変数から取得
-    const API_BASE = import.meta.env.VITE_API_URL || "";
     apiGet(
       `${API_BASE}/api/employees`,
       auth.token ? { Authorization: `Bearer ${auth.token}` } : undefined
@@ -110,13 +113,6 @@ function App() {
       setDateInput("");
     }
   }, [activeModal, activeEmployeeId]);
-
-  // ===============================
-  // ▼API通信・データ取得/更新ロジック
-  // ===============================
-  // APIのベースURL
-  // .envは「/api」無しで指定し、ここではそのまま利用
-  const API_BASE = import.meta.env.VITE_API_URL || "";
 
   // --- 従業員一覧を取得（employeeId昇順） ---
   // ポイント: APIから取得したデータをフロント用の型に整形
