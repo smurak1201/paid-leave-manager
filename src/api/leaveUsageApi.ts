@@ -1,35 +1,31 @@
 // =====================================================
 // leaveUsageApi.ts
 // -----------------------------------------------------
-// このファイルは「有給消化履歴API通信ロジック」を一元管理します。
-// 主な役割:
+// 【有給休暇管理アプリ】有給消化履歴API通信ロジック
+// -----------------------------------------------------
+// ▼主な役割
 //   - 有給消化履歴の一覧取得・追加・削除APIの呼び出し
-//   - 型安全・エラーハンドリング・API設計の共通化
-// 設計意図:
-//   - API通信の共通化・型安全・保守性向上
-//   - UI/ロジックからAPI通信の詳細を隠蔽し、再利用性・可読性向上
-// 使い方:
-//   - 各関数をimportして有給消化履歴データの取得・追加・削除を行う
+// ▼設計意図
+//   - API通信の共通化・型安全・UIからの分離
+// ▼使い方
+//   - 各関数をimportして有給消化履歴データ操作に利用
 // =====================================================
 
-import { apiGet, apiPost } from "../api";
-import type { LeaveUsage } from "../types/leaveUsage";
+// ===== import: API共通関数・型定義 =====
+import { apiGet, apiPost } from "../api"; // API通信共通ラッパー
+import type { LeaveUsage } from "../types/leaveUsage"; // 有給消化履歴型
 
+// ===== APIエンドポイント定数 =====
 const BASE_URL = "http://172.18.119.226:8000/api/leave-usages";
 
-/**
- * 有給消化履歴一覧を取得
- * @returns LeaveUsage[]
- */
+// ===== API呼び出し関数群 =====
+
+/** 有給消化履歴一覧を取得 */
 export async function fetchLeaveUsages(): Promise<LeaveUsage[]> {
   return apiGet<LeaveUsage[]>(BASE_URL);
 }
 
-/**
- * 有給消化履歴を追加
- * @param employeeId - 対象従業員ID（number型）
- * @param usedDate - 消化日
- */
+/** 有給消化履歴を追加 */
 export async function addLeaveUsage(
   employeeId: string,
   usedDate: string,
@@ -38,10 +34,7 @@ export async function addLeaveUsage(
   await apiPost(BASE_URL, { employee_id: employeeId, used_date: usedDate }, headers);
 }
 
-/**
- * 有給消化履歴を削除（RESTful: id指定）
- * @param id - 削除対象の有給消化履歴ID
- */
+/** 有給消化履歴を削除（id指定） */
 export async function deleteLeaveUsage(id: number, headers?: Record<string, string>): Promise<void> {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
