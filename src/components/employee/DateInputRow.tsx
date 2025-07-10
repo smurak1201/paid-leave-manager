@@ -26,6 +26,7 @@ interface DateInputRowProps {
   onSaveDate: () => void; // 編集保存ボタン押下時のハンドラ
   editDateIdx: number | null; // 編集中インデックス（nullなら追加モード）
   remainSimple: number; // 残日数（0なら追加不可）
+  isReadOnly?: boolean; // 閲覧者権限用
 }
 
 /**
@@ -38,6 +39,7 @@ export const DateInputRow: React.FC<DateInputRowProps> = ({
   onSaveDate,
   editDateIdx,
   remainSimple,
+  isReadOnly,
 }) => {
   // 日付入力欄の値が変わったときの処理
   const handleDateChange = useCallback(
@@ -87,8 +89,9 @@ export const DateInputRow: React.FC<DateInputRowProps> = ({
           onClick={handleAddClick}
           px={4}
           minW={"auto"}
-          disabled={isSaveDisabled}
-          cursor={isSaveDisabled ? "not-allowed" : "pointer"}
+          disabled={isSaveDisabled || isReadOnly}
+          cursor={isSaveDisabled || isReadOnly ? "not-allowed" : "pointer"}
+          opacity={isReadOnly ? 0.5 : 1}
           _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
         >
           <Icons.Plus size={16} style={{ marginRight: 6 }} />

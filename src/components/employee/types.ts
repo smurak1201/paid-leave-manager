@@ -114,6 +114,7 @@ export interface LeaveDatesModalProps {
     usedDates: string[];
   }>;
   addDateError?: string;
+  isReadOnly?: boolean; // 閲覧者権限用
 }
 
 /**
@@ -123,6 +124,7 @@ export interface LeaveDatesModalProps {
 export interface LeaveDateListProps {
   dates: string[];
   onDeleteDate: (idx: number) => void;
+  isReadOnly?: boolean;
 }
 
 /**

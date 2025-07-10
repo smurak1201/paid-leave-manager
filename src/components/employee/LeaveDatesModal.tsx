@@ -61,6 +61,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
   usedDates,
   grantDetails,
   addDateError,
+  isReadOnly,
 }) => {
   // モーダルが開いていない場合は何も表示しない
   if (!isOpen) return null;
@@ -176,6 +177,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
           onSaveDate={() => handleAddDate(dateInput)}
           editDateIdx={editDateIdx}
           remainSimple={remain}
+          isReadOnly={isReadOnly}
         />
         {addDateError && (
           <Text color="red.500" fontSize="sm" mt={-2} mb={2} textAlign="center">
@@ -205,6 +207,7 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
               onDeleteDate={(idx) =>
                 handleDelete((currentPage - 1) * ITEMS_PER_PAGE + idx)
               }
+              isReadOnly={isReadOnly}
             />
           </>
         )}

@@ -38,6 +38,7 @@ import { Icons } from "./icons";
 export const LeaveDateList: React.FC<LeaveDateListProps> = ({
   dates,
   onDeleteDate,
+  isReadOnly,
 }) => {
   // 日付リストを日本語表記に変換し、インデックス付きでメモ化
   const memoizedDates = useMemo(() => {
@@ -80,6 +81,9 @@ export const LeaveDateList: React.FC<LeaveDateListProps> = ({
               colorScheme="red"
               variant="ghost"
               onClick={() => onDeleteDate(idx)}
+              disabled={isReadOnly}
+              cursor={isReadOnly ? "not-allowed" : undefined}
+              opacity={isReadOnly ? 0.5 : 1}
             >
               <Icons.Trash2 size={16} /> 削除
             </Button>

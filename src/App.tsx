@@ -551,6 +551,7 @@ function App() {
           usedDates={getUsedDates(activeEmployeeId, summaries)}
           grantDetails={getGrantDetails(activeEmployeeId, summaries)}
           addDateError={addDateError}
+          isReadOnly={auth?.role === "viewer"}
         />
       </Box>
     </Box>
