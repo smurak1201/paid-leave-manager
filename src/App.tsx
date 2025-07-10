@@ -319,6 +319,8 @@ function App() {
           last_name: form.lastName,
           first_name: form.firstName,
           joined_at: form.joinedAt,
+          password: "password1234", // 初期パスワード
+          role: "viewer", // 一般従業員はviewer固定
           mode: "add",
         },
         auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined
