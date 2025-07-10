@@ -82,36 +82,20 @@ export const EmployeeTableRow: React.FC<
         {emp.firstName}
       </Td>
       {/* 入社年月日・勤続年数 */}
-      <Td color="gray.600" display={{ base: "none", md: "table-cell" }}>
-        {joinedAtJp}
-      </Td>
-      <Td color="gray.600" display={{ base: "none", md: "table-cell" }}>
-        {servicePeriod}
-      </Td>
+      <Td color="gray.600">{joinedAtJp}</Td>
+      <Td color="gray.600">{servicePeriod}</Td>
       {/* 今年度付与・繰越・消化日数 */}
-      <Td
-        isNumeric
-        color="teal.700"
-        display={{ base: "none", md: "table-cell" }}
-      >
+      <Td isNumeric color="teal.700">
         {grantThisYear}
       </Td>
-      <Td
-        isNumeric
-        color="teal.700"
-        display={{ base: "none", md: "table-cell" }}
-      >
+      <Td isNumeric color="teal.700">
         {carryOver}
       </Td>
-      <Td
-        isNumeric
-        color="teal.700"
-        display={{ base: "none", md: "table-cell" }}
-      >
+      <Td isNumeric color="teal.700">
         {used}
       </Td>
       {/* 残日数（色分けバッジ） */}
-      <Td isNumeric display={{ base: "none", md: "table-cell" }}>
+      <Td isNumeric>
         <Badge
           colorScheme={remain <= 3 ? "red" : remain <= 7 ? "yellow" : "teal"}
           fontSize="md"

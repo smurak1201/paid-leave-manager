@@ -174,7 +174,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
       borderRadius="lg"
       boxShadow="lg"
       bg="white"
-      p={{ base: 1, md: 2 }}
+      p={2}
       maxW="100vw"
       mx="auto"
       mb={0}
@@ -195,10 +195,10 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         colorScheme="teal"
         size="sm"
         sx={{
-          minWidth: 350,
+          minWidth: 650,
           width: "100%",
           "th, td": {
-            fontSize: { base: "xs", md: "sm" },
+            fontSize: "sm",
             py: [1, 2],
             px: [1, 2],
             whiteSpace: "nowrap",
@@ -227,21 +227,13 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
             <Th>従業員コード</Th>
             <Th>姓</Th>
             <Th>名</Th>
-            <Th display={{ base: "none", md: "table-cell" }}>入社年月</Th>
-            <Th display={{ base: "none", md: "table-cell" }}>勤続年数</Th>
-            <Th isNumeric display={{ base: "none", md: "table-cell" }}>
-              今年度付与
-            </Th>
-            <Th isNumeric display={{ base: "none", md: "table-cell" }}>
-              繰越
-            </Th>
-            <Th isNumeric display={{ base: "none", md: "table-cell" }}>
-              消化日数
-            </Th>
-            <Th isNumeric display={{ base: "none", md: "table-cell" }}>
-              残日数
-            </Th>
-            <Th minW="80px">操作</Th>
+            <Th>入社年月</Th>
+            <Th>勤続年数</Th>
+            <Th isNumeric>今年度付与</Th>
+            <Th isNumeric>繰越</Th>
+            <Th isNumeric>消化日数</Th>
+            <Th isNumeric>残日数</Th>
+            <Th minW="120px">操作</Th>
           </Tr>
         </Thead>
         <Tbody>
