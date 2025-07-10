@@ -105,6 +105,10 @@ function App() {
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // [解説] useEffect依存配列にauthのみを指定し、apiGetやAPI_BASEは追加しない方針。
+    // 依存配列を厳密にすると無限ループや不要な再実行のリスクがあるため、
+    // この警告（react-hooks/exhaustive-deps）は意図的に抑制しています。
+    // チーム・将来の保守のため、意図を明記して残しています。
   }, [auth]);
 
   // LeaveDatesModalを開くたびにエラー・入力値をリセット
