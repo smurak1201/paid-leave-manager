@@ -64,31 +64,54 @@ export const EmployeeTableRow: React.FC<
   // ===============================
   // ▼UI描画
   // ===============================
-  // テーブル行の描画
   return (
     <Tr bg={rowBg} transition="background 0.3s">
       {/* 従業員コード（業務用ID） */}
-      <Td fontWeight="bold" color="teal.700" fontSize="md">
+      <Td
+        fontWeight="bold"
+        color="teal.700"
+        fontSize={{ base: "sm", md: "md" }}
+      >
         {emp.employeeId}
       </Td>
       {/* 姓・名 */}
-      <Td color="gray.700">{emp.lastName}</Td>
-      <Td color="gray.700">{emp.firstName}</Td>
+      <Td color="gray.700" fontSize={{ base: "sm", md: "md" }}>
+        {emp.lastName}
+      </Td>
+      <Td color="gray.700" fontSize={{ base: "sm", md: "md" }}>
+        {emp.firstName}
+      </Td>
       {/* 入社年月日・勤続年数 */}
-      <Td color="gray.600">{joinedAtJp}</Td>
-      <Td color="gray.600">{servicePeriod}</Td>
+      <Td color="gray.600" display={{ base: "none", md: "table-cell" }}>
+        {joinedAtJp}
+      </Td>
+      <Td color="gray.600" display={{ base: "none", md: "table-cell" }}>
+        {servicePeriod}
+      </Td>
       {/* 今年度付与・繰越・消化日数 */}
-      <Td isNumeric color="teal.700">
+      <Td
+        isNumeric
+        color="teal.700"
+        display={{ base: "none", md: "table-cell" }}
+      >
         {grantThisYear}
       </Td>
-      <Td isNumeric color="teal.700">
+      <Td
+        isNumeric
+        color="teal.700"
+        display={{ base: "none", md: "table-cell" }}
+      >
         {carryOver}
       </Td>
-      <Td isNumeric color="teal.700">
+      <Td
+        isNumeric
+        color="teal.700"
+        display={{ base: "none", md: "table-cell" }}
+      >
         {used}
       </Td>
       {/* 残日数（色分けバッジ） */}
-      <Td isNumeric>
+      <Td isNumeric display={{ base: "none", md: "table-cell" }}>
         <Badge
           colorScheme={remain <= 3 ? "red" : remain <= 7 ? "yellow" : "teal"}
           fontSize="md"
