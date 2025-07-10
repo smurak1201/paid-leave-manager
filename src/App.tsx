@@ -46,7 +46,7 @@ function App() {
   // 認証情報（トークン・権限・従業員ID）
   const [auth, setAuth] = useState<{
     token: string;
-    role: string;
+    role: string; // "admin" or "viewer"
     employee_id: string | null;
   } | null>(() => {
     // セッションストレージから復元（リロード時もログイン状態を保持）
