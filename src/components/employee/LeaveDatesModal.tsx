@@ -196,7 +196,14 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                 onChange={onPageChange}
               />
             )}
-            <LeaveDateList dates={dates} onDeleteDate={handleDelete} />
+            {/* ページごとに分割して渡す */}
+            <LeaveDateList
+              dates={dates.slice(
+                (currentPage - 1) * ITEMS_PER_PAGE,
+                (currentPage - 1) * ITEMS_PER_PAGE + ITEMS_PER_PAGE
+              )}
+              onDeleteDate={handleDelete}
+            />
           </>
         )}
         <Box display="flex" justifyContent="flex-end" gap={2} mt={4}>
