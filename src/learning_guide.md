@@ -24,8 +24,8 @@
    - アプリ全体の状態管理・UI 構成・props/state の流れ・イベントハンドラの全体像を把握。
    - コメントで設計意図や流れが明記されているので、まずここをじっくり読みましょう。
 2. **型定義**
-   - `types/employee.ts`, `types/leaveUsage.ts`（型定義）
-   - どんなデータ構造を扱うか、型安全性の担保方法を確認。
+   - `types/employee.ts`, `types/leaveUsage.ts`, `types/employeeSummary.ts`（型定義）
+   - どんなデータ構造を扱うか、型安全性の担保方法・型ファイルの分割意図を確認。
 3. **主要 UI コンポーネント**
    - `components/employee/EmployeeTable.tsx`（従業員一覧テーブル）
    - `components/employee/EmployeeModal.tsx`（従業員追加・編集モーダル）
