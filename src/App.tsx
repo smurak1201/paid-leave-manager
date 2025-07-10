@@ -89,8 +89,10 @@ function App() {
   // 起動時にサーバー側の認証状態を検証し、無効なら自動ログアウト
   useEffect(() => {
     if (!auth) return;
+    // APIエンドポイントは環境変数から取得
+    const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, "") || "";
     apiGet(
-      "http://172.18.119.226:8000/api/employees",
+      `${API_BASE}/api/employees`,
       auth.token ? { Authorization: `Bearer ${auth.token}` } : undefined
     ).catch((e) => {
       if (e.message && e.message.includes("401")) {
@@ -113,7 +115,8 @@ function App() {
   // ▼API通信・データ取得/更新ロジック
   // ===============================
   // APIのベースURL
-  const API_BASE = "http://172.18.119.226:8000";
+  // APIエンドポイントのベースURLは環境変数から取得
+  const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, "") || "";
 
   // --- 従業員一覧を取得（employeeId昇順） ---
   // ポイント: APIから取得したデータをフロント用の型に整形
@@ -370,7 +373,7 @@ function App() {
       // 入社年月日からパスワード生成（例: 2023-05-01 → 20230501）
       const password = form.joinedAt.replace(/-/g, "");
       await apiPost(
-        "http://172.18.119.226:8000/api/employees",
+        `${API_BASE}/api/employees`,
         {
           employee_id: form.employeeId,
           last_name: form.lastName,
