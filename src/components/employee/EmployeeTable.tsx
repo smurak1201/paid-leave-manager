@@ -174,7 +174,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
       borderRadius="lg"
       boxShadow="lg"
       bg="white"
-      p={2}
+      p={{ base: 1, md: 2 }}
       maxW="100vw"
       mx="auto"
       mb={0}
@@ -195,24 +195,24 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         colorScheme="teal"
         size="sm"
         sx={{
-          minWidth: 650, // grantDays列追加で幅拡張
+          minWidth: 350,
           width: "100%",
           "th, td": {
-            fontSize: "sm",
+            fontSize: { base: "xs", md: "sm" },
             py: [1, 2],
             px: [1, 2],
             whiteSpace: "nowrap",
-            textAlign: "center", // すべて中央揃え
+            textAlign: "center",
           },
           th: {
             bg: "teal.50",
             color: "teal.700",
             fontWeight: "bold",
             letterSpacing: 1,
-            textAlign: "center", // ヘッダーも中央揃え
+            textAlign: "center",
           },
           td: {
-            textAlign: "center", // データも中央揃え
+            textAlign: "center",
           },
           tbody: {
             tr: {
@@ -227,13 +227,21 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
             <Th>従業員コード</Th>
             <Th>姓</Th>
             <Th>名</Th>
-            <Th>入社年月</Th>
-            <Th>勤続年数</Th>
-            <Th isNumeric>今年度付与</Th>
-            <Th isNumeric>繰越</Th>
-            <Th isNumeric>消化日数</Th>
-            <Th isNumeric>残日数</Th>
-            <Th minW="120px">操作</Th>
+            <Th display={{ base: "none", md: "table-cell" }}>入社年月</Th>
+            <Th display={{ base: "none", md: "table-cell" }}>勤続年数</Th>
+            <Th isNumeric display={{ base: "none", md: "table-cell" }}>
+              今年度付与
+            </Th>
+            <Th isNumeric display={{ base: "none", md: "table-cell" }}>
+              繰越
+            </Th>
+            <Th isNumeric display={{ base: "none", md: "table-cell" }}>
+              消化日数
+            </Th>
+            <Th isNumeric display={{ base: "none", md: "table-cell" }}>
+              残日数
+            </Th>
+            <Th minW="80px">操作</Th>
           </Tr>
         </Thead>
         <Tbody>

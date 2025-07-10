@@ -93,6 +93,9 @@ export const GuideModal: React.FC<{ open: boolean; onClose: () => void }> = ({
           <Text>
             このアプリは、従業員ごとの有給休暇の付与日数・取得状況・残日数を一元管理できます。
           </Text>
+          <Text>
+            管理者以外は閲覧のみ可能です。従業員の追加・編集・削除は管理者のみが行えます。
+          </Text>
           <Text {...sectionTitleProps}>付与日数と繰越日数について：</Text>
           <Text as="ul" pl={5} mb={2}>
             <Text as="li">毎年の付与日数は勤続年数に応じて決まります。</Text>
