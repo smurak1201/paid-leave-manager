@@ -29,7 +29,7 @@ export async function fetchEmployees(): Promise<Employee[]> {
 
 /**
  * 従業員を追加
- * @param form - idを除く従業員情報（employeeId必須, number型）
+ * @param form - idを除く従業員情報（employeeId必須, string型）
  */
 export async function addEmployee(form: Omit<Employee, "id">): Promise<void> {
   await apiPost(BASE_URL, { ...form, employee_id: form.employeeId, mode: "add" });
@@ -37,11 +37,11 @@ export async function addEmployee(form: Omit<Employee, "id">): Promise<void> {
 
 /**
  * 従業員情報を編集
- * @param form - 編集後の従業員情報（id, employeeId含む, number型）
+ * @param form - 編集後の従業員情報（employeeId必須, string型）
  */
 export async function editEmployee(form: Employee, headers?: Record<string, string>): Promise<void> {
   try {
-    const res = await fetch(`${BASE_URL}/${form.id}`, {
+    const res = await fetch(`${BASE_URL}/${form.employeeId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export async function editEmployee(form: Employee, headers?: Record<string, stri
 
 /**
  * 従業員を削除
- * @param employeeId - 削除対象の従業員ID（number型）
+ * @param employeeId - 削除対象の従業員ID（string型）
  */
 export async function deleteEmployee(employeeId: string, headers?: Record<string, string>): Promise<void> {
   const res = await fetch(`${BASE_URL}/${employeeId}`, {
