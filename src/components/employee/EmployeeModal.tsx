@@ -1,35 +1,22 @@
 // =====================================================
 // EmployeeModal.tsx
 // -----------------------------------------------------
-// このファイルは従業員追加・編集用モーダルコンポーネントです。
-// 主な役割:
+// 【有給休暇管理アプリ】従業員追加・編集用モーダルコンポーネント
+// -----------------------------------------------------
+// ▼主な役割
 //   - 従業員情報の入力・バリデーション・保存UI
-// 設計意図:
+// ▼設計意図
 //   - モーダルUIの責務分離・型安全・再利用性重視
 //   - propsで必要なデータ・関数のみ受け取り、状態は最小限
-// 使い方:
+// ▼使い方
 //   - App.tsxからpropsでデータ・操作関数を受け取る
 // =====================================================
 
-// =============================
-// EmployeeModal.tsx
-// 従業員追加・編集モーダル
-// =============================
-//
-// 役割:
-// ・従業員の追加・編集フォームUIを表示
-// ・バリデーションや初期化、入力値管理などフォームのロジックを担当
-//
-// 設計意図:
-// ・型安全・責務分離・UI/UX・可読性重視
-// ・フォームの状態管理やバリデーションはこのコンポーネントで完結
-// ・UI部品の責務を明確にし、親コンポーネントはデータ管理に専念できるようにする
-
 // ===== import: 型定義 =====
 import type { Employee } from "./types";
-// ===== import: React本体・フック =====
+
+// ===== import: 外部ライブラリ =====
 import React, { useState, useEffect } from "react";
-// ===== import: Chakra UI部品 =====
 import {
   Box,
   HStack,
@@ -40,13 +27,18 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { FormControl, FormLabel } from "@chakra-ui/form-control";
+
 // ===== import: アイコン =====
 import { User, X, BadgeInfo } from "lucide-react";
+
 // ===== import: カスタムUI部品・ユーティリティ =====
 import { CustomModal } from "../ui/CustomModal";
 import { validateEmployeeId } from "./utils";
 
-// props型: モーダルの開閉状態・従業員データ・追加/保存ハンドラなどを親から受け取る
+// ===============================
+// ▼props型定義
+// ===============================
+// モーダルの開閉状態・従業員データ・追加/保存ハンドラなどを親から受け取る
 interface EmployeeModalProps {
   isOpen: boolean; // モーダル表示状態
   onClose: () => void; // モーダルを閉じる関数
@@ -74,12 +66,15 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   onAdd,
   onSave,
 }) => {
+  // ===============================
+  // ▼状態管理
+  // ===============================
   // 入力フォームの状態
   const [form, setForm] = useState<FormType>(emptyForm);
   // 従業員IDのバリデーションエラー
   const [employeeIdError, setEmployeeIdError] = useState("");
 
-  // 初期化・リセット
+  // 初期化・リセット（モーダル開閉時や編集時に呼び出し）
   const resetForm = () => {
     if (employee) {
       setForm({ ...employee, employeeId: String(employee.employeeId) });
@@ -101,6 +96,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
       setEmployeeIdError(validateEmployeeId(value, employee, employees));
   };
 
+  // 保存ボタンの活性/非活性判定
   const isSaveDisabled = () =>
     !!employeeIdError ||
     !form.employeeId ||
@@ -108,13 +104,17 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     !form.firstName ||
     !form.joinedAt;
 
+  // 追加・保存ボタン押下時の処理
   const handleSave = () => {
-    const submitForm = { ...form, employeeId: Number(form.employeeId) };
+    const submitForm = { ...form, employeeId: form.employeeId };
     employee
       ? onSave(submitForm as Employee)
       : onAdd(submitForm as Omit<Employee, "id">);
   };
 
+  // ===============================
+  // ▼UI描画
+  // ===============================
   if (!isOpen) return null;
   return (
     <CustomModal isOpen={isOpen} onClose={onClose}>

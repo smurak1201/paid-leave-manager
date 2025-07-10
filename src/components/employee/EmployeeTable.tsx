@@ -1,34 +1,20 @@
 // =====================================================
 // EmployeeTable.tsx
 // -----------------------------------------------------
-// このファイルは従業員一覧テーブルコンポーネントです。
-// 主な役割:
+// 【有給休暇管理アプリ】従業員一覧テーブルコンポーネント
+// -----------------------------------------------------
+// ▼主な役割
 //   - 従業員リストをテーブル形式で表示
 //   - 編集/削除/確認などの操作ボタンを各行に配置
 //   - ページネーションや削除モーダルなど一覧画面のUI管理
-// 設計意図:
+// ▼設計意図
 //   - 表示と操作UIの責務分離・型安全・再利用性重視
 //   - propsで必要なデータ・関数のみ受け取り、状態は最小限
-// 使い方:
+// ▼使い方
 //   - App.tsxからpropsでデータ・操作関数を受け取る
 // =====================================================
 
-// =============================
-// EmployeeTable.tsx
-// 従業員一覧テーブルコンポーネント
-// =============================
-//
-// 役割:
-// ・従業員リストをテーブル形式で表示する
-// ・編集/削除/確認などの操作ボタンを各行に配置する
-// ・ページネーションや削除モーダルなど、一覧画面のUIをまとめて管理
-//
-// 設計意図:
-// ・「表示と操作UIの配置」のみを責務とし、データ管理や業務ロジックは親(App)に委譲
-// ・型安全・責務分離・再利用性・可読性を重視
-// ・propsで必要なデータ・関数のみ受け取り、状態は最小限に
-
-// ===== import: React本体・フック =====
+// ===== import: 外部ライブラリ =====
 import React, {
   useState,
   useEffect,
@@ -36,14 +22,15 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-// ===== import: Chakra UI（テーブル・レイアウト） =====
 import { Table, Thead, Tbody, Tr, Th } from "@chakra-ui/table";
 import { Box } from "@chakra-ui/react";
 
 // ===== import: 型定義 =====
 import type { Employee, EmployeeSummary, EmployeeTableProps } from "./types";
+
 // ===== import: ユーティリティ・アイコン =====
 import { getServicePeriod } from "./icons";
+
 // ===== import: UI部品 =====
 import { ConfirmDeleteModal } from "../ui/ConfirmDeleteModal";
 import { EmployeeTableRow } from "./EmployeeTableRow";
@@ -57,6 +44,9 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   currentPage,
   onPageChange,
 }) => {
+  // ===============================
+  // ▼状態管理・ページネーション
+  // ===============================
   // 1ページあたりの表示件数
   const ITEMS_PER_PAGE = 15;
   // 総ページ数を計算
@@ -71,22 +61,25 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     [employees, currentPage]
   );
   const summaryMap = useMemo(() => {
-    const map = new Map<number, EmployeeSummary>();
+    const map = new Map<string, EmployeeSummary>();
     summaries.forEach((s) => map.set(s.employeeId, s));
     return map;
   }, [summaries]);
-  // ページ切替時にリスト先頭へスクロール
+  // ページ切替時にリスト先頭へスクロール（UX向上のため）
   const listRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = 0;
   }, [currentPage]);
-  // 削除等でページ数が減った場合にcurrentPageを自動調整
+  // 削除等でページ数が減った場合にcurrentPageを自動調整（例：最終ページで削除したとき）
   useEffect(() => {
     if (currentPage > totalPages) onPageChange(totalPages);
   }, [employees.length, totalPages]);
 
-  // 削除対象の従業員ID（number型に修正）
-  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  // ===============================
+  // ▼削除モーダル・削除処理
+  // ===============================
+  // 削除対象の従業員ID（string型に修正）
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const prevEmployeesRef = useRef<Employee[]>(employees);
 
@@ -96,12 +89,12 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     prevEmployeesRef.current = employees;
   }, [employees]);
 
-  // 削除ボタンクリック時のハンドラ（number型に修正）
-  const handleDeleteClick = useCallback((id: number) => {
+  // 削除ボタンクリック時のハンドラ（string型に修正）
+  const handleDeleteClick = useCallback((id: string) => {
     setDeleteTarget(id);
     setDeleteOpen(true);
   }, []);
-  // 削除確定時のハンドラ（number型に修正）
+  // 削除確定時のハンドラ（string型に修正）
   const handleDeleteConfirm = () => {
     if (deleteTarget !== null) onDelete(deleteTarget);
     setDeleteOpen(false);
@@ -112,7 +105,9 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     setDeleteTarget(null);
   };
 
-  // ページネーション共通部品
+  // ===============================
+  // ▼ページネーションUI部品（ローカル定義）
+  // ===============================
   const PageNav: React.FC<{
     current: number;
     total: number;
@@ -159,7 +154,10 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     </Box>
   );
 
-  const getSummary = (id: number) =>
+  // ===============================
+  // ▼サマリー取得関数
+  // ===============================
+  const getSummary = (id: string) =>
     summaryMap.get(id) ?? {
       grantThisYear: 0,
       carryOver: 0,
@@ -167,6 +165,9 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
       remain: 0,
     };
 
+  // ===============================
+  // ▼UI描画
+  // ===============================
   return (
     <Box
       overflowX="auto"
@@ -250,8 +251,14 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               onDelete, // 追加
               handleDeleteClick,
               rowIndex: i, // 行インデックスを明示的に渡す
+              isReadOnly:
+                typeof window !== "undefined" &&
+                window.sessionStorage.getItem("auth")
+                  ? JSON.parse(window.sessionStorage.getItem("auth") || "{}")
+                      .role === "viewer"
+                  : false,
             };
-            return <EmployeeTableRow key={emp.id} {...rowProps} />;
+            return <EmployeeTableRow key={emp.employeeId} {...rowProps} />;
           })}
         </Tbody>
       </Table>
@@ -262,7 +269,9 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
         targetName={
           deleteTarget !== null
             ? (() => {
-                const emp = employees.find((e) => e.id === deleteTarget);
+                const emp = employees.find(
+                  (e) => e.employeeId === deleteTarget
+                );
                 return emp ? `${emp.lastName} ${emp.firstName}` : undefined;
               })()
             : undefined

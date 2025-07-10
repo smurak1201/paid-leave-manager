@@ -1,94 +1,31 @@
 // =====================================================
 // color-mode.tsx
 // -----------------------------------------------------
-// このファイルはカラーモード（ダーク/ライト）切替UI部品です。
-// 主な役割:
+// 【有給休暇管理アプリ】カラーモード（ダーク/ライト）切替UI部品
+// -----------------------------------------------------
+// ▼主な役割
 //   - カラーモード切替ボタン・状態管理
-// 設計意図:
+// ▼設計意図
 //   - UIテーマ切替の責務分離・再利用性重視
 //   - propsで状態・切替関数を受け取る
-// 使い方:
+// ▼使い方
 //   - App.tsx等からimportして利用
 // =====================================================
-//
-// 役割:
-// ・アプリ全体のカラーモード（ダーク/ライト）切替・管理
-//
-// 設計意図:
-// ・Chakra UI/next-themesを活用し、テーマ切替・状態管理を一元化
-// ・UI部品の責務分離・型安全性強化
-//
-// import分類:
-// - Chakra UI部品
-// - next-themes
-// - React本体・フック
 
-"use client";
+// ===== import: 外部ライブラリ =====
+import { useColorMode } from "@chakra-ui/system";
+import { IconButton } from "@chakra-ui/react";
+import { Icons } from "../employee/icons";
 
-import type { IconButtonProps } from "@chakra-ui/react";
-import { ClientOnly, IconButton, Skeleton } from "@chakra-ui/react";
-import { ThemeProvider, useTheme } from "next-themes";
-import type { ThemeProviderProps } from "next-themes";
-import * as React from "react";
-import { LuMoon, LuSun } from "react-icons/lu";
-
-export interface ColorModeProviderProps extends ThemeProviderProps {}
-
-export function ColorModeProvider(props: ColorModeProviderProps) {
+export function ColorModeButton(props: any) {
+  const { colorMode, toggleColorMode } = useColorMode();
   return (
-    <ThemeProvider attribute="class" disableTransitionOnChange {...props} />
+    <IconButton
+      onClick={toggleColorMode}
+      variant="ghost"
+      aria-label="カラーモード切替"
+      icon={colorMode === "dark" ? <Icons.Moon /> : <Icons.Sun />}
+      {...props}
+    />
   );
 }
-
-export type ColorMode = "light" | "dark";
-
-export interface UseColorModeReturn {
-  colorMode: ColorMode;
-  setColorMode: (colorMode: ColorMode) => void;
-  toggleColorMode: () => void;
-}
-
-export function useColorMode(): UseColorModeReturn {
-  const { resolvedTheme, setTheme, forcedTheme } = useTheme();
-  const colorMode = forcedTheme || resolvedTheme;
-  const toggleColorMode = () => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark");
-  };
-  return {
-    colorMode: colorMode as ColorMode,
-    setColorMode: setTheme,
-    toggleColorMode,
-  };
-}
-
-export function useColorModeValue<T>(light: T, dark: T) {
-  const { colorMode } = useColorMode();
-  return colorMode === "dark" ? dark : light;
-}
-
-export function ColorModeIcon() {
-  const { colorMode } = useColorMode();
-  return colorMode === "dark" ? <LuMoon /> : <LuSun />;
-}
-
-interface ColorModeButtonProps extends Omit<IconButtonProps, "aria-label"> {}
-
-export const ColorModeButton = React.forwardRef<
-  HTMLButtonElement,
-  ColorModeButtonProps
->(function ColorModeButton(props, ref) {
-  const { toggleColorMode } = useColorMode();
-  return (
-    <ClientOnly fallback={<Skeleton boxSize="8" />}>
-      <IconButton
-        onClick={toggleColorMode}
-        variant="ghost"
-        aria-label="カラーモード切替"
-        ref={ref}
-        {...props}
-      >
-        <ColorModeIcon />
-      </IconButton>
-    </ClientOnly>
-  );
-});

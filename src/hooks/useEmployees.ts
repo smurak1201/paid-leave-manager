@@ -1,26 +1,15 @@
 // =====================================================
 // useEmployees.ts
 // -----------------------------------------------------
-// このファイルは従業員データ取得・管理用カスタムフックです。
-// 主な役割:
+// 【有給休暇管理アプリ】従業員データ取得・管理用カスタムフック
+// -----------------------------------------------------
+// ▼主な役割
 //   - 従業員一覧の取得・状態管理
-// 設計意図:
+// ▼設計意図
 //   - データ取得ロジックの責務分離・再利用性重視
-// 使い方:
+// ▼使い方
 //   - App.tsx等からimportして利用
 // =====================================================
-//
-// 役割:
-// ・従業員一覧データの取得・追加・編集・削除・ローディング/エラー状態管理
-//
-// 設計意図:
-// ・UI部品から分離し、再利用性・保守性・可読性向上
-// ・API通信・状態管理・副作用処理を一元化
-//
-// import分類:
-// - React本体・フック
-// - 型定義
-// - API通信関数
 
 import { useState, useEffect, useCallback } from "react";
 import type { Employee } from "../types/employee";
@@ -71,8 +60,8 @@ export function useEmployees() {
     await load();
   };
   // 従業員削除
-  const remove = async (employeeId: number) => {
-    await deleteEmployee(employeeId); // number型で渡す
+  const remove = async (employeeId: string) => {
+    await deleteEmployee(employeeId); // string型で渡す
     await load();
   };
 

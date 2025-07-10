@@ -1,32 +1,26 @@
 // =====================================================
 // LeaveDateList.tsx
 // -----------------------------------------------------
-// このファイルは従業員の有給取得日リスト表示コンポーネントです。
-// 主な役割:
+// 【有給休暇管理アプリ】有給取得日リスト表示コンポーネント
+// -----------------------------------------------------
+// ▼主な役割
 //   - 有給取得日一覧の表示
 //   - 削除ボタン等の操作UI
-// 設計意図:
+// ▼設計意図
 //   - 表示UIの責務分離・型安全・再利用性重視
 //   - propsで必要なデータ・関数のみ受け取り、状態は持たない
-// 使い方:
+// ▼使い方
 //   - LeaveDatesModal等からpropsでデータ・操作関数を受け取る
 // =====================================================
-//
-// 役割:
-// ・有給取得日リストを一覧表示し、各日付ごとに削除ボタンを表示
-//
-// 設計意図:
-// ・型安全・責務分離・UI/UX・可読性重視
-// ・リスト表示のみに責務を限定し、ロジックや状態管理は親に委譲
 
-// ===== import: Chakra UI部品 =====
+// ===== import: 外部ライブラリ =====
 import { Box, Button, Text } from "@chakra-ui/react";
-// ===== import: React本体・フック =====
 import React, { useMemo } from "react";
-// ===== import: アニメーション（未使用なら削除可） =====
 import { AnimatePresence } from "framer-motion";
+
 // ===== import: 型定義 =====
 import type { LeaveDateListProps } from "./types";
+
 // ===== import: アイコン =====
 import { Icons } from "./icons";
 
@@ -38,6 +32,7 @@ import { Icons } from "./icons";
 export const LeaveDateList: React.FC<LeaveDateListProps> = ({
   dates,
   onDeleteDate,
+  isReadOnly,
 }) => {
   // 日付リストを日本語表記に変換し、インデックス付きでメモ化
   const memoizedDates = useMemo(() => {
@@ -80,6 +75,9 @@ export const LeaveDateList: React.FC<LeaveDateListProps> = ({
               colorScheme="red"
               variant="ghost"
               onClick={() => onDeleteDate(idx)}
+              disabled={isReadOnly}
+              cursor={isReadOnly ? "not-allowed" : undefined}
+              opacity={isReadOnly ? 0.5 : 1}
             >
               <Icons.Trash2 size={16} /> 削除
             </Button>
