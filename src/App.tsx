@@ -24,6 +24,7 @@ import { Box, Heading, Button, Flex, useDisclosure } from "@chakra-ui/react";
 // ===== import: 型定義 =====
 import type { Employee } from "./types/employee";
 import type { LeaveUsage } from "./types/leaveUsage";
+import type { EmployeeSummary } from "./types/employeeSummary";
 
 // ===== import: 従業員関連コンポーネント・ユーティリティ =====
 import { EmployeeTable } from "./components/employee/EmployeeTable";
@@ -145,23 +146,6 @@ function App() {
       employeeId: u.employee_id,
       usedDate: u.used_date,
     }));
-  };
-
-  // --- サマリー型定義 ---
-  type EmployeeSummary = {
-    employeeId: string; // 従業員ID
-    grantThisYear: number; // 今年の付与日数
-    carryOver: number; // 繰越日数
-    used: number; // 今年使用した日数
-    remain: number; // 残り日数
-    usedDates: string[]; // 今年使用した日付のリスト
-    grantDetails?: Array<{
-      grantDate: string; // 付与日
-      days: number; // 付与日数
-      used: number; // 使用済み日数
-      remain: number; // 残り日数
-      usedDates: string[]; // 使用した日付のリスト
-    }>;
   };
 
   // --- 従業員ごとの有給休暇サマリーを取得 ---
