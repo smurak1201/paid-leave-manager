@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { fetchEmployeeById } from "../api/employeeApi.viewerLogin";
 import { Box, Button, Input, Heading, Text } from "@chakra-ui/react";
 
 interface LoginFormProps {
@@ -20,11 +21,48 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     setError("");
     setLoading(true);
     try {
-      // 1. 事前にCSRFクッキーを取得
+      // 閲覧者ログイン時はフルネーム連結パスワードを自動生成
+      if (employeeId && password === "__viewer_auto__") {
+        const emp = await fetchEmployeeById(employeeId);
+        if (!emp) {
+          setError("従業員IDが存在しません");
+          setLoading(false);
+          return;
+        }
+        const viewerPassword = `${emp.employeeId}${emp.lastName}${emp.firstName}`;
+        // 通常のログインAPIを呼ぶ
+        await fetch("http://172.18.119.226:8000/sanctum/csrf-cookie", {
+          credentials: "include",
+        });
+        const res = await fetch("http://172.18.119.226:8000/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            employee_id: employeeId,
+            password: viewerPassword,
+          }),
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.message || "ログインに失敗しました");
+        } else {
+          onLoginSuccess({
+            role: data.role,
+            employee_id: data.employee_id,
+            token: data.token,
+          });
+        }
+        setLoading(false);
+        return;
+      }
+      // 管理者・通常ログイン
       await fetch("http://172.18.119.226:8000/sanctum/csrf-cookie", {
         credentials: "include",
       });
-      // 2. ログインAPIを実行
       const res = await fetch("http://172.18.119.226:8000/api/login", {
         method: "POST",
         headers: {
@@ -38,7 +76,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       if (!res.ok) {
         setError(data.message || "ログインに失敗しました");
       } else {
-        // トークン・ユーザー情報を親に通知
         onLoginSuccess({
           role: data.role,
           employee_id: data.employee_id,
@@ -93,6 +130,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             setPassword(e.target.value)
           }
           required
+          placeholder="閲覧者は空欄で自動入力"
+          onFocus={() => {
+            // 閲覧者用: パスワード欄にフォーカス時、空欄なら自動セット
+            if (password === "" && employeeId) setPassword("__viewer_auto__");
+          }}
         />
       </Box>
       {error && (
