@@ -90,7 +90,7 @@ function App() {
   useEffect(() => {
     if (!auth) return;
     // APIエンドポイントは環境変数から取得
-    const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, "") || "";
+    const API_BASE = import.meta.env.VITE_API_URL || "";
     apiGet(
       `${API_BASE}/api/employees`,
       auth.token ? { Authorization: `Bearer ${auth.token}` } : undefined
@@ -115,8 +115,8 @@ function App() {
   // ▼API通信・データ取得/更新ロジック
   // ===============================
   // APIのベースURL
-  // APIエンドポイントのベースURLは環境変数から取得
-  const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/api$/, "") || "";
+  // .envは「/api」無しで指定し、ここではそのまま利用
+  const API_BASE = import.meta.env.VITE_API_URL || "";
 
   // --- 従業員一覧を取得（employeeId昇順） ---
   // ポイント: APIから取得したデータをフロント用の型に整形
