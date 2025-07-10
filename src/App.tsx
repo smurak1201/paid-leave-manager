@@ -332,6 +332,8 @@ function App() {
   // --- 従業員追加・編集ロジック（認証ヘッダー付与対応） ---
   const handleAddEmployee = async (form: any) => {
     try {
+      // 入社年月日からパスワード生成（例: 2023-05-01 → 20230501）
+      const password = form.joinedAt.replace(/-/g, "");
       await apiPost(
         "http://172.18.119.226:8000/api/employees",
         {
@@ -339,7 +341,7 @@ function App() {
           last_name: form.lastName,
           first_name: form.firstName,
           joined_at: form.joinedAt,
-          password: "password", // 初期パスワードを"password"に
+          password,
           role: "viewer", // 一般従業員はviewer固定
           mode: "add",
         },
