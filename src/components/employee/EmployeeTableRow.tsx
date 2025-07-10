@@ -1,45 +1,36 @@
 // =====================================================
 // EmployeeTableRow.tsx
 // -----------------------------------------------------
-// このファイルは従業員一覧テーブルの1行を表示するコンポーネントです。
-// 主な役割:
+// 【有給休暇管理アプリ】従業員一覧テーブルの1行表示部品
+// -----------------------------------------------------
+// ▼主な役割
 //   - 従業員ごとの情報（ID/氏名/入社日/残日数など）を1行で表示
 //   - 操作ボタン（確認・編集・削除）を提供
-// 設計意図:
+// ▼設計意図
 //   - テーブルの1行ごとに責務を分離し、再利用性・可読性を高める
 //   - propsで必要な情報・操作関数のみ受け取り、状態は持たない純粋な表示部品
-// 使い方:
+// ▼使い方
 //   - EmployeeTableからpropsでデータ・操作関数を受け取る
 // =====================================================
 
-// =============================
-// 従業員一覧テーブルの1行を表示するコンポーネント
-// =============================
-//
-// 役割:
-// ・従業員ごとの情報（ID/氏名/入社日/残日数など）を1行で表示
-// ・操作ボタン（確認・編集・削除）を提供
-// ・奇数行色分けや残日数0の強調など、UIの分かりやすさを重視
-//
-// 設計意図:
-// ・テーブルの1行ごとに責務を分離し、再利用性・可読性を高める
-// ・propsで必要な情報・操作関数のみ受け取り、状態は持たない純粋な表示部品
-
-// ===== import: React本体 =====
+// ===== import: 外部ライブラリ =====
 import React from "react";
-// ===== import: Chakra UI（テーブル・UI部品） =====
 import { Td, Tr } from "@chakra-ui/table";
 import { Badge, HStack, IconButton, Icon } from "@chakra-ui/react";
+
 // ===== import: アイコン・カスタムUI部品 =====
 import { Icons } from "./icons";
 import { Tooltip } from "../ui/tooltip";
+
 // ===== import: 型定義 =====
 import type { RowContentProps } from "./types";
 
 export const EmployeeTableRow: React.FC<
   RowContentProps & { rowIndex?: number }
 > = function EmployeeTableRow(props) {
-  // propsから各従業員のデータや操作関数を受け取る
+  // ===============================
+  // ▼props受け取り
+  // ===============================
   const {
     emp, // 従業員データ（ID・氏名・入社日など）
     grantThisYear, // 今年度付与日数
@@ -53,11 +44,14 @@ export const EmployeeTableRow: React.FC<
     rowIndex, // 行インデックス（奇数行色分け用）
   } = props;
 
+  // ===============================
+  // ▼UIロジック
+  // ===============================
   // 入社年月日を「YYYY年M月D日」形式に変換
   const [y, m, d] = emp.joinedAt.split("-");
   const joinedAtJp = `${y}年${Number(m)}月${d ? Number(d) + "日" : ""}`;
 
-  // 行の背景色を決定
+  // 行の背景色を決定（残日数0なら赤、奇数行ならteal系）
   // ・残日数0なら薄い赤色
   // ・奇数行ならteal系の薄い色
   let rowBg = undefined;
@@ -67,6 +61,9 @@ export const EmployeeTableRow: React.FC<
     rowBg = "rgba(0,128,128,0.06)";
   }
 
+  // ===============================
+  // ▼UI描画
+  // ===============================
   // テーブル行の描画
   return (
     <Tr bg={rowBg} transition="background 0.3s">

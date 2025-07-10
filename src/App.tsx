@@ -1,29 +1,17 @@
 // =====================================================
 // App.tsx
 // -----------------------------------------------------
-// このファイルは「有給休暇管理アプリ」のメインコンポーネントです。
-// 主な役割:
-//   - 従業員・有給取得日など全体の状態管理
-//   - 主要なUI部品（テーブル・モーダル等）の呼び出しとprops受け渡し
-//   - API通信やバリデーションなど業務ロジックの集約
-// 設計意図:
-//   - 単方向データフロー、状態の一元管理、責務分離
-//   - props/stateの流れ・UI部品の責務・業務ロジック・型定義を日本語コメントで明記
-//   - 学習用途でも可読性・責務分離・型安全を重視
-// 使い方:
-// =====================================================
-// App.tsx
+// 【有給休暇管理アプリ】メインコンポーネント
 // -----------------------------------------------------
-// このファイルは「有給休暇管理アプリ」のメインコンポーネントです。
-// 主な役割:
+// ▼主な役割
 //   - 従業員・有給取得日など全体の状態管理
 //   - 主要なUI部品（テーブル・モーダル等）の呼び出しとprops受け渡し
 //   - API通信やバリデーションなど業務ロジックの集約
-// 設計意図:
+// ▼設計意図
 //   - 単方向データフロー、状態の一元管理、責務分離
 //   - props/stateの流れ・UI部品の責務・業務ロジック・型定義を日本語コメントで明記
 //   - 学習用途でも可読性・責務分離・型安全を重視
-// 使い方:
+// ▼使い方
 //   - 主要な状態・ロジックはApp.tsx内で完結し、UI部品には必要なstate/関数のみをpropsで渡す
 //   - 各stateや関数の役割は日本語コメントで明記
 // =====================================================
@@ -52,17 +40,53 @@ import { editEmployee, deleteEmployee } from "./api/employeeApi";
 import { addLeaveUsage } from "./api/leaveUsageApi";
 
 function App() {
-  // ====== すべてのフックはトップレベルで宣言 ======
+  // ===============================
+  // ▼アプリ全体の状態管理（useState）
+  // ===============================
+  // 認証情報（トークン・権限・従業員ID）
   const [auth, setAuth] = useState<{
     token: string;
     role: string;
     employee_id: string | null;
   } | null>(() => {
-    // セッションストレージから復元
+    // セッションストレージから復元（リロード時もログイン状態を保持）
     const saved = sessionStorage.getItem("auth");
     return saved ? JSON.parse(saved) : null;
   });
-  // --- 起動時にサーバー側の認証状態を検証し、無効なら自動ログアウト ---
+
+  // 従業員リスト
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  // 有給取得日リスト
+  const [leaveUsages, setLeaveUsages] = useState<LeaveUsage[]>([]);
+  // 従業員一覧のページ番号
+  const [currentPage, setCurrentPage] = useState(1);
+  // 有給取得日一覧のページ番号
+  const [leaveDatesPage, setLeaveDatesPage] = useState(1);
+  // アクティブなモーダル（add:追加, edit:編集, leaveDates:有給日一覧）
+  const [activeModal, setActiveModal] = useState<
+    null | "add" | "edit" | "leaveDates"
+  >(null);
+  // 編集・参照対象の従業員ID
+  const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null);
+  // ガイドモーダルの開閉状態
+  const guideDisclosure = useDisclosure();
+  // データ読み込み中フラグ
+  const [loading, setLoading] = useState(true);
+  // エラーメッセージ
+  const [error, setError] = useState("");
+  // サマリー情報（従業員ごとの有給付与・消化状況）
+  const [summaries, setSummaries] = useState<EmployeeSummary[]>([]);
+  // 有給日編集用のインデックス
+  const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
+  // 有給日入力欄の値
+  const [dateInput, setDateInput] = useState("");
+  // 有給日追加時のエラー
+  const [addDateError, setAddDateError] = useState("");
+
+  // ===============================
+  // ▼認証状態の検証（useEffect）
+  // ===============================
+  // 起動時にサーバー側の認証状態を検証し、無効なら自動ログアウト
   useEffect(() => {
     if (!auth) return;
     apiGet(
@@ -76,23 +100,8 @@ function App() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth]);
-  const [employees, setEmployees] = useState<Employee[]>([]); // 従業員リスト
-  const [leaveUsages, setLeaveUsages] = useState<LeaveUsage[]>([]); // 有給取得日リスト
-  const [currentPage, setCurrentPage] = useState(1); // 現在のページ番号
-  const [leaveDatesPage, setLeaveDatesPage] = useState(1); // 有給取得日の現在のページ番号
-  const [activeModal, setActiveModal] = useState<
-    null | "add" | "edit" | "leaveDates"
-  >(null); // アクティブなモーダルの状態
-  const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null); // アクティブな従業員ID
-  const guideDisclosure = useDisclosure(); // ガイドモーダルの開閉状態管理
-  const [loading, setLoading] = useState(true); // データ読み込み中フラグ
-  const [error, setError] = useState(""); // エラーメッセージ
-  // --- 追加: サマリー・有給日編集用のstate ---
-  const [summaries, setSummaries] = useState<EmployeeSummary[]>([]);
-  const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
-  const [dateInput, setDateInput] = useState("");
-  const [addDateError, setAddDateError] = useState("");
-  // --- LeaveDatesModalを開くたびにエラーをリセット ---
+
+  // LeaveDatesModalを開くたびにエラー・入力値をリセット
   useEffect(() => {
     if (activeModal === "leaveDates") {
       setAddDateError("");
@@ -100,9 +109,14 @@ function App() {
     }
   }, [activeModal, activeEmployeeId]);
 
-  // --- データ取得・更新用関数 ---
-  // 従業員一覧を従業員コード（employeeId）の昇順で返す
+  // ===============================
+  // ▼API通信・データ取得/更新ロジック
+  // ===============================
+  // APIのベースURL
   const API_BASE = "http://172.18.119.226:8000";
+
+  // --- 従業員一覧を取得（employeeId昇順） ---
+  // ポイント: APIから取得したデータをフロント用の型に整形
   const fetchEmployees = async () => {
     const data = await apiGet<any[]>(
       `${API_BASE}/api/employees`,
@@ -120,7 +134,8 @@ function App() {
       .sort((a, b) => (a.employeeId > b.employeeId ? 1 : -1));
   };
 
-  // 有給取得日の取得
+  // --- 有給取得日一覧を取得 ---
+  // ポイント: APIのレスポンスをフロント用の型に変換
   const fetchLeaveUsages = async () => {
     const data = await apiGet<any[]>(
       `${API_BASE}/api/leave-usages`,
@@ -132,6 +147,8 @@ function App() {
       usedDate: u.used_date,
     }));
   };
+
+  // --- サマリー型定義 ---
   type EmployeeSummary = {
     employeeId: string; // 従業員ID
     grantThisYear: number; // 今年の付与日数
@@ -140,7 +157,6 @@ function App() {
     remain: number; // 残り日数
     usedDates: string[]; // 今年使用した日付のリスト
     grantDetails?: Array<{
-      // 付与の詳細情報
       grantDate: string; // 付与日
       days: number; // 付与日数
       used: number; // 使用済み日数
@@ -149,7 +165,8 @@ function App() {
     }>;
   };
 
-  // 従業員ごとの有給休暇サマリーを取得
+  // --- 従業員ごとの有給休暇サマリーを取得 ---
+  // ポイント: 各従業員ごとにAPIを呼び出し、サマリー情報を集約
   const fetchSummaries = async (emps: Employee[]) => {
     return Promise.all(
       emps.map(async (emp) => {
@@ -168,6 +185,7 @@ function App() {
             grantDetails: data.grantDetails ?? [],
           };
         } catch {
+          // エラー時は空のサマリーを返す
           return {
             employeeId: emp.employeeId,
             grantThisYear: 0,
@@ -182,15 +200,17 @@ function App() {
     );
   };
 
-  // データ再取得をまとめて行う関数
+  // --- データ再取得をまとめて行う関数 ---
+  // ポイント: 従業員・有給日・サマリーを一括で再取得
   const reloadAll = async () => {
-    const employeesList = await fetchEmployees(); // 従業員リストを取得
-    setEmployees(employeesList); // 従業員リストを更新
-    setLeaveUsages(await fetchLeaveUsages()); // 有給取得日を更新
-    setSummaries(await fetchSummaries(employeesList)); // サマリーを更新
-    return employeesList; // 更新後の従業員リストを返す
+    const employeesList = await fetchEmployees();
+    setEmployees(employeesList);
+    setLeaveUsages(await fetchLeaveUsages());
+    setSummaries(await fetchSummaries(employeesList));
+    return employeesList;
   };
-  // サマリーのデフォルト値
+
+  // --- サマリーのデフォルト値 ---
   const emptySummary = {
     grantThisYear: 0,
     carryOver: 0,
@@ -199,7 +219,10 @@ function App() {
     usedDates: [],
   };
 
-  // --- 初回データ取得（認証済みのときのみ） ---
+  // ===============================
+  // ▼初回データ取得・サマリー再取得（useEffect）
+  // ===============================
+  // 認証済みのときのみ初回データ取得
   useEffect(() => {
     if (!auth) return;
     setLoading(true);
@@ -216,7 +239,7 @@ function App() {
       });
   }, [auth]);
 
-  // --- サマリー再取得 ---
+  // 従業員リストが変化したらサマリーも再取得
   useEffect(() => {
     if (employees.length === 0) return;
     fetchSummaries(employees).then((summaries) => {
@@ -224,7 +247,10 @@ function App() {
     });
   }, [employees]);
 
-  // --- 従業員編集モーダルを開く ---
+  // ===============================
+  // ▼UI操作系ロジック
+  // ===============================
+  // 従業員編集モーダルを開く
   const handleEdit = (employeeId: string) => {
     setActiveEmployeeId(employeeId);
     setActiveModal("edit");
@@ -234,13 +260,18 @@ function App() {
   const findEmployee = (id: string | null) =>
     employees.find((e) => e.employeeId === id) ?? null;
 
-  // --- 従業員の有給取得日確認モーダルを開く ---
+  // 従業員の有給取得日確認モーダルを開く
   const handleView = (employeeId: string) => {
     setActiveEmployeeId(employeeId);
     setActiveModal("leaveDates");
   };
 
-  // --- 従業員削除ロジック（認証ヘッダー付与対応） ---
+  // ===============================
+  // ▼業務ロジック（CRUD操作）
+  // ===============================
+
+  // --- 従業員削除 ---
+  // ポイント: 認証ヘッダーを付与し、削除後は一覧を再取得
   const handleDeleteEmployee = async (employeeId: string) => {
     try {
       await deleteEmployee(
@@ -253,10 +284,12 @@ function App() {
     }
   };
 
-  // --- 有給取得日追加ロジック（認証ヘッダー付与対応） ---
+  // --- 有給取得日追加 ---
+  // ポイント: 入力バリデーション・重複チェック・API呼び出し
   const handleAddDate = async (employeeId: string | null, date: string) => {
     if (!employeeId) return;
     setAddDateError("");
+    // 日付形式チェック
     if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       setAddDateError("日付を正しく入力してください");
       return;
@@ -288,7 +321,8 @@ function App() {
     }
   };
 
-  // --- 有給取得日削除ロジック（RESTful: id指定・認証ヘッダー付与対応） ---
+  // --- 有給取得日削除 ---
+  // ポイント: RESTfulなid指定・認証ヘッダー付与
   const handleDeleteDate = async (employeeId: string | null, idx: number) => {
     const emp = findEmployee(employeeId);
     if (!emp) return false;
@@ -329,7 +363,8 @@ function App() {
     }
   };
 
-  // --- 従業員追加・編集ロジック（認証ヘッダー付与対応） ---
+  // --- 従業員追加 ---
+  // ポイント: 入社日から初期パスワード自動生成、追加後はページ送り
   const handleAddEmployee = async (form: any) => {
     try {
       // 入社年月日からパスワード生成（例: 2023-05-01 → 20230501）
@@ -356,6 +391,9 @@ function App() {
       alert(e.message || "従業員追加に失敗しました");
     }
   };
+
+  // --- 従業員編集 ---
+  // ポイント: 編集後は一覧を再取得
   const handleSaveEmployee = async (form: any) => {
     try {
       await editEmployee(
@@ -376,7 +414,12 @@ function App() {
     }
   };
 
-  // --- summary, usedDates, grantDetailsのgetter関数を分離 ---
+  // ===============================
+  // ▼サマリー・有給日・付与詳細のgetter関数
+  // ===============================
+
+  // --- サマリー取得 ---
+  // ポイント: activeEmployeeIdから該当サマリーを返す
   const getSummary = (
     activeEmployeeId: string | null,
     employees: Employee[],
@@ -388,6 +431,7 @@ function App() {
     return s || emptySummary;
   };
 
+  // --- 有給取得日リスト取得 ---
   const getUsedDates = (
     activeEmployeeId: string | null,
     summaries: EmployeeSummary[]
@@ -396,6 +440,7 @@ function App() {
     return empSummary?.usedDates ?? [];
   };
 
+  // --- 付与詳細リスト取得 ---
   const getGrantDetails = (
     activeEmployeeId: string | null,
     summaries: EmployeeSummary[]
@@ -412,8 +457,10 @@ function App() {
     return [];
   };
 
-  // --- 認証状態の永続化 ---
-  // authが変化したらセッションストレージに保存
+  // ===============================
+  // ▼認証状態の永続化
+  // ===============================
+  // ポイント: authが変化したらセッションストレージに保存
   useEffect(() => {
     if (auth) {
       sessionStorage.setItem("auth", JSON.stringify(auth));
@@ -422,7 +469,10 @@ function App() {
     }
   }, [auth]);
 
-  // --- 画面描画 ---
+  // ===============================
+  // ▼画面描画（JSX）
+  // ===============================
+  // ポイント: ログイン状態で分岐し、主要なUI部品に必要なpropsのみ渡す
   if (!auth) {
     return <LoginForm onLoginSuccess={setAuth} />;
   }
