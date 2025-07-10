@@ -127,6 +127,11 @@ export const EmployeeTableRow: React.FC<
               variant="ghost"
               colorScheme="teal"
               onClick={() => onEdit(emp.employeeId)}
+              disabled={props.isReadOnly}
+              style={{
+                cursor: props.isReadOnly ? "not-allowed" : undefined,
+                opacity: props.isReadOnly ? 0.5 : 1,
+              }}
             >
               <Icon as={Icons.Edit} boxSize={5} />
             </IconButton>
@@ -138,6 +143,11 @@ export const EmployeeTableRow: React.FC<
               variant="ghost"
               colorScheme="red"
               onClick={() => handleDeleteClick(emp.employeeId)}
+              disabled={props.isReadOnly}
+              style={{
+                cursor: props.isReadOnly ? "not-allowed" : undefined,
+                opacity: props.isReadOnly ? 0.5 : 1,
+              }}
             >
               <Icon as={Icons.Trash2} boxSize={5} />
             </IconButton>

@@ -69,6 +69,7 @@ export interface RowContentProps {
   onDelete: (employeeId: string) => void;
   onView: (employeeId: string) => void;
   handleDeleteClick: (employeeId: string) => void;
+  isReadOnly?: boolean;
 }
 
 /**

@@ -250,6 +250,12 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               onDelete, // 追加
               handleDeleteClick,
               rowIndex: i, // 行インデックスを明示的に渡す
+              isReadOnly:
+                typeof window !== "undefined" &&
+                window.sessionStorage.getItem("auth")
+                  ? JSON.parse(window.sessionStorage.getItem("auth") || "{}")
+                      .role === "viewer"
+                  : false,
             };
             return <EmployeeTableRow key={emp.employeeId} {...rowProps} />;
           })}

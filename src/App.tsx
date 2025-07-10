@@ -476,12 +476,19 @@ function App() {
               colorScheme="teal"
               variant="outline"
               onClick={() => {
-                setActiveEmployeeId(null);
-                setActiveModal("add");
+                if (auth?.role !== "viewer") {
+                  setActiveEmployeeId(null);
+                  setActiveModal("add");
+                }
               }}
               size="md"
               px={6}
               boxShadow="md"
+              disabled={auth?.role === "viewer"}
+              style={{
+                cursor: auth?.role === "viewer" ? "not-allowed" : undefined,
+                opacity: auth?.role === "viewer" ? 0.5 : 1,
+              }}
             >
               <Icons.Plus size={18} style={{ marginRight: 6 }} />
               従業員追加
