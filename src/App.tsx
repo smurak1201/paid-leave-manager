@@ -1,10 +1,16 @@
-// --- LeaveDatesModalを開くたびにエラーをリセット ---
-useEffect(() => {
-  if (activeModal === "leaveDates") {
-    setAddDateError("");
-    setDateInput(""); // 必要なら入力欄もリセット
-  }
-}, [activeModal, activeEmployeeId]);
+// =====================================================
+// App.tsx
+// -----------------------------------------------------
+// このファイルは「有給休暇管理アプリ」のメインコンポーネントです。
+// 主な役割:
+//   - 従業員・有給取得日など全体の状態管理
+//   - 主要なUI部品（テーブル・モーダル等）の呼び出しとprops受け渡し
+//   - API通信やバリデーションなど業務ロジックの集約
+// 設計意図:
+//   - 単方向データフロー、状態の一元管理、責務分離
+//   - props/stateの流れ・UI部品の責務・業務ロジック・型定義を日本語コメントで明記
+//   - 学習用途でも可読性・責務分離・型安全を重視
+// 使い方:
 // =====================================================
 // App.tsx
 // -----------------------------------------------------
@@ -86,6 +92,13 @@ function App() {
   const [editDateIdx, setEditDateIdx] = useState<number | null>(null);
   const [dateInput, setDateInput] = useState("");
   const [addDateError, setAddDateError] = useState("");
+  // --- LeaveDatesModalを開くたびにエラーをリセット ---
+  useEffect(() => {
+    if (activeModal === "leaveDates") {
+      setAddDateError("");
+      setDateInput("");
+    }
+  }, [activeModal, activeEmployeeId]);
 
   // --- データ取得・更新用関数 ---
   // 従業員一覧を従業員コード（employeeId）の昇順で返す
