@@ -319,7 +319,7 @@ function App() {
           last_name: form.lastName,
           first_name: form.firstName,
           joined_at: form.joinedAt,
-          password: "password1234", // 初期パスワード
+          password: "password", // 初期パスワードを"password"に
           role: "viewer", // 一般従業員はviewer固定
           mode: "add",
         },
