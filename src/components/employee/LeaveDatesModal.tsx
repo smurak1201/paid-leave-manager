@@ -202,7 +202,9 @@ export const LeaveDatesModal: React.FC<LeaveDatesModalProps> = ({
                 (currentPage - 1) * ITEMS_PER_PAGE,
                 (currentPage - 1) * ITEMS_PER_PAGE + ITEMS_PER_PAGE
               )}
-              onDeleteDate={handleDelete}
+              onDeleteDate={(idx) =>
+                handleDelete((currentPage - 1) * ITEMS_PER_PAGE + idx)
+              }
             />
           </>
         )}
