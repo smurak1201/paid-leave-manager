@@ -8,7 +8,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         // target: 'http://172.22.227.254:8000',
-        target: 'https://xs209049.xsrv.jp',
+        target: 'https://xs209049.xsrv.jp/paid-leave-manager',
         changeOrigin: true,
       },
     },
