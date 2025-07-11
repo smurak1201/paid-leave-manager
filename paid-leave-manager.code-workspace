@@ -2,6 +2,10 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"name": "Ubuntu Laravel Backend",
+			"path": "\\\\wsl.localhost\\Ubuntu\\home\\user\\paid-leave-manager"
 		}
 	]
 }
