@@ -7,7 +7,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://172.22.227.254:8000',
+        // target: 'http://172.22.227.254:8000',
+        target: 'https://xs209049.xsrv.jp',
         changeOrigin: true,
       },
     },
