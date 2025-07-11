@@ -16,7 +16,8 @@ import { apiGet, apiPost } from "../api"; // API通信共通ラッパー
 import type { Employee } from "../types/employee"; // 従業員型
 
 // ===== APIエンドポイント定数 =====
-const BASE_URL = "http://172.18.119.226:8000/api/employees";
+const API_BASE = import.meta.env.VITE_API_URL;
+const BASE_URL = `${API_BASE}/api/employees`;
 
 // ===== API呼び出し関数群 =====
 

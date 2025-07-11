@@ -32,7 +32,8 @@ export interface LeaveSummary {
 }
 
 // ===== APIエンドポイント定数 =====
-const BASE_URL = "http://172.18.119.226:8000/api/leave-summary";
+const API_BASE = import.meta.env.VITE_API_URL;
+const BASE_URL = `${API_BASE}/api/leave-summary`;
 
 // ===== API呼び出し関数 =====
 

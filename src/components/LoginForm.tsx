@@ -1,7 +1,24 @@
-import React, { useState } from "react";
-// 閲覧者もID・パスワード手入力方式に統一
-import { Box, Button, Input, Heading, Text } from "@chakra-ui/react";
+// =====================================================
+// LoginForm.tsx
+// -----------------------------------------------------
+// 【有給休暇管理アプリ】ログインフォームAPI通信ロジック
+// -----------------------------------------------------
+// ▼主な役割
+//   - ログイン・CSRF取得APIの呼び出し
+// ▼設計意図
+//   - API通信の共通化・型安全・UIからの分離
+// ▼使い方
+//   - APIベースURL定数を利用し、API呼び出し箇所を統一
+// =====================================================
 
+// ===== import: 外部ライブラリ =====
+import React, { useState } from "react"; // React本体・フック
+import { Box, Button, Input, Heading, Text } from "@chakra-ui/react"; // UIコンポーネント
+
+// ===== APIエンドポイント定数 =====
+const API_BASE = import.meta.env.VITE_API_URL;
+
+// ===== 型定義 =====
 interface LoginFormProps {
   onLoginSuccess: (user: {
     role: string;
@@ -10,12 +27,15 @@ interface LoginFormProps {
   }) => void;
 }
 
+// ===== コンポーネント本体 =====
 const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
-  const [employeeId, setEmployeeId] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  // ===== useState: 入力・状態管理 =====
+  const [employeeId, setEmployeeId] = useState(""); // 従業員ID入力欄
+  const [password, setPassword] = useState(""); // パスワード入力欄
+  const [error, setError] = useState(""); // エラーメッセージ
+  const [loading, setLoading] = useState(false); // ログイン処理中フラグ
 
+  // ===== ログイン処理関数 =====
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -23,10 +43,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     try {
       // 閲覧者も管理者もID・パスワード手入力方式に統一
       // 管理者・通常ログイン
-      await fetch("http://172.18.119.226:8000/sanctum/csrf-cookie", {
+      await fetch(`${API_BASE}/sanctum/csrf-cookie`, {
         credentials: "include",
       });
-      const res = await fetch("http://172.18.119.226:8000/api/login", {
+      const res = await fetch(`${API_BASE}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -113,4 +133,5 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   );
 };
 
-export default LoginForm;
+// ===== export =====
+export default LoginForm; // ログインフォームコンポーネント

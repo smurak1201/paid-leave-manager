@@ -16,7 +16,8 @@ import { apiGet, apiPost } from "../api"; // API通信共通ラッパー
 import type { LeaveUsage } from "../types/leaveUsage"; // 有給消化履歴型
 
 // ===== APIエンドポイント定数 =====
-const BASE_URL = "http://172.18.119.226:8000/api/leave-usages";
+const API_BASE = import.meta.env.VITE_API_URL;
+const BASE_URL = `${API_BASE}/api/leave-usages`;
 
 // ===== API呼び出し関数群 =====
 
