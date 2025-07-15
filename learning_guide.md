@@ -1,58 +1,81 @@
-# 有給休暇管理アプリ ソースコード学習ガイド
+# 有給休暇管理アプリ ソースコード学習ガイド（React + Laravel）
 
-このドキュメントは、当アプリのソースコードを効率的に学ぶためのポイントや、読む順序のガイドです。各ファイル・コメントの意図を理解しながら、React・型安全・UI/UX 設計・業務ロジックの実践的な学びを深めてください。
+このドキュメントは、当アプリのフロントエンド・バックエンド両方のソースコードを効率的に学ぶためのポイントや、読む順序のガイドです。各ファイル・コメントの意図を理解しながら、React・型安全・UI/UX 設計・業務ロジック・Laravel 設計の実践的な学びを深めてください。
 
 ---
 
-## 1. 学習時に意識すべきポイント
+## 1. フロントエンド（React/TypeScript）学習ガイド
+
+### 学習時に意識すべきポイント
 
 - **責務分離**: 各コンポーネント・フック・ユーティリティの「役割」を意識し、どこで何を担当しているかを把握しましょう。
-- **型安全性**: TypeScript の型定義（`types/employee.ts` など）を確認し、props や state の型がどのように守られているかを意識しましょう。
+- **型安全性**: TypeScript の型定義（`frontend/src/types/employee.ts` など）を確認し、props や state の型がどのように守られているかを意識しましょう。
 - **単方向データフロー**: props/state の流れ（親 → 子、id のみ渡しデータ参照は親で一元管理）を追い、React の設計思想を体感しましょう。
 - **UI/UX 設計**: Chakra UI や lucide-react の使い方、バリデーション・エラーメッセージ・モーダルの UX 改善ポイントを観察しましょう。
 - **バリデーション共通化**: カスタムフックやユーティリティでバリデーション処理がどのように共通化されているかを確認しましょう（例：従業員コードは半角英数字・重複不可、即時エラー表示）。
 - **コメントの活用**: 主要ファイル・関数・props・型定義に「設計意図・役割・import 分類・ロジックや変数の解説コメント」が付与されています。まずコメントを読み、全体像 → 詳細の順で理解を深めましょう。
-- **業務ロジック**: 有給付与・消化・繰越・時効消滅・最大保有日数・FIFO 消化順序など、日本法令に即したロジックがどこでどう実装されているかを意識しましょう（主に `app/Http/Controllers/LeaveUsageController.php` で一元管理、フロントエンドの型・コメントも参照）。
+- **業務ロジック**: 有給付与・消化・繰越・時効消滅・最大保有日数・FIFO 消化順序など、日本法令に即したロジックがどこでどう実装されているかを意識しましょう（主に `backend/app/Http/Controllers/LeaveUsageController.php` で一元管理、フロントエンドの型・コメントも参照）。
 - **可読性・保守性**: コードの分割・命名・重複排除・初学者向け配慮・責務分離・型安全性など、読みやすさ・直しやすさの工夫を探しましょう。
 - **ガイドの活用**: 画面右上のガイドボタンから「有給休暇管理ガイド」モーダルを開き、法令準拠のロジックやサンプル表・未対応要件も確認できます。
 
----
+### ソースコードを読むおすすめの順序
 
-## 2. ソースコードを読むおすすめの順序
-
-1. **`App.tsx`**
+1. **`frontend/src/App.tsx`**
    - アプリ全体の状態管理・UI 構成・props/state の流れ・イベントハンドラの全体像を把握。
    - コメントで設計意図や流れが明記されているので、まずここをじっくり読みましょう。
 2. **型定義**
-   - `types/employee.ts`, `types/leaveUsage.ts`, `types/employeeSummary.ts`（型定義）
+   - `frontend/src/types/employee.ts`, `frontend/src/types/leaveUsage.ts`, `frontend/src/types/employeeSummary.ts`（型定義）
    - どんなデータ構造を扱うか、型安全性の担保方法・型ファイルの分割意図を確認。
 3. **主要 UI コンポーネント**
-   - `components/employee/EmployeeTable.tsx`（従業員一覧テーブル）
-   - `components/employee/EmployeeModal.tsx`（従業員追加・編集モーダル）
-   - `components/employee/LeaveDatesModal.tsx`（有給日管理モーダル）
-   - `components/employee/LeaveDateList.tsx`（有給日リスト）
+   - `frontend/src/components/employee/EmployeeTable.tsx`（従業員一覧テーブル）
+   - `frontend/src/components/employee/EmployeeModal.tsx`（従業員追加・編集モーダル）
+   - `frontend/src/components/employee/LeaveDatesModal.tsx`（有給日管理モーダル）
+   - `frontend/src/components/employee/LeaveDateList.tsx`（有給日リスト）
    - それぞれの責務・props・UI/UX 設計・バリデーションの流れを追いましょう。
 4. **カスタムフック・ユーティリティ**
-   - `hooks/useEmployeeForm.ts`（従業員フォーム管理・バリデーション）
-   - `hooks/useLeaveDates.ts`（有給日編集ロジック）
-   - `components/employee/utils.ts`（UI 用ロジック）
+   - `frontend/src/hooks/useEmployeeForm.ts`（従業員フォーム管理・バリデーション）
+   - `frontend/src/hooks/useLeaveDates.ts`（有給日編集ロジック）
+   - `frontend/src/components/employee/utils.ts`（UI 用ロジック）
    - 共通化・再利用性・ロジック分離の工夫を確認。
 5. **UI 部品・アイコン・ガイド**
-   - `components/employee/icons.ts`（アイコン管理）
-   - `components/ui/GuideModal.tsx`（有給休暇管理ガイドモーダル：制度ロジック・未対応要件も明記）
-   - `components/ui/tooltip.tsx`, `toaster.tsx`, `provider.tsx`, `CustomModal.tsx`, `ConfirmDeleteModal.tsx`, `color-mode.tsx`（UI 部品の責務分離・設計コメント例）
+   - `frontend/src/components/employee/icons.ts`（アイコン管理）
+   - `frontend/src/components/ui/GuideModal.tsx`（有給休暇管理ガイドモーダル：制度ロジック・未対応要件も明記）
+   - `frontend/src/components/ui/tooltip.tsx`, `frontend/toaster.tsx`, `frontend/provider.tsx`, `frontend/CustomModal.tsx`, `frontend/ConfirmDeleteModal.tsx`, `frontend/color-mode.tsx`（UI 部品の責務分離・設計コメント例）
    - UI の細部や学習サポートの工夫を観察。
 6. **API・設定ファイル**
-   - `api.ts`（API 通信共通化・エラーハンドリング）
-   - `.gitignore`, `package.json`, `tsconfig.*.json`, `vite.config.ts`, `eslint.config.js` など
+   - `frontend/src/api.ts`（API 通信共通化・エラーハンドリング）
+   - `frontend/package.json`, `frontend/tsconfig.*.json`, `frontend/vite.config.ts`, `frontend/eslint.config.js` など
    - 必要最小限の設定・不要記述の排除・型/構文チェックの工夫を確認。
 7. **バックエンド主要ロジック**
-   - `app/Http/Controllers/LeaveUsageController.php`（有給付与・消化・繰越・時効消滅・最大保有日数・FIFO 消化順序ロジック）
+   - `backend/app/Http/Controllers/LeaveUsageController.php`（有給付与・消化・繰越・時効消滅・最大保有日数・FIFO 消化順序ロジック）
    - Laravel のルーティング・モデル・バリデーション・API レスポンス設計も参考に。
 
 ---
 
-## 3. 日本の有給休暇制度に対応しているロジック・未対応ロジック
+## 2. バックエンド（Laravel/PHP）学習ガイド
+
+### 学習時に意識すべきポイント
+
+- **責務分離**: ルート（`backend/routes/api.php`）→ コントローラ（`backend/app/Http/Controllers/`）→ モデル（`backend/app/Models/`）→ FormRequest（`backend/app/Http/Requests/`）と役割が分かれています。
+- **バリデーション**: API に送られてくるデータが正しいかどうかを `$request->validate` や FormRequest でチェック。
+- **業務ロジック**: 有給付与・消化・繰越・時効消滅・最大保有日数・FIFO 消化順序など、日本の法律に沿ったルールがどこでどう実装されているか。
+- **API 設計**: RESTful（リソースごとに URL と HTTP メソッドで操作を分ける）な設計。
+- **モデル設計**: `Employee`, `LeaveUsage`, `LeaveGrantMaster` などのモデルは、DB テーブルと 1 対 1 で対応。
+- **保守性・拡張性**: コードの分割・命名・バリデーション共通化・例外処理の工夫。
+- **法令準拠ロジック**: 日本の有給休暇制度にどこまで対応しているか、未対応要件は何か。
+
+### ソースコードを読むおすすめの順序
+
+1. **`backend/routes/api.php`**
+2. **コントローラ**: `backend/app/Http/Controllers/LeaveUsageController.php`, `backend/app/Http/Controllers/EmployeesController.php`
+3. **モデル**: `backend/app/Models/Employee.php`, `backend/app/Models/LeaveUsage.php`, `backend/app/Models/LeaveGrantMaster.php`
+4. **FormRequest**: `backend/app/Http/Requests/EmployeeRequest.php`
+5. **Seeder・マスターデータ**: `backend/database/seeders/LeaveGrantMasterSeeder.php`
+6. **バリデーション・エラー処理**: 各 API の `$request->validate` や FormRequest の流れ
+
+---
+
+## 3. 日本の有給休暇制度に対応しているロジック・未対応ロジック（共通）
 
 ### 対応済みロジック
 
@@ -78,21 +101,20 @@
 
 ## 4. 学びを深めるためのアクション例
 
-- コメントを参考に、props/state の流れや型定義を自分で図解してみる
+- コメントや設計意図を参考に、props/state や型定義・DB 設計を自分で図解してみる
 - バリデーションやロジック部分を書き換えて動作を試す
-- UI/UX 改善案を考え、実際にコードを修正してみる
-- 新しい従業員属性や有給ルールを追加してみる
-- コード分割や型定義の工夫を他のプロジェクトにも応用してみる
-- 設計コメントを自分なりに書き換えてみることで、理解を深める
+- UI/UX・API・モデル・Seeder・マスターデータの改善案を考え、実際にコードを修正してみる
+- 新しい従業員属性や有給ルール・付与ロジックを追加してみる
+- コード分割や型定義・設計コメントの工夫を他のプロジェクトにも応用してみる
 
 ---
 
 ## 5. まとめ
 
-- 「なぜこの設計なのか」「どこで何をしているか」を常に意識し、コメントを手がかりに全体像 → 詳細へと段階的に理解を深めましょう。
+- 「なぜこの設計なのか」「どこで何をしているか」を常に意識し、コメントや関数名・型定義・DB 設計を手がかりに全体像 → 詳細へと段階的に理解を深めましょう。
 - 疑問点や改善案があれば、実際に手を動かして試すことでより実践的な力が身につきます。
 - 設計コメントを活用し、他のプロジェクトや実務にも応用できる「設計意図を伝える力」を養いましょう。
 
 ---
 
-このガイドを活用し、実務・学習の両面で役立つ React ＋ TypeScript アプリ開発力を身につけてください！
+このガイドを活用し、実務・学習の両面で役立つ React ＋ TypeScript／Laravel ＋ PHP アプリ開発力を身につけてください！
