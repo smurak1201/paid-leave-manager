@@ -29,7 +29,7 @@ Laravel は「MVC」という設計パターンで作られています。
 
 -   `routes/api.php` … API の入り口。URL ごとにどのコントローラを呼ぶか決める場所
 -   `app/Http/Controllers/` … コントローラ（C）。API ごとの処理本体
--   例: `LeaveUsageController.php`（有給付与・消化・繰越・時効消滅・最大保有日数・FIFO 消化順序ロジック）、`EmployeesController.php`（従業員管理 API）
+    -   例: `LeaveUsageController.php`（有給付与・消化・繰越・時効消滅・最大保有日数・FIFO 消化順序ロジック）、`EmployeesController.php`（従業員管理 API）
 -   `app/Models/` … モデル（M）。データベースのテーブルと連携するクラス
     -   例: `Employee.php`（従業員テーブル用）、`LeaveUsage.php`（有給履歴）、`LeaveGrantMaster.php`（付与マスター）
 -   `app/Http/Requests/EmployeeRequest.php` … バリデーション共通化用 FormRequest（従業員追加・編集）
@@ -47,18 +47,18 @@ Laravel は「MVC」という設計パターンで作られています。
     -   ルート（routes）→ コントローラ（Controllers）→ モデル（Models）→ FormRequest（バリデーション）と役割が分かれています。
     -   どのファイルが「何のために」存在するかを意識しましょう。
 -   **バリデーション**：
-    -   API に送られてくるデータが正しいかどうかを`$request->validate`や FormRequest でチェックします。
+    -   API に送られてくるデータが正しいかどうかを `$request->validate` や FormRequest でチェックします。
     -   間違ったデータはエラーとして返します。
     -   FormRequest を使うことでバリデーションルールをコントローラから分離し、再利用性・可読性が向上します。
 -   **業務ロジック**：
     -   有給付与・消化・繰越・時効消滅・最大保有日数・FIFO 消化順序など、日本の法律に沿ったルールがどこでどう実装されているかを意識しましょう。
-    -   例：`app/Http/Controllers/LeaveUsageController.php`の`showSummary`や`store`、`generateGrants`関数など
+    -   例：`app/Http/Controllers/LeaveUsageController.php` の `showSummary` や `store`、`generateGrants` 関数など
 -   **API 設計**：
     -   RESTful（リソースごとに URL と HTTP メソッドで操作を分ける）な設計になっています。
     -   例：GET で一覧取得、POST で追加、DELETE で削除など。全 API は `routes/api.php` に集約されています。
 -   **モデル設計**：
-    -   `Employee`, `LeaveUsage`, `LeaveGrantMaster`などのモデルは、DB テーブルと 1 対 1 で対応しています。
-    -   `$fillable`で「一括登録できるカラム」を指定します。
+    -   `Employee`, `LeaveUsage`, `LeaveGrantMaster` などのモデルは、DB テーブルと 1 対 1 で対応しています。
+    -   `$fillable` で「一括登録できるカラム」を指定します。
     -   モデルごとに設計コメント・型定義・責務分離が徹底されています。
 -   **保守性・拡張性**：
     -   コードの分割・命名・バリデーション共通化・例外処理の工夫を探しましょう。
@@ -72,23 +72,23 @@ Laravel は「MVC」という設計パターンで作られています。
 
 ## 2. ソースコードを読むおすすめの順序（初心者向け解説付き）
 
-1.  **`routes/api.php`**
-    -   どんな API が用意されているか、URL とコントローラの対応関係をざっくり把握。
-    -   例：`/api/employees` → `EmployeeController`の`index`関数
-2.  **`app/Http/Controllers/LeaveUsageController.php`・`EmployeesController.php`**
-    -   有給付与・消化・繰越・時効消滅・最大保有日数・FIFO 消化順序など、主要な業務ロジックの実装を確認。
-    -   `showSummary`/`store`/`destroy`/`generateGrants`などの関数ごとに「何をしているか」を追いましょう。
-3.  **モデル（`app/Models/`）**
-    -   `Employee.php`, `LeaveUsage.php`, `LeaveGrantMaster.php`の中身を見て、DB テーブルとの対応や`fillable`の意味を確認。
-4.  **FormRequest（`app/Http/Requests/EmployeeRequest.php`）**
-    -   バリデーションルールの共通化・再利用例として確認。
-    -   バリデーションエラー時のレスポンス設計も合わせて確認。
-5.  **Seeder・マスターデータ（`database/seeders/`）**
-    -   `LeaveGrantMasterSeeder.php`で、どんな初期データが投入されるかを確認。
-    -   サンプル用 Seeder や未使用ファイルは整理・削除も検討。
-6.  **バリデーション・エラー処理**
-    -   各 API の`$request->validate`や、エラー時のレスポンス設計を確認。
-    -   FormRequest を使ったバリデーション共通化・例外処理の流れも意識。
+1. **`routes/api.php`**
+    - どんな API が用意されているか、URL とコントローラの対応関係をざっくり把握。
+    - 例：`/api/employees` → `EmployeeController` の `index` 関数
+2. **`app/Http/Controllers/LeaveUsageController.php`・`EmployeesController.php`**
+    - 有給付与・消化・繰越・時効消滅・最大保有日数・FIFO 消化順序など、主要な業務ロジックの実装を確認。
+    - `showSummary`/`store`/`destroy`/`generateGrants` などの関数ごとに「何をしているか」を追いましょう。
+3. **モデル（`app/Models/`）**
+    - `Employee.php`, `LeaveUsage.php`, `LeaveGrantMaster.php` の中身を見て、DB テーブルとの対応や `$fillable` の意味を確認。
+4. **FormRequest（`app/Http/Requests/EmployeeRequest.php`）**
+    - バリデーションルールの共通化・再利用例として確認。
+    - バリデーションエラー時のレスポンス設計も合わせて確認。
+5. **Seeder・マスターデータ（`database/seeders/`）**
+    - `LeaveGrantMasterSeeder.php` で、どんな初期データが投入されるかを確認。
+    - サンプル用 Seeder や未使用ファイルは整理・削除も検討。
+6. **バリデーション・エラー処理**
+    - 各 API の `$request->validate` や、エラー時のレスポンス設計を確認。
+    - FormRequest を使ったバリデーション共通化・例外処理の流れも意識。
 
 ---
 
