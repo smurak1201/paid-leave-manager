@@ -1,5 +1,7 @@
-frontend/.env
-frontend/vite.config.ts
+## frontend
+- .env
+- vite.config.ts
 
-backend/.env
-backend/public/index.php
+## backend
+- .env
+- public/index.php
