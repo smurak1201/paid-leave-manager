@@ -1,23 +1,52 @@
-# 有給休暇管理アプリ（React + Laravel）
 
-このアプリは、日本の労働基準法・厚生労働省ガイドラインに準拠した有給休暇管理を効率化するための Web アプリです。従業員ごとの有給付与・消化・繰越・時効消滅を自動計算し、直感的な UI で管理できます。
+# 有給休暇管理アプリ（React + Laravel モノレポ）
+
+このアプリは、日本の労働基準法・厚生労働省ガイドラインに準拠した有給休暇管理を効率化する Web アプリです。従業員ごとの有給付与・消化・繰越・時効消滅を自動計算し、直感的な UI で管理できます。
+
+---
+
+## リポジトリ構成
+
+本リポジトリはフロントエンド（React/Vite）とバックエンド（Laravel）を1つのリポジトリで管理するモノレポ構成です。
+
+- `frontend/` : フロントエンド（React + Vite）
+- `backend/`  : バックエンド（Laravel API）
 
 ---
 
 ## クイックスタート
 
-### フロントエンド（React/Vite）
+### 1. フロントエンド（React/Vite）
 
-1. `npm install` で依存パッケージをインストール
-2. `npm run dev` でローカル開発サーバー起動
-3. ブラウザで `http://localhost:5173` を開く
+```bash
+cd frontend
+npm install
+npm run dev
+# ブラウザで http://localhost:5173 を開く
+```
 
-### バックエンド（Laravel）
+### 2. バックエンド（Laravel）
 
-1. `composer install` で依存パッケージをインストール
-2. `.env` 設定（DB 接続・APP_KEY 生成など）
-3. `php artisan migrate --seed` で DB 初期化・マスターデータ投入
-4. `php artisan serve` でローカル API サーバー起動
+```bash
+cd backend
+composer install
+cp .env.example .env # 必要に応じて
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve # http://localhost:8000 でAPI起動
+```
+
+---
+
+## ディレクトリ構成（抜粋）
+
+- `frontend/src/` : React/TypeScriptの主要ソース
+- `frontend/public/` : 静的ファイル
+- `backend/app/` : Laravelコントローラ・モデル等
+- `backend/database/` : マイグレーション・シーダー
+- `backend/routes/` : API/Webルーティング
+- `backend/public/` : 公開用エントリ
+- `backend/.env` : バックエンド環境設定
 
 ---
 
@@ -50,6 +79,9 @@
 
 ---
 
+
+---
+
 ## 技術スタック
 
 - React (Vite)
@@ -62,28 +94,10 @@
 
 ---
 
-## ファイル構成（抜粋）
 
-- `src/App.tsx` : アプリ全体の状態管理・UI 構成のメインエントリ
+---
 
-- `src/App.tsx` : アプリ全体の状態管理・UI 構成のメインエントリ
-- `src/components/employee/` : 従業員・有給日関連の UI コンポーネント群（テーブル・モーダル・リスト等）
-- `src/components/ui/` : 汎用 UI コンポーネント（モーダル・トースト・ガイド等）
-- `src/hooks/` : カスタムフック（従業員・有給日データ取得/編集・フォームバリデーション等）
-- `src/types/` : 型定義ファイル（従業員・有給履歴・UI 用 props 等）
-- `src/api.ts` : API 通信共通処理・エラーハンドリング
-- `src/api/employeeApi.ts` : 従業員 API 通信ロジック
-- `src/api/leaveUsageApi.ts` : 有給取得日 API 通信ロジック
-- `src/api/leaveGrantMasterApi.ts` : 付与マスター API 通信ロジック
-- `src/components/employee/utils.ts` : 有給付与・残日数計算等のユーティリティ関数
-- `src/learning_guide.md` : フロントエンド設計・コードリーディングガイド
-- `app/Http/Controllers/EmployeesController.php` : 従業員 API コントローラ
-- `app/Http/Controllers/LeaveUsageController.php` : 有給取得日・消化・繰越・時効消滅ロジック
-- `app/Http/Controllers/LeaveGrantMasterController.php` : 付与マスター API コントローラ
-- `app/Http/Requests/EmployeeRequest.php` : 従業員バリデーション(FormRequest)
-- `database/seeders/AdminEmployeeSeeder.php` : 管理者従業員用シーダー
-- `database/seeders/LeaveGrantMasterSeeder.php` : 有給付与マスター用シーダー
-- `backend_learning_guide.md` : Laravel バックエンド学習ガイド
+## 実装済みロジック（2025年7月現在）
 
 ---
 
@@ -97,6 +111,9 @@
 - 有効期限切れ分の自動失効
 - 日単位での有給取得・管理
 - API/型/コメントの統一・リファクタリング
+
+---
+
 
 ---
 
@@ -114,6 +131,9 @@
 
 ---
 
+
+---
+
 ## 学習・実務での活用ポイント
 
 - コントローラ・モデル・FormRequest（バリデーション）・業務ロジックの分離、冒頭の設計コメントを参考に、React/Laravel API 設計・法令準拠ロジックの実装例として活用できます。
@@ -121,9 +141,15 @@
 
 ---
 
-## 生成 AI の利用について
+
+---
+
+## 生成AIの利用について
 
 本アプリの設計・リファクタリング・ドキュメント作成には、GitHub Copilot（2024 年 6 月時点のバージョン）を活用しています。
+
+---
+
 
 ---
 
