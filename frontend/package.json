@@ -15,6 +15,7 @@
     "@chakra-ui/react": "^3.21.0",
     "@chakra-ui/table": "^2.1.0",
     "@emotion/react": "^11.14.0",
+    "dompurify": "^3.2.6",
     "framer-motion": "^12.18.1",
     "lucide-react": "^0.522.0",
     "react": "^19.1.0",
